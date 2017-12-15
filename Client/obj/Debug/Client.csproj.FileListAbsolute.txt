@@ -1,0 +1,14 @@
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\Client.exe.config
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\Client.exe
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\Client.pdb
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\ServerInterface.dll
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\ServerInterface.pdb
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.csprojResolveAssemblyReference.cache
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.Form1.resources
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.Properties.Resources.resources
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.csproj.GenerateResource.Cache
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.csproj.CoreCompileInputs.cache
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.exe
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.pdb
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\ServiceChannelManager.dll
+E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\ServiceChannelManager.pdb

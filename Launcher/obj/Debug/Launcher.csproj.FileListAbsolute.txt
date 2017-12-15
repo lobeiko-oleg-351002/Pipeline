@@ -1,0 +1,11 @@
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Launcher.exe
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Launcher.pdb
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\ServerInterfaceForLauncher.dll
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\ServerInterfaceForLauncher.pdb
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csprojResolveAssemblyReference.cache
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.ProgressBar.resources
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.Properties.Resources.resources
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csproj.GenerateResource.Cache
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csproj.CoreCompileInputs.cache
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.exe
+E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.pdb

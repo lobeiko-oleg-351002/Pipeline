@@ -1,0 +1,13 @@
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\Pipeline.exe.config
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\Pipeline.exe
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\Pipeline.pdb
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterface.dll
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterface.pdb
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Server.csprojResolveAssemblyReference.cache
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Server.csproj.CoreCompileInputs.cache
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Pipeline.exe
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Pipeline.pdb
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterfaceForLauncher.dll
+E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterfaceForLauncher.pdb
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Pipeline.Properties.Resources.resources
+E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Server.csproj.GenerateResource.Cache

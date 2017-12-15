@@ -1,0 +1,8 @@
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\ServiceChannelManager.dll
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\ServiceChannelManager.pdb
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\ServerInterface.dll
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\ServerInterface.pdb
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.csprojResolveAssemblyReference.cache
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.csproj.CoreCompileInputs.cache
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.dll
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.pdb
