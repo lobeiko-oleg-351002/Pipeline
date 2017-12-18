@@ -6,3 +6,5 @@ E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChanne
 E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.csproj.CoreCompileInputs.cache
 E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.dll
 E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\obj\Debug\ServiceChannelManager.pdb
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\BllEntities.dll
+E:\Projects\Visual Studio\Pipeline\ServiceChannelManager\bin\Debug\BllEntities.pdb

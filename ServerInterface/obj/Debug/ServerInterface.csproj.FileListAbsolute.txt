@@ -4,3 +4,5 @@ E:\Projects\Visual Studio\Pipeline\ServerInterface\obj\Debug\ServerInterface.csp
 E:\Projects\Visual Studio\Pipeline\ServerInterface\obj\Debug\ServerInterface.csproj.CoreCompileInputs.cache
 E:\Projects\Visual Studio\Pipeline\ServerInterface\obj\Debug\ServerInterface.dll
 E:\Projects\Visual Studio\Pipeline\ServerInterface\obj\Debug\ServerInterface.pdb
+E:\Projects\Visual Studio\Pipeline\ServerInterface\bin\Debug\BllEntities.dll
+E:\Projects\Visual Studio\Pipeline\ServerInterface\bin\Debug\BllEntities.pdb

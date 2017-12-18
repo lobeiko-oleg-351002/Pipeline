@@ -63,18 +63,18 @@ namespace Pipeline.Properties {
         /// <summary>
         ///   Looks up a localized string similar to \\\\192.168.2.100\\share\\ish\\Олег\\PipelineUpdate.
         /// </summary>
-        internal static string updatePath {
+        internal static string UPDATE_PATH {
             get {
-                return ResourceManager.GetString("updatePath", resourceCulture);
+                return ResourceManager.GetString("UPDATE_PATH", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to 0.12.
         /// </summary>
-        internal static string version {
+        internal static string VERSION {
             get {
-                return ResourceManager.GetString("version", resourceCulture);
+                return ResourceManager.GetString("VERSION", resourceCulture);
             }
         }
     }

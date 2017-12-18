@@ -1,4 +1,7 @@
-﻿using ServerInterface;
+﻿using DAL.Repositories;
+using DAL.Repositories.Interface;
+using ORM;
+using ServerInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +14,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            Methods.Init();
             Console.ReadLine();
             ServiceHost serviceHost = new ServiceHost(typeof(Methods));
             serviceHost.Open();

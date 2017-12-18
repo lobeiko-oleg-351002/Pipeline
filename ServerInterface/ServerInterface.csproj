@@ -43,5 +43,11 @@
     <Compile Include="IMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BllEntities\BllEntities.csproj">
+      <Project>{964AF979-FF92-4E79-A810-AFC81EEAA6B6}</Project>
+      <Name>BllEntities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

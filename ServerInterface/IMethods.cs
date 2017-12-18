@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BllEntities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -11,6 +12,9 @@ namespace ServerInterface
     {
         [OperationContract]
         string GetTestString();
+
+        [OperationContract]
+        BllUser SignIn(string login, string password);
 
 
     }
