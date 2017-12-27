@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ServerInterface
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IServerCallBack))]
     public interface IMethods
     {
         [OperationContract]
@@ -16,6 +17,30 @@ namespace ServerInterface
         [OperationContract]
         BllUser SignIn(string login, string password);
 
+        [OperationContract]
+        IEnumerable<BllStatus> GetAllStatuses();
+
+        [OperationContract]
+        IEnumerable<BllEventType> GetAllEventTypes();
+
+        [OperationContract]
+        IEnumerable<BllAttribute> GetAllAttributes();
+
+        [OperationContract]
+        IEnumerable<BllGroup> GetAllGroups();
+
+        [OperationContract]
+        IEnumerable<BllUser> GetUsersByGroup(BllGroup group);
+
+        [OperationContract]
+        void CreateAndSendOutEvent(BllEvent Event);
+
+        [OperationContract]
+        List<BllEvent> GetEventsForUser(BllUser user);
+
+        [OperationContract]
+        void RegisterClient(string clientName);
 
     }
+
 }

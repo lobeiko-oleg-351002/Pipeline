@@ -11,6 +11,6 @@ namespace DAL.Repositories.Interface
     {
         DalUser GetUserByLogin(string login);
         DalUser Authorize(string login, string password);
-
+        IEnumerable<DalUser> GetUsersByGroup(int group_id);
     }
 }

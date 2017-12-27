@@ -38,5 +38,14 @@ namespace DAL.Repositories
             return mapper.MapToDal(ormEntity);
         }
 
+        public IEnumerable<DalUser> GetUsersByGroup(int group_id)
+        {
+            List<DalUser> users = new List<DalUser>();
+            foreach (var item in context.Users.Where(entity => entity.group_id == group_id))
+            {
+                users.Add(mapper.MapToDal(item));
+            }
+            return users;
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace BLL.Services.Interface
     {
         BllUser GetUserByLogin(string login);
         BllUser Authorize(string login, string password);
+        IEnumerable<BllUser> GetUsersByGroup(int group_id);
         new BllUser Create(BllUser entity);
     }
 }

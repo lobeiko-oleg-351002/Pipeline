@@ -13,7 +13,6 @@ namespace BLL.Services
 {
     public class GroupService : Service<BllGroup, DalGroup, Group, GroupMapper>, IGroupService
     {
-        // private readonly IUnitOfWork uow;
 
         public GroupService(IUnitOfWork uow) : base(uow, uow.Groups)
         {

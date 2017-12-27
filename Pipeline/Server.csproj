@@ -10,6 +10,7 @@
     <AssemblyName>Pipeline</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -22,7 +23,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -96,7 +96,7 @@
       <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{DE2DA6F5-AF46-47A2-9166-EA153C2A6570}</Project>
+      <Project>{3A394037-9F9B-43DE-8710-46F22AF7114C}</Project>
       <Name>ORM</Name>
     </ProjectReference>
     <ProjectReference Include="..\ServerInterfaceForLauncher\ServerInterfaceForLauncher.csproj">

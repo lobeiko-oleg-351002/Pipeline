@@ -9,7 +9,13 @@ namespace ORM
     [Table("User")]
     public partial class User : IOrmEntity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public User()
+        {
+            SelectedUser = new HashSet<SelectedUser>();
+            Event = new HashSet<Event>();
+        }
+
         public int id { get; set; }
 
         [Required]
@@ -31,5 +37,11 @@ namespace ORM
         public bool changeRights { get; set; }
 
         public virtual Group Group { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SelectedUser> SelectedUser { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Event> Event { get; set; }
     }
 }

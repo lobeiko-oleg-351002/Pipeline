@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 
 namespace Server
 {
@@ -18,8 +19,17 @@ namespace Server
             Console.ReadLine();
             ServiceHost serviceHost = new ServiceHost(typeof(Methods));
             serviceHost.Open();
-            Console.WriteLine("Host is working. Press ENTER for exit...");
-            Console.ReadLine();
+
+            while(true)
+            {
+                Console.WriteLine("Host is working.");
+                Thread.Sleep(10000);
+                Methods.PingClients();
+
+                //Console.ReadLine();
+            }
+
+
         }
     }
 }

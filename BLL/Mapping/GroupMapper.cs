@@ -11,14 +11,6 @@ namespace BLL.Mapping
 {
     public class GroupMapper : IGroupMapper
     {
-        IUnitOfWork uow;
-
-        public GroupMapper(IUnitOfWork uow)
-        {
-            this.uow = uow;
-
-        }
-
         public GroupMapper() { }
 
         public DalGroup MapToDal(BllGroup entity)

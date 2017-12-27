@@ -52,5 +52,15 @@ namespace BLL.Services
             }
             return null;
         }
+
+        public IEnumerable<BllUser> GetUsersByGroup(int group_id)
+        {
+            List<BllUser> users = new List<BllUser>();
+            foreach(var item in uow.Users.GetUsersByGroup(group_id))
+            {
+                users.Add(mapper.MapToBll(item));
+            }
+            return users;
+        }
     }
 }

@@ -39,18 +39,58 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\AttributeMapper.cs" />
+    <Compile Include="Mapping\EntityLibMapper.cs" />
+    <Compile Include="Mapping\EntitySimpleLibMapper.cs" />
+    <Compile Include="Mapping\EventMapper.cs" />
+    <Compile Include="Mapping\EventTypeMapper.cs" />
+    <Compile Include="Mapping\FilepathMapper.cs" />
     <Compile Include="Mapping\GroupMapper.cs" />
+    <Compile Include="Mapping\Interface\IAttributeMapper.cs" />
+    <Compile Include="Mapping\Interface\IStatusLibMapper.cs" />
+    <Compile Include="Mapping\Interface\IEntityLibMapper.cs" />
+    <Compile Include="Mapping\Interface\IEntitySimpleLibMapper.cs" />
+    <Compile Include="Mapping\Interface\IEventMapper.cs" />
+    <Compile Include="Mapping\Interface\IEventTypeMapper.cs" />
+    <Compile Include="Mapping\Interface\IFilepathMapper.cs" />
     <Compile Include="Mapping\Interface\IGroupMapper.cs" />
     <Compile Include="Mapping\Interface\IMapper.cs" />
+    <Compile Include="Mapping\Interface\ISelectedEntityMapper.cs" />
+    <Compile Include="Mapping\Interface\IStatusMapper.cs" />
     <Compile Include="Mapping\Interface\IUserMapper.cs" />
+    <Compile Include="Mapping\SelectedStatusMapper.cs" />
+    <Compile Include="Mapping\SelectedEntityMapper.cs" />
+    <Compile Include="Mapping\StatusLibMapper.cs" />
+    <Compile Include="Mapping\StatusMapper.cs" />
     <Compile Include="Mapping\UserMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AttributeLibService.cs" />
+    <Compile Include="Services\AttributeService.cs" />
+    <Compile Include="Services\EntityLibService.cs" />
+    <Compile Include="Services\EntitySimpleLibService.cs" />
+    <Compile Include="Services\EventService.cs" />
+    <Compile Include="Services\EventTypeService.cs" />
+    <Compile Include="Services\FilepathLibService.cs" />
+    <Compile Include="Services\FilepathService.cs" />
     <Compile Include="Services\GroupService.cs" />
+    <Compile Include="Services\Interface\IAttributeService.cs" />
+    <Compile Include="Services\Interface\IEntityLibService.cs" />
+    <Compile Include="Services\Interface\IEntitySimpleLibService.cs" />
+    <Compile Include="Services\Interface\IEventService.cs" />
+    <Compile Include="Services\Interface\IEventTypeService.cs" />
+    <Compile Include="Services\Interface\IFilepathLibService.cs" />
+    <Compile Include="Services\Interface\IFilepathService.cs" />
     <Compile Include="Services\Interface\IGroupService.cs" />
+    <Compile Include="Services\Interface\ISelectedEntityService.cs" />
     <Compile Include="Services\Interface\IService.cs" />
+    <Compile Include="Services\Interface\IStatusService.cs" />
     <Compile Include="Services\Interface\IUserService.cs" />
+    <Compile Include="Services\SelectedEntityService.cs" />
     <Compile Include="Services\Service.cs" />
-    <Compile Include="Services\UservService.cs" />
+    <Compile Include="Services\StatusLibService.cs" />
+    <Compile Include="Services\StatusService.cs" />
+    <Compile Include="Services\UserLibService.cs" />
+    <Compile Include="Services\UserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BllEntities\BllEntities.csproj">
@@ -62,7 +102,7 @@
       <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{DE2DA6F5-AF46-47A2-9166-EA153C2A6570}</Project>
+      <Project>{3A394037-9F9B-43DE-8710-46F22AF7114C}</Project>
       <Name>ORM</Name>
     </ProjectReference>
   </ItemGroup>
