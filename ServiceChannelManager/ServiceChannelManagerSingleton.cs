@@ -10,13 +10,20 @@ namespace ServiceChannelManager
 {
     public class ServiceChannelManagerSingleton
     {
-        private static IMethods SourceChannel;
+        private static IBusinessService SourceChannel;
+
+        private static IFileService FileService;
 
         private static ServiceChannelManagerSingleton instance;
 
-        public IMethods GetServerMethods(IServerCallBack handler)
+        public IBusinessService GetServerMethods(IServerCallBack handler)
         {
-            return SourceChannel ?? (SourceChannel = CreateChannel<IMethods>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
+            return (SourceChannel = CreateChannel<IBusinessService>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
+        }
+
+        public IBusinessService GetFileService(IServerCallBack handler)
+        {
+            return SourceChannel ?? (SourceChannel = CreateChannel<IBusinessService>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
         }
 
         public static ServiceChannelManagerSingleton Instance

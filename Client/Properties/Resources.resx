@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DOWNLOADS_FOLDER" xml:space="preserve">
+    <value>\Pipeline\Files</value>
+  </data>
+  <data name="SERVER_NOT_FOUND" xml:space="preserve">
+    <value>Сервер недоступен</value>
+  </data>
+  <data name="SERVER_OFFLINE" xml:space="preserve">
+    <value>Автономная работа</value>
+  </data>
+  <data name="SERVER_ONLINE" xml:space="preserve">
+    <value>Сервер доступен</value>
+  </data>
   <data name="USER_NOT_FOUND" xml:space="preserve">
     <value>Неверный логин/пароль</value>
   </data>

@@ -18,10 +18,10 @@ namespace Client
             InitializeComponent();
         }
 
-        IMethods server;
+        IBusinessService server;
         public BllUser User;
 
-        public SignInForm(IMethods server)
+        public SignInForm(IBusinessService server)
         {
             InitializeComponent();
             this.server = server;
@@ -34,7 +34,14 @@ namespace Client
 
         private void button1_Click(object sender, EventArgs e)
         {
-            User = server.SignIn(textBox1.Text, SHA1(textBox2.Text));
+            try
+            {
+                User = server.SignIn(textBox1.Text, SHA1(textBox2.Text));
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
             if (User == null)
             {
                 MessageBox.Show(Properties.Resources.ResourceManager.GetString("USER_NOT_FOUND"));

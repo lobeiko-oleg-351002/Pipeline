@@ -15,16 +15,18 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Methods.Init();
+            BusinessService.Init();
             Console.ReadLine();
-            ServiceHost serviceHost = new ServiceHost(typeof(Methods));
-            serviceHost.Open();
+            ServiceHost host = new ServiceHost(typeof(BusinessService));
+            host.Open();
+            ServiceHost fileService = new ServiceHost(typeof(FileService));
+            fileService.Open();
 
             while(true)
             {
                 Console.WriteLine("Host is working.");
                 Thread.Sleep(10000);
-                Methods.PingClients();
+                BusinessService.PingClients();
 
                 //Console.ReadLine();
             }

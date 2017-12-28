@@ -61,6 +61,42 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to \Pipeline\Files.
+        /// </summary>
+        internal static string DOWNLOADS_FOLDER {
+            get {
+                return ResourceManager.GetString("DOWNLOADS_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сервер недоступен.
+        /// </summary>
+        internal static string SERVER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("SERVER_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Автономная работа.
+        /// </summary>
+        internal static string SERVER_OFFLINE {
+            get {
+                return ResourceManager.GetString("SERVER_OFFLINE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сервер доступен.
+        /// </summary>
+        internal static string SERVER_ONLINE {
+            get {
+                return ResourceManager.GetString("SERVER_ONLINE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Неверный логин/пароль.
         /// </summary>
         internal static string USER_NOT_FOUND {

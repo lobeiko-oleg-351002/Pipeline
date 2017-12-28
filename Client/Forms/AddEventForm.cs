@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -13,8 +14,8 @@ namespace Client.Forms
 {
     public partial class AddEventForm : ParentForm
     {
-        IMethods server;
-        BllEvent Event;
+        IBusinessService server;
+        public BllEvent Event { get; private set; }
         List<BllStatus> Statuses;
         List<BllEventType> EventTypes;
         List<BllAttribute> Attributes;
@@ -27,7 +28,7 @@ namespace Client.Forms
             InitializeComponent();
         }
 
-        public AddEventForm(IMethods server, BllUser sender)
+        public AddEventForm(IBusinessService server, BllUser sender)
         {
             InitializeComponent();
             this.server = server;
@@ -82,6 +83,7 @@ namespace Client.Forms
 
         private void button4_Click(object sender, EventArgs e)
         {
+            Event = null;
             Close();
         }
 
@@ -111,15 +113,34 @@ namespace Client.Forms
                 }
                 nodeCount += groupNode.GetNodeCount(false);
             }
+
             Event.FilepathLib = new BllFilepathLib();
-            foreach (var path in Filepaths)
-            {
-                Event.FilepathLib.Entities.Add(new BllFilepath { Path = path});
-            }
+            UploadFiles(Event.FilepathLib);
 
             Event.Sender = this.Sender;
-            server.CreateAndSendOutEvent(Event);
+            Event = server.CreateAndSendOutEvent(Event);
             Close();
+        }
+
+        private void UploadFiles(BllFilepathLib lib)
+        {           
+            foreach (var path in Filepaths)
+            {
+                string virtualPath = Path.GetFileName(path);
+
+                using (Stream uploadStream = new FileStream(path, FileMode.Open))
+                {
+                    using (FileServiceClient fileService = new FileServiceClient())
+                    {
+                        fileService.PutFile(new FileUploadMessage()
+                        {
+                            VirtualPath = virtualPath,
+                            DataStream = uploadStream
+                        });
+                    }
+                }
+                Event.FilepathLib.Entities.Add(new BllFilepath { Path = virtualPath });
+            }
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)

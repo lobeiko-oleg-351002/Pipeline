@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IMethods.cs" />
+    <Compile Include="FileUploadMessage.cs" />
+    <Compile Include="IFileService.cs" />
+    <Compile Include="IBusinessService.cs" />
     <Compile Include="IServerCallBack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

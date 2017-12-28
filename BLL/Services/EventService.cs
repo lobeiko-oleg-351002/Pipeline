@@ -24,7 +24,7 @@ namespace BLL.Services
             mapper = new EventMapper(uow);
         }
 
-        public override void Create(BllEvent entity)
+        public new BllEvent Create(BllEvent entity)
         {
             AttributeLibService attributeLibService = new AttributeLibService(uow);
             StatusLibService statusLibService = new StatusLibService(uow);
@@ -36,7 +36,11 @@ namespace BLL.Services
             entity.AttributeLib = attributeLibService.Create(entity.AttributeLib);
             entity.FilepathLib = filepathLibService.Create(entity.FilepathLib);
 
-            uow.Events.Create(mapper.MapToDal(entity));
+            var ormEntity = uow.Events.Create(mapper.MapToDal(entity));
+            entity.Date = ormEntity.date;
+            entity.Id = ormEntity.id;
+
+            return entity;
 
         }
 
