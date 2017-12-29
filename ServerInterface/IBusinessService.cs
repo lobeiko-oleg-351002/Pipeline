@@ -44,6 +44,8 @@ namespace ServerInterface
         [OperationContract]
         string PingServer();
 
+
+
     }
 
 }

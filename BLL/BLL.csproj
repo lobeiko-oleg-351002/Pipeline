@@ -44,9 +44,11 @@
     <Compile Include="Mapping\EntitySimpleLibMapper.cs" />
     <Compile Include="Mapping\EventMapper.cs" />
     <Compile Include="Mapping\EventTypeMapper.cs" />
+    <Compile Include="Mapping\FilepathLibMapper.cs" />
     <Compile Include="Mapping\FilepathMapper.cs" />
     <Compile Include="Mapping\GroupMapper.cs" />
     <Compile Include="Mapping\Interface\IAttributeMapper.cs" />
+    <Compile Include="Mapping\Interface\IFilepathLibMapper.cs" />
     <Compile Include="Mapping\Interface\IStatusLibMapper.cs" />
     <Compile Include="Mapping\Interface\IEntityLibMapper.cs" />
     <Compile Include="Mapping\Interface\IEntitySimpleLibMapper.cs" />
@@ -78,7 +80,6 @@
     <Compile Include="Services\Interface\IEntitySimpleLibService.cs" />
     <Compile Include="Services\Interface\IEventService.cs" />
     <Compile Include="Services\Interface\IEventTypeService.cs" />
-    <Compile Include="Services\Interface\IFilepathLibService.cs" />
     <Compile Include="Services\Interface\IFilepathService.cs" />
     <Compile Include="Services\Interface\IGroupService.cs" />
     <Compile Include="Services\Interface\ISelectedEntityService.cs" />

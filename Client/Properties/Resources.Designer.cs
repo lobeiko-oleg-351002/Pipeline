@@ -61,11 +61,38 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Данному файлу не присвоена программа для запуска.
+        /// </summary>
+        internal static string CANNOT_OPEN_FILE {
+            get {
+                return ResourceManager.GetString("CANNOT_OPEN_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to \Pipeline\Files.
         /// </summary>
         internal static string DOWNLOADS_FOLDER {
             get {
                 return ResourceManager.GetString("DOWNLOADS_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Файл с таким именем уже существует: .
+        /// </summary>
+        internal static string FILE_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("FILE_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Название не должно содержать символы [\\\\~#%&amp;*{}/:&lt;&gt;?|\&quot;]..
+        /// </summary>
+        internal static string INVALID_INPUT {
+            get {
+                return ResourceManager.GetString("INVALID_INPUT", resourceCulture);
             }
         }
         

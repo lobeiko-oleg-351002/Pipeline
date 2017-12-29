@@ -28,7 +28,7 @@ namespace DAL.Repositories
         private StatusLibRepository statusLibRepository;
         private EntityLibRepository<AttributeLib> attributeLibRepository;
         private EntityLibRepository<UserLib> userLibRepository;
-        private EntityLibRepository<FilepathLib> filepathLibRepository;
+        private FilepathLibRepository filepathLibRepository;
 
         public IGroupRepository Groups
             => groupRepository ?? (groupRepository = new GroupRepository(context));
@@ -57,7 +57,7 @@ namespace DAL.Repositories
 
         public IRepository<IDalEntityLib, UserLib> UserLibs => userLibRepository ?? (userLibRepository = new EntityLibRepository<UserLib>(context));
 
-        public IRepository<IDalEntityLib, FilepathLib> FilepathLibs => filepathLibRepository ?? (filepathLibRepository = new EntityLibRepository<FilepathLib>(context));
+        public FilepathLibRepository FilepathLibs => filepathLibRepository ?? (filepathLibRepository = new FilepathLibRepository(context));
 
         public UnitOfWork(ServiceDB context)
         {

@@ -10,6 +10,8 @@ namespace BllEntities
     {
         public int Id { get; set; }
 
+        public string FolderName { get; set; }
+
         public List<BllFilepath> Entities { get; set; }
 
         public BllFilepathLib()

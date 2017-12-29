@@ -19,6 +19,11 @@ namespace Client
             return base.Channel.GetFile(virtualPath);
         }
 
+        public bool IsFileExists(string filename)
+        {
+            return Channel.IsFileExists(filename);
+        }
+
         public void PutFile(FileUploadMessage msg)
         {
             base.Channel.PutFile(msg);

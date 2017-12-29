@@ -18,6 +18,10 @@ namespace ORM
 
         public int id { get; set; }
 
+        [Required]
+        [StringLength(100)]
+        public string folderName { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Event> Event { get; set; }
 

@@ -54,6 +54,7 @@
     <Compile Include="Entities\DalEntityLib.cs" />
     <Compile Include="Entities\DalEvent.cs" />
     <Compile Include="Entities\DalFilepath.cs" />
+    <Compile Include="Entities\DalFilepathLib.cs" />
     <Compile Include="Entities\DalGroup.cs" />
     <Compile Include="Entities\DalSelectedEntity.cs" />
     <Compile Include="Entities\DalSelectedStatus.cs" />
@@ -71,11 +72,13 @@
     <Compile Include="Mapping\EntityLibMapper.cs" />
     <Compile Include="Mapping\EventMapper.cs" />
     <Compile Include="Mapping\EventTypeMapper.cs" />
+    <Compile Include="Mapping\FilepathLibMapper.cs" />
     <Compile Include="Mapping\FilepathMapper.cs" />
     <Compile Include="Mapping\GroupMapper.cs" />
     <Compile Include="Mapping\Interface\IAttributeMapper.cs" />
     <Compile Include="Mapping\Interface\IEventMapper.cs" />
     <Compile Include="Mapping\Interface\IEventTypeMapper.cs" />
+    <Compile Include="Mapping\Interface\IFilepathLibMapper.cs" />
     <Compile Include="Mapping\Interface\IFilepathMapper.cs" />
     <Compile Include="Mapping\Interface\IGroupMapper.cs" />
     <Compile Include="Mapping\Interface\IMapper.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Repositories\EntityLibRepository.cs" />
     <Compile Include="Repositories\EventRepository.cs" />
     <Compile Include="Repositories\EventTypeRepository.cs" />
+    <Compile Include="Repositories\FilepathLibRepository.cs" />
     <Compile Include="Repositories\FilepathRepository.cs" />
     <Compile Include="Repositories\GroupRepository.cs" />
     <Compile Include="Repositories\Interface\IAttributeRepository.cs" />

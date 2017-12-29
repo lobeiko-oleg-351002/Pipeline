@@ -16,5 +16,8 @@ namespace ServerInterface
         [OperationContract]
         Stream GetFile(string virtualPath);
 
+        [OperationContract]
+        bool IsFileExists(string filename);
+
     }
 }

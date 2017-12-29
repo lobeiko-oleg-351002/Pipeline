@@ -24,7 +24,7 @@ namespace DAL.Repositories.Interface
         StatusLibRepository StatusLibs { get; }
         IRepository<IDalEntityLib, AttributeLib> AttributeLibs { get; }
         IRepository<IDalEntityLib, UserLib> UserLibs { get; }
-        IRepository<IDalEntityLib, FilepathLib> FilepathLibs { get; }
+        FilepathLibRepository FilepathLibs { get; }
 
         void Commit();
     }

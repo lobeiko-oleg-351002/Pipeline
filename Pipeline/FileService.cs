@@ -22,14 +22,29 @@ namespace Server
             return new FileStream(filePath, FileMode.Open, FileAccess.Read);
         }
 
+        public bool IsFileExists(string filename)
+        {
+            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string filePath = Path.Combine(storage, filename);
+
+            if (File.Exists(filePath))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void PutFile(FileUploadMessage msg)
         {
             string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
-            string filePath = Path.Combine(storage, msg.VirtualPath);
-            string dir = Path.GetDirectoryName(filePath);
+            string fileFolder = Path.Combine(storage, msg.FolderName);
+            string filePath = Path.Combine(fileFolder, msg.VirtualPath);
 
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
+            if (!Directory.Exists(storage))
+                Directory.CreateDirectory(storage);
+
+            if (!Directory.Exists(fileFolder))
+                Directory.CreateDirectory(fileFolder);
 
             using (var outputStream = new FileStream(filePath, FileMode.Create))
             {

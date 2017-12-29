@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Client.Forms
@@ -33,7 +34,7 @@ namespace Client.Forms
             InitializeComponent();
             this.server = server;
             this.Sender = sender;
-            Event = new BllEvent();
+
 
             EventTypes = server.GetAllEventTypes().ToList();
             foreach (var EventType in EventTypes)
@@ -89,7 +90,15 @@ namespace Client.Forms
 
         private void button3_Click(object sender, EventArgs e)
         {
+            Event = new BllEvent();
             Event.Name = textBox1.Text;
+            Event.FilepathLib = new BllFilepathLib();
+            bool success = UploadFiles(Event.FilepathLib);
+            if (!success)
+            {
+                return;
+            }
+
             Event.Type = EventTypes[comboBox2.SelectedIndex];
             Event.Description = richTextBox1.Text;
             Event.StatusLib = new BllStatusLib();
@@ -114,33 +123,58 @@ namespace Client.Forms
                 nodeCount += groupNode.GetNodeCount(false);
             }
 
-            Event.FilepathLib = new BllFilepathLib();
-            UploadFiles(Event.FilepathLib);
+
 
             Event.Sender = this.Sender;
             Event = server.CreateAndSendOutEvent(Event);
             Close();
         }
 
-        private void UploadFiles(BllFilepathLib lib)
-        {           
+        private bool UploadFiles(BllFilepathLib lib)
+        {
+            //List<string> matchedFiles = new List<string>();
+            //FileServiceClient fileService = new FileServiceClient();
+            //foreach (var path in Filepaths)
+            //{
+            //    string name = Path.GetFileName(path);
+            //    if(fileService.IsFileExists(name))
+            //    {
+            //        matchedFiles.Add(name);
+            //    }
+            //}
+
+            //if (matchedFiles.Count > 0)
+            //{
+            //    MessageBox.Show(Properties.Resources.ResourceManager.GetString("FILE_ALREADY_EXISTS") + string.Join(", ", matchedFiles) + ".");
+            //    return false;
+            //}
+            //else
+            //{
+
+            string foldername = Event.Name + " " + DateTime.Now.ToString("dd.MM.yy H-mm-ss");
+            Event.FilepathLib.FolderName = foldername;
             foreach (var path in Filepaths)
             {
-                string virtualPath = Path.GetFileName(path);
-
+                string fileName = Path.GetFileName(path);
+                
                 using (Stream uploadStream = new FileStream(path, FileMode.Open))
                 {
                     using (FileServiceClient fileService = new FileServiceClient())
                     {
-                        fileService.PutFile(new FileUploadMessage()
+                        var msg = new FileUploadMessage()
                         {
-                            VirtualPath = virtualPath,
-                            DataStream = uploadStream
-                        });
+                            VirtualPath = fileName,
+                            DataStream = uploadStream,
+                            FolderName = foldername
+                        };
+                        fileService.PutFile(msg);
                     }
                 }
-                Event.FilepathLib.Entities.Add(new BllFilepath { Path = virtualPath });
+                Event.FilepathLib.Entities.Add(new BllFilepath { Path = fileName});
             }
+            //}
+            return true;
+            
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -180,6 +214,21 @@ namespace Client.Forms
             int selectedIndex = listBox1.SelectedIndex;
             Filepaths.RemoveAt(selectedIndex);
             listBox1.Items.RemoveAt(selectedIndex);
+        }
+
+
+        private void textBox1_Validating(object sender, CancelEventArgs e)
+        {
+            string pattern = "[\\\\~#%&*{}/:<>?|\"]";
+
+            Regex regEx = new Regex(pattern);
+            Match match = regEx.Match(textBox1.Text);
+            if (match.Success)
+            {
+                e.Cancel = true;
+                ToolTip tt = new ToolTip();
+                tt.Show(Properties.Resources.INVALID_INPUT, textBox1, 0, 0, 4000);
+            }
         }
     }
 }

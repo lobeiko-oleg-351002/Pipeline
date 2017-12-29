@@ -44,7 +44,7 @@ namespace Client
                 {
                     Invoke(new Action(() =>
                     {
-                        textBox1.Text = Properties.Resources.ResourceManager.GetString("SERVER_ONLINE");
+                        textBox1.Text = GetConstFromResources("SERVER_ONLINE");
                         создатьСобытиеToolStripMenuItem.Enabled = true;
                     }));
                 }
@@ -52,7 +52,7 @@ namespace Client
                 {
                     Invoke(new Action(() =>
                     {
-                        textBox1.Text = Properties.Resources.ResourceManager.GetString("SERVER_OFFLINE");
+                        textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
                         создатьСобытиеToolStripMenuItem.Enabled = false;
                     }));
 
@@ -60,6 +60,11 @@ namespace Client
                 }
                 _isServerOnline = value;
             }
+        }
+
+        private string GetConstFromResources(string name)
+        {
+            return Properties.Resources.ResourceManager.GetString(name);
         }
 
 
@@ -97,7 +102,6 @@ namespace Client
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
                 isServerOnline = false;
             }
         }
@@ -108,6 +112,13 @@ namespace Client
             foreach (var item in EventList)
             {
                 AddEventToDataGrid(item);
+                foreach (var name in item.FilepathLib.Entities)
+                {
+                    new Thread(delegate () {
+                        DownloadFile(name.Path, item.FilepathLib.FolderName);
+                    }).Start();
+                    
+                }
             }
             
         }
@@ -170,7 +181,7 @@ namespace Client
             }
             catch
             {
-                MessageBox.Show(Properties.Resources.ResourceManager.GetString("SERVER_NOT_FOUND"));
+                MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND"));
                 ExitApp();
             }
         }
@@ -211,30 +222,48 @@ namespace Client
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
-            string downloadPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Properties.Resources.ResourceManager.GetString("DOWNLOADS_FOLDER");
+            
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
                 e.RowIndex >= 0)
             {
                 foreach (var name in EventList[e.RowIndex].FilepathLib.Entities)
                 {
-                    string fullPath = downloadPath + "\\" + name.Path;
-                    if (!File.Exists(fullPath))
+                    try
                     {
-                        using (FileStream output = new FileStream(fullPath, FileMode.Create))
-                        {
-                            Stream downloadStream;
-
-                            using (FileServiceClient client = new FileServiceClient())
-                            {
-                                downloadStream = client.GetFile(name.Path);
-                            }
-
-                            downloadStream.CopyTo(output);
-                        }
+                        Process.Start(DownloadFile(name.Path, EventList[e.RowIndex].FilepathLib.FolderName));
                     }
-                    Process.Start(fullPath);
+                    catch
+                    {
+                        MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), name.Path);
+                    }
                 }
             }
+        }
+
+        private string DownloadFile(string name, string folderName)
+        {
+            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + GetConstFromResources("DOWNLOADS_FOLDER");
+            string eventFolderPath = Path.Combine(downloadsPath, folderName);
+            string filePath = Path.Combine(downloadsPath, folderName, name);
+            if (!Directory.Exists(eventFolderPath))
+            {
+                Directory.CreateDirectory(eventFolderPath);
+            }
+            if (!File.Exists(filePath))
+            {
+                using (FileStream output = new FileStream(filePath, FileMode.Create))
+                {
+                    Stream downloadStream;
+
+                    using (FileServiceClient client = new FileServiceClient())
+                    {
+                        downloadStream = client.GetFile(Path.Combine(folderName, name));
+                    }
+
+                    downloadStream.CopyTo(output);
+                }
+            }
+            return filePath;
         }
 
         public void Ping()

@@ -13,6 +13,9 @@ namespace ServerInterface
         [MessageHeader(MustUnderstand = true)]
         public string VirtualPath { get; set; }
 
+        [MessageHeader(MustUnderstand = true)]
+        public string FolderName { get; set; }
+
         [MessageBodyMember(Order = 1)]
         public Stream DataStream { get; set; }
     }
