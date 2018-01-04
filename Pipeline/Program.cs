@@ -21,6 +21,8 @@ namespace Server
             host.Open();
             ServiceHost fileService = new ServiceHost(typeof(FileService));
             fileService.Open();
+            ServiceHost launcherService = new ServiceHost(typeof(LauncherService));
+            launcherService.Open();
 
             while(true)
             {

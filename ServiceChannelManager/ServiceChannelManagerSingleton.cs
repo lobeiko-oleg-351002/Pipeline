@@ -12,8 +12,6 @@ namespace ServiceChannelManager
     {
         private static IBusinessService SourceChannel;
 
-        private static IFileService FileService;
-
         private static ServiceChannelManagerSingleton instance;
 
         public IBusinessService GetServerMethods(IServerCallBack handler)
@@ -21,10 +19,6 @@ namespace ServiceChannelManager
             return (SourceChannel = CreateChannel<IBusinessService>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
         }
 
-        public IBusinessService GetFileService(IServerCallBack handler)
-        {
-            return SourceChannel ?? (SourceChannel = CreateChannel<IBusinessService>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
-        }
 
         public static ServiceChannelManagerSingleton Instance
         {
@@ -39,12 +33,9 @@ namespace ServiceChannelManager
         }
         private static T CreateChannel<T>(string serviceAddress, IServerCallBack handler)
         {
-            //EndpointIdentity spn = EndpointIdentity.CreateSpnIdentity("Server"); // dns
-            //Uri uri = new Uri(serviceAddress);
-           // var address = new EndpointAddress(uri, spn);
-           // WSHttpBinding binding = new WSHttpBinding();
-            //binding.MaxReceivedMessageSize = 2147483647;
-            DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), new NetTcpBinding(), serviceAddress);
+            NetTcpBinding binding = new NetTcpBinding("businessTcpBinding");
+            DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), binding, serviceAddress);
+            //factory.Credentials.Windows.AllowedImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.Impersonation;
             return factory.CreateChannel();
         }
 

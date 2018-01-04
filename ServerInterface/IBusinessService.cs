@@ -12,9 +12,6 @@ namespace ServerInterface
     public interface IBusinessService
     {
         [OperationContract]
-        string GetTestString();
-
-        [OperationContract]
         BllUser SignIn(string login, string password);
 
         [OperationContract]

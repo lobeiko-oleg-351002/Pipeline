@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Server
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public class BusinessService : IBusinessService, ILauncherMethods
+    public class BusinessService : IBusinessService
     {
 
         private static ServiceDB serviceDB;
@@ -28,12 +28,14 @@ namespace Server
 
         private const string SERVER_STATE = "Online";
 
+
         public static void Init()
         {
             serviceDB = new ServiceDB();
             uow = new UnitOfWork(serviceDB);
         }
 
+  
         public BllEvent CreateAndSendOutEvent(BllEvent Event)
         {
             var datetime = DateTime.Now;
@@ -45,6 +47,7 @@ namespace Server
             return res;
 
         }
+
 
         public BllEvent UpdateAndSendOutEvent(BllEvent Event)
         {
@@ -98,11 +101,13 @@ namespace Server
             return attributeService.GetAll();
         }
 
+
         public IEnumerable<BllEventType> GetAllEventTypes()
         {
             IEventTypeService eventTypeService = new EventTypeService(uow);
             return eventTypeService.GetAll();
         }
+
 
         public IEnumerable<BllGroup> GetAllGroups()
         {
@@ -110,31 +115,17 @@ namespace Server
             return groupService.GetAll();
         }
 
+
         public List<BllStatus> GetAllStatuses()
         {
             IStatusService statusService = new StatusService(uow);
             return statusService.GetAll().ToList(); 
         }
 
-        public string GetCurrentVersion()
-        {
-            return Pipeline.Properties.Resources.ResourceManager.GetString("VERSION");
-        }
-
         public List<BllEvent> GetEventsForUser(BllUser user)
         {
             IEventService eventService = new EventService(uow);
             return eventService.GetEventsForUser(user).ToList();
-        }
-
-        public string GetTestString()
-        {
-            return "TEST";
-        }
-
-        public string GetUpdatePath()
-        {
-            return Pipeline.Properties.Resources.ResourceManager.GetString("UPDATE_PATH");
         }
 
         public IEnumerable<BllUser> GetUsersByGroup(BllGroup group)

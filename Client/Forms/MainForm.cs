@@ -52,7 +52,7 @@ namespace Client
                     {
                         textBox1.Text = GetConstFromResources("SERVER_ONLINE");
                         создатьСобытиеToolStripMenuItem.Enabled = true;
-                        if (comboBox1.SelectedIndex != 0)
+                        if (comboBox1.SelectedIndex > 0)
                         {
                             button1.Enabled = true;
                         }
@@ -155,6 +155,7 @@ namespace Client
             }
             catch(Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 isServerOnline = false;
             }
         }
@@ -177,7 +178,6 @@ namespace Client
             else
             {
                 EventList = server.GetEventsForUser(User);
-                InitStatuses();
                 foreach (var item in EventList)
                 {
                     AddEventToDataGrid(item);
@@ -420,6 +420,13 @@ namespace Client
             if (comboBox1.SelectedIndex == 0)
             {
                 button1.Enabled = false;
+            }
+            else
+            {
+                if (isServerOnline)
+                {
+                    button1.Enabled = true;
+                }
             }
 
         }
