@@ -13,6 +13,9 @@ namespace ServerInterface
         void GetEvent(BllEvent Event);
 
         [OperationContract(IsOneWay = true)]
+        void UpdateEvent(BllEvent Event);
+
+        [OperationContract(IsOneWay = true)]
         void Ping();
 
     }

@@ -61,6 +61,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to \Pipeline\data.xml.
+        /// </summary>
+        internal static string CACHE_XML_FILE {
+            get {
+                return ResourceManager.GetString("CACHE_XML_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Данному файлу не присвоена программа для запуска.
         /// </summary>
         internal static string CANNOT_OPEN_FILE {
@@ -88,7 +97,7 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Название не должно содержать символы [\\\\~#%&amp;*{}/:&lt;&gt;?|\&quot;]..
+        ///   Looks up a localized string similar to Название не должно содержать символы [\~#%&amp;*{}/:&lt;&gt;?|\&quot;]..
         /// </summary>
         internal static string INVALID_INPUT {
             get {

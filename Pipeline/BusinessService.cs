@@ -46,6 +46,34 @@ namespace Server
 
         }
 
+        public BllEvent UpdateAndSendOutEvent(BllEvent Event)
+        {
+            var datetime = DateTime.Now;
+            Event.StatusLib.SelectedEntities.Last().Date = datetime;
+            IEventService eventService = new EventService(uow);
+            BllEvent res = eventService.Update(Event);
+            UpdateEventWithUsers(Event);
+            return res;
+        }
+
+        private void UpdateEventWithUsers(BllEvent Event)
+        {
+            foreach (var reciever in Event.RecieverLib.SelectedEntities)
+            {
+                try
+                {
+                    if (Event.Sender.Id != reciever.Entity.Id)
+                    {
+                        Clients[reciever.Entity.Login].UpdateEvent(Event);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Clients.Remove(reciever.Entity.Login);
+                }
+            }
+        }
+
         private void InvokeEventWithUsers(BllEvent Event)
         {
             foreach (var reciever in Event.RecieverLib.SelectedEntities)
@@ -82,10 +110,10 @@ namespace Server
             return groupService.GetAll();
         }
 
-        public IEnumerable<BllStatus> GetAllStatuses()
+        public List<BllStatus> GetAllStatuses()
         {
             IStatusService statusService = new StatusService(uow);
-            return statusService.GetAll();
+            return statusService.GetAll().ToList(); 
         }
 
         public string GetCurrentVersion()

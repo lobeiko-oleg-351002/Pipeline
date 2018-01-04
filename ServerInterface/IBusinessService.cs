@@ -18,7 +18,7 @@ namespace ServerInterface
         BllUser SignIn(string login, string password);
 
         [OperationContract]
-        IEnumerable<BllStatus> GetAllStatuses();
+        List<BllStatus> GetAllStatuses();
 
         [OperationContract]
         IEnumerable<BllEventType> GetAllEventTypes();
@@ -34,6 +34,9 @@ namespace ServerInterface
 
         [OperationContract]
         BllEvent CreateAndSendOutEvent(BllEvent Event);
+
+        [OperationContract]
+        BllEvent UpdateAndSendOutEvent(BllEvent Event);
 
         [OperationContract]
         List<BllEvent> GetEventsForUser(BllUser user);

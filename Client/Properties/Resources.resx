@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CACHE_XML_FILE" xml:space="preserve">
+    <value>\Pipeline\data.xml</value>
+  </data>
   <data name="CANNOT_OPEN_FILE" xml:space="preserve">
     <value>Данному файлу не присвоена программа для запуска</value>
   </data>
@@ -127,7 +130,7 @@
     <value>Файл с таким именем уже существует: </value>
   </data>
   <data name="INVALID_INPUT" xml:space="preserve">
-    <value>Название не должно содержать символы [\\\\~#%&amp;*{}/:&lt;&gt;?|\"].</value>
+    <value>Название не должно содержать символы [\~#%&amp;*{}/:&lt;&gt;?|\"].</value>
   </data>
   <data name="SERVER_NOT_FOUND" xml:space="preserve">
     <value>Сервер недоступен</value>

@@ -10,5 +10,6 @@ namespace BLL.Services.Interface
     {
         IEnumerable<BllEvent> GetEventsForUser(BllUser user);
         new BllEvent Create(BllEvent entity);
+        new BllEvent Update(BllEvent entity);
     }
 }

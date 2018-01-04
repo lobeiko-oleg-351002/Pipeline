@@ -8,8 +8,11 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Client
 {
@@ -24,6 +27,7 @@ namespace Client
         const string PASSWORD_TAG = "password";
         const string DATE_FORMAT = "dd.MM.yyyy";
         const string TIME_FORMAT = "HH:mm";
+        const string STATUS_NOT_CHANGED = "Статус не изменён";
 
         const int PING_SLEEPTIME_MS = 10000;
 
@@ -31,6 +35,8 @@ namespace Client
 
         BllUser User = null;
         List<BllEvent> EventList;
+        List<BllStatus> Statuses;
+        BllEvent SelectedEvent;
 
         bool isAppClosed;
 
@@ -46,14 +52,21 @@ namespace Client
                     {
                         textBox1.Text = GetConstFromResources("SERVER_ONLINE");
                         создатьСобытиеToolStripMenuItem.Enabled = true;
+                        if (comboBox1.SelectedIndex != 0)
+                        {
+                            button1.Enabled = true;
+                        }
+                        if (comboBox1.Items.Count == 1)
+                        {
+                            InitStatuses();
+                        }
                     }));
                 }
                 if ((value == false) && (_isServerOnline == true))
                 {
                     Invoke(new Action(() =>
                     {
-                        textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
-                        создатьСобытиеToolStripMenuItem.Enabled = false;
+                        SetControlsServerOffline();
                     }));
 
  
@@ -62,9 +75,43 @@ namespace Client
             }
         }
 
+        private void SetControlsServerOffline()
+        {
+            textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
+            создатьСобытиеToolStripMenuItem.Enabled = false;
+            button1.Enabled = false;
+        }
+
         private string GetConstFromResources(string name)
         {
             return Properties.Resources.ResourceManager.GetString(name);
+        }
+
+        private void SetSelectedEventToControls(BllEvent Event)
+        {
+            SelectedEvent = Event;
+            textBox2.Text = Event.Sender.Fullname;
+            textBox3.Text = Event.Name;
+            textBox4.Text = Event.Date.ToString(DATE_FORMAT);
+            textBox5.Text = Event.Date.ToString(TIME_FORMAT);
+            listBox1.Items.Clear();
+            foreach(var status in Event.StatusLib.SelectedEntities)
+            {
+                listBox1.Items.Add(status.Entity.Name + " " + status.Date);
+            }
+            listBox3.Items.Clear();
+            foreach (var attr in Event.AttributeLib.SelectedEntities)
+            {
+                listBox3.Items.Add(attr.Entity.Name);
+            }
+            listBox2.Items.Clear();
+            foreach (var filename in Event.FilepathLib.Entities)
+            {
+                listBox2.Items.Add(filename.Path);
+            }
+            richTextBox1.Text = Event.Description;
+
+            comboBox1.SelectedIndex = 0;
         }
 
 
@@ -72,11 +119,15 @@ namespace Client
         {
             server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this);
             EventList = new List<BllEvent>();
+            
+            comboBox1.Items.Add(STATUS_NOT_CHANGED);
+
 
             Authorize(server);
             if (!isAppClosed)
             {
-                GetEventList();
+                SetControlsServerOffline();
+                PingServer();
                 new Thread(() =>
                 {
                     while (!isAppClosed)
@@ -86,6 +137,8 @@ namespace Client
                         Thread.Sleep(PING_SLEEPTIME_MS);
                     }
                 }).Start();
+                GetEventList();
+                
             }
         }
 
@@ -106,19 +159,38 @@ namespace Client
             }
         }
 
+        private void InitStatuses()
+        {
+            Statuses = server.GetAllStatuses();
+            foreach (var item in Statuses)
+            {
+                comboBox1.Items.Add(item.Name);
+            }
+        }
+
         private void GetEventList()
         {
-            EventList = server.GetEventsForUser(User);
-            foreach (var item in EventList)
+            if (isServerOnline == false)
             {
-                AddEventToDataGrid(item);
-                foreach (var name in item.FilepathLib.Entities)
+                DeserializeEvents();
+            }
+            else
+            {
+                EventList = server.GetEventsForUser(User);
+                InitStatuses();
+                foreach (var item in EventList)
                 {
-                    new Thread(delegate () {
-                        DownloadFile(name.Path, item.FilepathLib.FolderName);
-                    }).Start();
-                    
+                    AddEventToDataGrid(item);
+                    foreach (var name in item.FilepathLib.Entities)
+                    {
+                        new Thread(delegate ()
+                        {
+                            DownloadFile(name.Path, item.FilepathLib.FolderName);
+                        }).Start();
+
+                    }
                 }
+                SerializeEvents();
             }
             
         }
@@ -181,8 +253,11 @@ namespace Client
             }
             catch
             {
-                MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND"));
-                ExitApp();
+                if ((login == null) && (password == null))
+                {
+                    MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND"));
+                    ExitApp();
+                }
             }
         }
 
@@ -203,12 +278,17 @@ namespace Client
 
         private void создатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (User == null)
+            {
+                Authorize(server);
+            }
             AddEventForm addEventForm = new AddEventForm(server, User);
             addEventForm.ShowDialog();
             if (addEventForm.Event != null)
             {
                 EventList.Add(addEventForm.Event);
                 AddEventToDataGrid(addEventForm.Event);
+                SerializeEventsBackground();
             }
         }
 
@@ -216,11 +296,23 @@ namespace Client
         {
             EventList.Add(Event);
             AddEventToDataGrid(Event);
+            SerializeEventsBackground();
+            
             MessageBox.Show("event");
+        }
+
+        private void SerializeEventsBackground()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                SerializeEvents();
+            }).Start();
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            
             var senderGrid = (DataGridView)sender;
             
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
@@ -269,6 +361,108 @@ namespace Client
         public void Ping()
         {
             
+        }
+
+        private void SerializeEvents()
+        {
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
+                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                using (FileStream stream = new FileStream(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Create))
+                {
+                    serializer.Serialize(stream, EventList);
+                }
+            }
+            catch (IOException)
+            {
+
+            }
+        }
+
+        private void DeserializeEvents()
+        {
+            try
+            {
+                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                using (Stream stream = File.Open(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Open))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
+                    EventList = (List<BllEvent>)serializer.Deserialize(stream);
+                    foreach (BllEvent item in EventList)
+                    {
+                        AddEventToDataGrid(item);
+                    }
+                }
+            }
+            catch (IOException)
+            {
+            }
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+            SetSelectedEventToControls(EventList[e.RowIndex]);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SelectedEvent.StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex - 1] });
+            SelectedEvent = server.UpdateAndSendOutEvent(SelectedEvent);
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedIndex == 0)
+            {
+                button1.Enabled = false;
+            }
+
+        }
+
+        public void UpdateEvent(BllEvent Event)
+        {
+            int i = 0;
+            for (i = 0; i < EventList.Count; i++)
+            {
+                if (EventList[i].Id == Event.Id)
+                {
+                    EventList[i] = Event;
+                    break;
+                }
+            }
+            UpdateEventStatusInDataGrid(Event.StatusLib.SelectedEntities.Last(), i);
+            SerializeEventsBackground();
+
+            MessageBox.Show("updateStatus");
+        }
+
+        private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index)
+        {
+            var cell = ((DataGridViewComboBoxCell)dataGridView1.Rows[index].Cells[4]);
+            cell.Items.Add(status.Entity.Name + " " + status.Date);
+            cell.Value = cell.Items[cell.Items.Count - 1];
+        }
+
+        private void listBox2_DoubleClick(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start(DownloadFile(SelectedEvent.FilepathLib.Entities[listBox2.SelectedIndex].Path, SelectedEvent.FilepathLib.FolderName));
+            }
+            catch
+            {
+                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), SelectedEvent.FilepathLib.Entities[listBox2.SelectedIndex].Path);
+            }
+        }
+
+        private void comboBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

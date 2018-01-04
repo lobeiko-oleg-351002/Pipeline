@@ -37,14 +37,15 @@ namespace BLL.Services
             entity.FilepathLib = filepathLibService.Create(entity.FilepathLib);
 
             var ormEntity = uow.Events.Create(mapper.MapToDal(entity));
+            uow.Commit();
+
             entity.Date = ormEntity.date;
             entity.Id = ormEntity.id;
 
             return entity;
-
         }
 
-        public override void Update(BllEvent entity)
+        public new BllEvent Update(BllEvent entity)
         {
             AttributeLibService attributeLibService = new AttributeLibService(uow);
             StatusLibService statusLibService = new StatusLibService(uow);
@@ -56,6 +57,9 @@ namespace BLL.Services
             filepathLibService.Update(entity.FilepathLib);
             uow.Events.Update(mapper.MapToDal(entity));
             uow.Commit();
+
+            return mapper.MapToBll(uow.Events.Get(entity.Id));
+
         }
 
         public IEnumerable<BllEvent> GetEventsForUser(BllUser user)
