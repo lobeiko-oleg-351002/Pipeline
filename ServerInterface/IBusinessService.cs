@@ -33,7 +33,7 @@ namespace ServerInterface
         BllEvent CreateAndSendOutEvent(BllEvent Event);
 
         [OperationContract]
-        BllEvent UpdateAndSendOutEvent(BllEvent Event);
+        BllEvent UpdateAndSendOutEvent(BllEvent Event, BllUser updater);
 
         [OperationContract]
         List<BllEvent> GetEventsForUser(BllUser user);

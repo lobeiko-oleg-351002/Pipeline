@@ -79,7 +79,7 @@ namespace Pipeline.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.30.
+        ///   Looks up a localized string similar to 0.33.
         /// </summary>
         internal static string VERSION {
             get {

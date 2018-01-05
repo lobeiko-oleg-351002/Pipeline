@@ -61,8 +61,15 @@ namespace Launcher
                 if (appVersion != currentVersion)
                 {
                     string updatePath = SourceChannel.GetUpdatePath();
+                    string login = (config.GetSection("appSettings") as AppSettingsSection).Settings["login"].Value;
+                    string password = (config.GetSection("appSettings") as AppSettingsSection).Settings["password"].Value;
                     CopyDirectory(updatePath, currentLocation);
-                    Console.WriteLine("Updating for " + currentVersion);
+                    map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
+                    config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
+                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("Version", currentVersion);
+                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("login", login);
+                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("password", password);
+                    config.Save(ConfigurationSaveMode.Modified);
                 }
             }
             catch(Exception ex)

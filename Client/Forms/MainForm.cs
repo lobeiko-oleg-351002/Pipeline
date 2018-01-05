@@ -36,7 +36,7 @@ namespace Client
         BllUser User = null;
         List<BllEvent> EventList;
         List<BllStatus> Statuses;
-        BllEvent SelectedEvent;
+        int SelectedRowIndex;
 
         bool isAppClosed;
 
@@ -89,7 +89,6 @@ namespace Client
 
         private void SetSelectedEventToControls(BllEvent Event)
         {
-            SelectedEvent = Event;
             textBox2.Text = Event.Sender.Fullname;
             textBox3.Text = Event.Name;
             textBox4.Text = Event.Date.ToString(DATE_FORMAT);
@@ -123,6 +122,7 @@ namespace Client
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
 
 
+
             Authorize(server);
             if (!isAppClosed)
             {
@@ -140,6 +140,8 @@ namespace Client
                 GetEventList();
                 
             }
+
+            dataGridView1.CurrentRow.Selected = false;
         }
 
         private void PingServer()
@@ -149,6 +151,7 @@ namespace Client
                 if (isServerOnline == false)
                 {
                     server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this);
+                    server.RegisterClient(User.Login);
                 }
                 server.PingServer();
                 isServerOnline = true;
@@ -203,15 +206,9 @@ namespace Client
             row.Cells[1].Value = Event.Name;
             row.Cells[2].Value = Event.Date.Date.ToString(DATE_FORMAT);
             row.Cells[3].Value = Event.Date.ToString(TIME_FORMAT);
-            var statusCell = ((DataGridViewComboBoxCell)row.Cells[4]);
-            foreach (var status in Event.StatusLib.SelectedEntities)
-            {                
-                statusCell.Items.Add(status.Entity.Name + " " +  status.Date);
-            }
-            if (statusCell.Items.Count != 0)
-            {
-                statusCell.Value = statusCell.Items[statusCell.Items.Count - 1];
-            }
+            var status = Event.StatusLib.SelectedEntities.Last();
+            row.Cells[4].Value = status.Entity.Name + " " + status.Date;
+           
             foreach (var attr in Event.AttributeLib.SelectedEntities)
             {
                 row.Cells[5].Value += attr.Entity.Name + "; ";
@@ -248,7 +245,7 @@ namespace Client
                 }
                 if (User != null)
                 {
-                    server.RegisterClient(User.Login);
+                    label9.Text = User.Fullname;
                 }
             }
             catch
@@ -278,17 +275,21 @@ namespace Client
 
         private void создатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (User == null)
+            PingServer();
+            if (isServerOnline)
             {
-                Authorize(server);
-            }
-            AddEventForm addEventForm = new AddEventForm(server, User);
-            addEventForm.ShowDialog();
-            if (addEventForm.Event != null)
-            {
-                EventList.Add(addEventForm.Event);
-                AddEventToDataGrid(addEventForm.Event);
-                SerializeEventsBackground();
+                if (User == null)
+                {
+                    Authorize(server);
+                }
+                AddEventForm addEventForm = new AddEventForm(server, User);
+                addEventForm.ShowDialog();
+                if (addEventForm.Event != null)
+                {
+                    EventList.Add(addEventForm.Event);
+                    AddEventToDataGrid(addEventForm.Event);
+                    SerializeEventsBackground();
+                }
             }
         }
 
@@ -406,13 +407,23 @@ namespace Client
             {
                 return;
             }
+            SelectedRowIndex = e.RowIndex;
             SetSelectedEventToControls(EventList[e.RowIndex]);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SelectedEvent.StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex - 1] });
-            SelectedEvent = server.UpdateAndSendOutEvent(SelectedEvent);
+            PingServer();
+            if (isServerOnline)
+            {
+                EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex - 1] });
+                EventList[SelectedRowIndex] = server.UpdateAndSendOutEvent(EventList[SelectedRowIndex], User);
+                EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
+                var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
+                listBox1.Items.Add(newStatus.Entity.Name + " " + newStatus.Date);
+                UpdateEventStatusInDataGrid(newStatus, dataGridView1.SelectedRows[0].Index);
+                comboBox1.SelectedIndex = 0;
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -442,7 +453,12 @@ namespace Client
                     break;
                 }
             }
-            UpdateEventStatusInDataGrid(Event.StatusLib.SelectedEntities.Last(), i);
+            var status = Event.StatusLib.SelectedEntities.Last();
+            UpdateEventStatusInDataGrid(status, i);
+            if (dataGridView1.SelectedRows[0].Index == i)
+            {
+                listBox1.Items.Add(status.Entity.Name + " " + status.Date);
+            }
             SerializeEventsBackground();
 
             MessageBox.Show("updateStatus");
@@ -450,20 +466,19 @@ namespace Client
 
         private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index)
         {
-            var cell = ((DataGridViewComboBoxCell)dataGridView1.Rows[index].Cells[4]);
-            cell.Items.Add(status.Entity.Name + " " + status.Date);
-            cell.Value = cell.Items[cell.Items.Count - 1];
+            var cell = dataGridView1.Rows[index].Cells[4];
+            cell.Value = status.Entity.Name + " " + status.Date;
         }
 
         private void listBox2_DoubleClick(object sender, EventArgs e)
         {
             try
             {
-                Process.Start(DownloadFile(SelectedEvent.FilepathLib.Entities[listBox2.SelectedIndex].Path, SelectedEvent.FilepathLib.FolderName));
+                Process.Start(DownloadFile(EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path, EventList[SelectedRowIndex].FilepathLib.FolderName));
             }
             catch
             {
-                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), SelectedEvent.FilepathLib.Entities[listBox2.SelectedIndex].Path);
+                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path);
             }
         }
 

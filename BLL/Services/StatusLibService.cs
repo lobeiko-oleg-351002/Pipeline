@@ -67,14 +67,16 @@ namespace BLL.Services
                 dalEntity.Lib_id = entity.Id;
                 if (Entity.Id == 0)
                 {
-                    uow.SelectedStatuses.Create(dalEntity);
+                   var en =  uow.SelectedStatuses.Create(dalEntity);
+                    uow.Commit();
+                    Entity.Id = en.id;
                 }
-                else
-                {
-                    uow.SelectedStatuses.Update(dalEntity);
-                }
+                //else
+                //{
+                //    uow.SelectedStatuses.Update(dalEntity);
+                //}
             }
-            var EntitysWithLibId = ((IGetterByLibId<DalSelectedStatus>)uow.SelectedStatuses).GetEntitiesByLibId(entity.Id);
+            var EntitysWithLibId = uow.SelectedStatuses.GetEntitiesByLibId(entity.Id);
             foreach (var Entity in EntitysWithLibId)
             {
                 bool isTrashEntity = true;

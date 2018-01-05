@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -43,29 +44,35 @@ namespace Server
             Event.StatusLib.SelectedEntities.Last().Date = datetime;
             IEventService eventService = new EventService(uow);
             BllEvent res = eventService.Create(Event);
-            InvokeEventWithUsers(Event);
+            new Thread(() =>
+            {
+                InvokeEventWithUsers(Event);
+            }).Start();
             return res;
 
         }
 
 
-        public BllEvent UpdateAndSendOutEvent(BllEvent Event)
+        public BllEvent UpdateAndSendOutEvent(BllEvent Event, BllUser updater)
         {
             var datetime = DateTime.Now;
             Event.StatusLib.SelectedEntities.Last().Date = datetime;
-            IEventService eventService = new EventService(uow);
-            BllEvent res = eventService.Update(Event);
-            UpdateEventWithUsers(Event);
-            return res;
+            StatusLibService service = new StatusLibService(uow);
+            Event.StatusLib = service.Update(Event.StatusLib);
+            new Thread(() =>
+            {
+                UpdateEventWithUsers(Event, updater);
+            }).Start();
+            return Event;
         }
 
-        private void UpdateEventWithUsers(BllEvent Event)
+        private void UpdateEventWithUsers(BllEvent Event, BllUser updater)
         {
             foreach (var reciever in Event.RecieverLib.SelectedEntities)
             {
                 try
                 {
-                    if (Event.Sender.Id != reciever.Entity.Id)
+                    if (updater.Id != reciever.Entity.Id)
                     {
                         Clients[reciever.Entity.Login].UpdateEvent(Event);
                     }
