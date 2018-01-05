@@ -79,6 +79,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pipeline.
+        /// </summary>
+        internal static string CLIENT_NAME {
+            get {
+                return ResourceManager.GetString("CLIENT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to \Pipeline\Files.
         /// </summary>
         internal static string DOWNLOADS_FOLDER {

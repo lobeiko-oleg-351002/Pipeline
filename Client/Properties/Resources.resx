@@ -123,6 +123,9 @@
   <data name="CANNOT_OPEN_FILE" xml:space="preserve">
     <value>Данному файлу не присвоена программа для запуска</value>
   </data>
+  <data name="CLIENT_NAME" xml:space="preserve">
+    <value>Pipeline</value>
+  </data>
   <data name="DOWNLOADS_FOLDER" xml:space="preserve">
     <value>\Pipeline\Files</value>
   </data>

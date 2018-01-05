@@ -7,8 +7,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -29,6 +32,7 @@ namespace Client
         const string TIME_FORMAT = "HH:mm";
         const string STATUS_NOT_CHANGED = "Статус не изменён";
 
+
         const int PING_SLEEPTIME_MS = 10000;
 
         IBusinessService server;
@@ -37,6 +41,8 @@ namespace Client
         List<BllEvent> EventList;
         List<BllStatus> Statuses;
         int SelectedRowIndex;
+        int newEventsCount;
+        List<int> NewEventRowIndexes = new List<int>();
 
         bool isAppClosed;
 
@@ -73,6 +79,11 @@ namespace Client
                 }
                 _isServerOnline = value;
             }
+        }
+
+        private void LogMessage(string message)
+        {
+            //richTextBox2.Text += "[" + DateTime.Now.ToString(TIME_FORMAT) + "] " + message + "\n";
         }
 
         private void SetControlsServerOffline()
@@ -292,13 +303,38 @@ namespace Client
                 }
             }
         }
+        private void HighlightNewRow()
+        {
+            DataGridViewCellStyle style = new DataGridViewCellStyle();
+            style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
+            int i = dataGridView1.Rows.Count - 1;
+            foreach (DataGridViewCell cell in dataGridView1.Rows[i].Cells)
+            {
+                cell.Style.Font = style.Font;
+            }
+
+        }
+
+        private void RowCommonFont(int i)
+        {
+            DataGridViewCellStyle style = new DataGridViewCellStyle();
+            style.Font = new Font(dataGridView1.Font, FontStyle.Regular);
+            foreach (DataGridViewCell cell in dataGridView1.Rows[i].Cells)
+            {
+                cell.Style.Font = style.Font;
+            }
+        }
 
         public void GetEvent(BllEvent Event)
         {
             EventList.Add(Event);
             AddEventToDataGrid(Event);
             SerializeEventsBackground();
-            
+            HighlightNewRow();
+            NewEventRowIndexes.Add(dataGridView1.Rows.Count - 1);
+            SetEventsCountInPanel();
+            SystemSounds.Beep.Play();
+            FlashWindow.Start(this);
             MessageBox.Show("event");
         }
 
@@ -401,11 +437,32 @@ namespace Client
             }
         }
 
+        
+        private void SetEventsCountInPanel()
+        {
+            int n = NewEventRowIndexes.Count;
+            Text = GetConstFromResources("CLIENT_NAME");
+            if (n > 0)
+            {
+                Text += " (" + n + ")";
+            }
+            else
+            {
+                FlashWindow.Stop(this);
+            }
+        }
+
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
             {
                 return;
+            }
+            if (NewEventRowIndexes.Contains(e.RowIndex))
+            {
+                RowCommonFont(e.RowIndex);
+                NewEventRowIndexes.Remove(e.RowIndex);
+                SetEventsCountInPanel();
             }
             SelectedRowIndex = e.RowIndex;
             SetSelectedEventToControls(EventList[e.RowIndex]);
@@ -414,6 +471,7 @@ namespace Client
         private void button1_Click(object sender, EventArgs e)
         {
             PingServer();
+            
             if (isServerOnline)
             {
                 EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex - 1] });
@@ -421,7 +479,7 @@ namespace Client
                 EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
                 var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
                 listBox1.Items.Add(newStatus.Entity.Name + " " + newStatus.Date);
-                UpdateEventStatusInDataGrid(newStatus, dataGridView1.SelectedRows[0].Index);
+                UpdateEventStatusInDataGrid(newStatus, dataGridView1.SelectedRows[0].Index, false);
                 comboBox1.SelectedIndex = 0;
             }
         }
@@ -454,20 +512,28 @@ namespace Client
                 }
             }
             var status = Event.StatusLib.SelectedEntities.Last();
-            UpdateEventStatusInDataGrid(status, i);
-            if (dataGridView1.SelectedRows[0].Index == i)
+            UpdateEventStatusInDataGrid(status, i, true);
+            if (dataGridView1.SelectedRows.Count > 0)
             {
-                listBox1.Items.Add(status.Entity.Name + " " + status.Date);
+                if (dataGridView1.SelectedRows[0].Index == i)
+                {
+                    listBox1.Items.Add(status.Entity.Name + " " + status.Date);
+                }
             }
             SerializeEventsBackground();
-
+            SystemSounds.Beep.Play();
             MessageBox.Show("updateStatus");
         }
 
-        private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index)
+        private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index, bool isBold)
         {
             var cell = dataGridView1.Rows[index].Cells[4];
             cell.Value = status.Entity.Name + " " + status.Date;
+            if (isBold)
+            {
+                cell.Style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
+            }
+
         }
 
         private void listBox2_DoubleClick(object sender, EventArgs e)
