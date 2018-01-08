@@ -27,5 +27,7 @@ namespace BllEntities
         public BllUserLib RecieverLib { get; set; }
 
         public DateTime Date { get; set; }
+
+        public bool IsAdmited { get; set; }
     }
 }

@@ -43,6 +43,7 @@ namespace Client
         int SelectedRowIndex;
         int newEventsCount;
         List<int> NewEventRowIndexes = new List<int>();
+        NotifyIcon notifyIcon = new NotifyIcon();
 
         bool isAppClosed;
 
@@ -129,7 +130,14 @@ namespace Client
         {
             server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this);
             EventList = new List<BllEvent>();
-            
+
+            notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+            notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
+            notifyIcon.BalloonTipTitle = "Pipeline";
+            notifyIcon.Icon = this.Icon;
+            notifyIcon.Text = "Pipeline";
+            notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
+
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
 
 
@@ -169,7 +177,7 @@ namespace Client
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
                 isServerOnline = false;
             }
         }
@@ -187,7 +195,7 @@ namespace Client
         {
             if (isServerOnline == false)
             {
-                DeserializeEvents();
+                DeserializeEventsToDataGrid();
             }
             else
             {
@@ -204,9 +212,38 @@ namespace Client
 
                     }
                 }
+                HighlightNewRows();
+                FlashWindow.Start(this);
+                SetEventsCountInPanel();
                 SerializeEvents();
             }
             
+        }
+
+        private void HighlightNewRows()
+        {
+            var EventsFromCache = DeserializeEvents();
+            for(int i = 0; i < EventList.Count; i++)
+            {
+                bool isAdmited = false;
+                foreach(var item in EventsFromCache)
+                {
+                    if (item.Id == EventList[i].Id)
+                    {
+                        if (item.IsAdmited)
+                        {
+                            EventList[i].IsAdmited = true;
+                            isAdmited = true;
+                        }
+                        break;
+                    }
+                }
+                if (!isAdmited)
+                {
+                    HighlightRow(i);
+                    NewEventRowIndexes.Add(i);
+                }
+            }
         }
 
         private void AddEventToDataGrid(BllEvent Event)
@@ -303,11 +340,10 @@ namespace Client
                 }
             }
         }
-        private void HighlightNewRow()
+        private void HighlightRow(int i)
         {
             DataGridViewCellStyle style = new DataGridViewCellStyle();
             style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
-            int i = dataGridView1.Rows.Count - 1;
             foreach (DataGridViewCell cell in dataGridView1.Rows[i].Cells)
             {
                 cell.Style.Font = style.Font;
@@ -330,12 +366,11 @@ namespace Client
             EventList.Add(Event);
             AddEventToDataGrid(Event);
             SerializeEventsBackground();
-            HighlightNewRow();
+            HighlightRow(dataGridView1.RowCount - 1);
             NewEventRowIndexes.Add(dataGridView1.Rows.Count - 1);
             SetEventsCountInPanel();
             SystemSounds.Beep.Play();
             FlashWindow.Start(this);
-            MessageBox.Show("event");
         }
 
         private void SerializeEventsBackground()
@@ -417,7 +452,7 @@ namespace Client
             }
         }
 
-        private void DeserializeEvents()
+        private void DeserializeEventsToDataGrid()
         {
             try
             {
@@ -435,6 +470,24 @@ namespace Client
             catch (IOException)
             {
             }
+        }
+
+        private List<BllEvent> DeserializeEvents()
+        {
+            try
+            {
+                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                using (Stream stream = File.Open(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Open))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
+                    return (List<BllEvent>)serializer.Deserialize(stream);
+                }
+            }
+            catch (IOException)
+            {
+            }
+            return null;
+
         }
 
         
@@ -460,6 +513,7 @@ namespace Client
             }
             if (NewEventRowIndexes.Contains(e.RowIndex))
             {
+                EventList[e.RowIndex].IsAdmited = true;
                 RowCommonFont(e.RowIndex);
                 NewEventRowIndexes.Remove(e.RowIndex);
                 SetEventsCountInPanel();
@@ -522,7 +576,6 @@ namespace Client
             }
             SerializeEventsBackground();
             SystemSounds.Beep.Play();
-            MessageBox.Show("updateStatus");
         }
 
         private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index, bool isBold)
@@ -551,6 +604,28 @@ namespace Client
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            SerializeEvents();
+            notifyIcon.Visible = false;
+        }
+
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
+            this.ShowInTaskbar = true;
+            notifyIcon.Visible = false;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            notifyIcon.Visible = true;
+            notifyIcon.ShowBalloonTip(3000);
+            this.ShowInTaskbar = false;
+            this.Hide();
+            e.Cancel = true;
         }
     }
 }
