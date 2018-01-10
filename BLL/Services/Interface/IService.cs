@@ -13,11 +13,11 @@ namespace BLL.Services.Interface
 
         TEntity Get(int id);
 
-        void Create(TEntity entity);
+        TEntity Create(TEntity entity);
 
         void Delete(int id);
 
-        void Update(TEntity entity);
+        TEntity Update(TEntity entity);
 
     }
 }

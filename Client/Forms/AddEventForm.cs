@@ -36,7 +36,7 @@ namespace Client.Forms
             this.Sender = sender;
 
 
-            EventTypes = server.GetAllEventTypes().ToList();
+            EventTypes = server.GetAllEventTypes();
             foreach (var EventType in EventTypes)
             {
                 comboBox2.Items.Add(EventType.Name);
@@ -46,7 +46,7 @@ namespace Client.Forms
                 comboBox2.SelectedIndex = 0;
             }
 
-            Statuses = server.GetAllStatuses().ToList();
+            Statuses = server.GetAllStatuses();
             foreach(var status in Statuses)
             {
                 comboBox1.Items.Add(status.Name);
@@ -56,13 +56,13 @@ namespace Client.Forms
                 comboBox1.SelectedIndex = 0;
             }
 
-            Attributes = server.GetAllAttributes().ToList();
+            Attributes = server.GetAllAttributes();
             foreach(var attribute in Attributes)
             {
                 checkedListBox1.Items.Add(attribute.Name);
             }
 
-            IEnumerable<BllGroup> groups = server.GetAllGroups();
+            List<BllGroup> groups = server.GetAllGroups();
 
             foreach(var group in groups)
             {

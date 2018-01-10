@@ -36,7 +36,7 @@ namespace Client
         {
             try
             {
-                User = server.SignIn(textBox1.Text, SHA1(textBox2.Text));
+                User = server.SignIn(textBox1.Text, Sha1.Encrypt(textBox2.Text));
             }
             catch(Exception ex)
             {
@@ -52,17 +52,6 @@ namespace Client
             }
         }
 
-        private static string SHA1(string input)
-        {
-            byte[] hash;
-            using (var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider())
-            {
-                hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(input));
 
-            }
-            var sb = new StringBuilder();
-            foreach (byte b in hash) sb.AppendFormat("{0:x2}", b);
-            return sb.ToString();
-        }
     }
 }

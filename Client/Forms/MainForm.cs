@@ -19,7 +19,7 @@ using System.Xml.Serialization;
 
 namespace Client
 {
-    public partial class MainForm : ParentForm, IServerCallBack
+    public partial class MainForm : ParentForm, IClientCallBack
     {
         public MainForm()
         {
@@ -31,6 +31,7 @@ namespace Client
         const string DATE_FORMAT = "dd.MM.yyyy";
         const string TIME_FORMAT = "HH:mm";
         const string STATUS_NOT_CHANGED = "Статус не изменён";
+        const string IP_KEY = "hostIP";
 
 
         const int PING_SLEEPTIME_MS = 10000;
@@ -41,7 +42,6 @@ namespace Client
         List<BllEvent> EventList;
         List<BllStatus> Statuses;
         int SelectedRowIndex;
-        int newEventsCount;
         List<int> NewEventRowIndexes = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
 
@@ -66,6 +66,10 @@ namespace Client
                         if (comboBox1.Items.Count == 1)
                         {
                             InitStatuses();
+                        }
+                        if (User == null)
+                        {
+                            Authorize(server);
                         }
                     }));
                 }
@@ -128,25 +132,28 @@ namespace Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this);
+            string ip = ConfigurationManager.AppSettings[IP_KEY];
+            server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
             EventList = new List<BllEvent>();
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
 
             notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
             notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
-            notifyIcon.BalloonTipTitle = "Pipeline";
+            notifyIcon.BalloonTipTitle = GetConstFromResources("CLIENT_NAME"); ;
             notifyIcon.Icon = this.Icon;
-            notifyIcon.Text = "Pipeline";
+            notifyIcon.Text = GetConstFromResources("CLIENT_NAME"); ;
             notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
 
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
 
 
 
-            Authorize(server);
+             Authorize(server);
             if (!isAppClosed)
             {
                 SetControlsServerOffline();
                 PingServer();
+
                 new Thread(() =>
                 {
                     while (!isAppClosed)
@@ -157,10 +164,13 @@ namespace Client
                     }
                 }).Start();
                 GetEventList();
-                
+                if (dataGridView1.Rows.Count > 0)
+                {
+                    dataGridView1.CurrentRow.Selected = false;
+                }
             }
 
-            dataGridView1.CurrentRow.Selected = false;
+
         }
 
         private void PingServer()
@@ -169,8 +179,9 @@ namespace Client
             {
                 if (isServerOnline == false)
                 {
-                    server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this);
-                    server.RegisterClient(User.Login);
+                    string ip = ConfigurationManager.AppSettings[IP_KEY];
+                    server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
+                    
                 }
                 server.PingServer();
                 isServerOnline = true;
@@ -271,6 +282,7 @@ namespace Client
         {
             string login = ConfigurationManager.AppSettings[LOGIN_TAG];
             string password = ConfigurationManager.AppSettings[PASSWORD_TAG];
+            User = new BllUser { Login = login, Password = password };
             try
             {
                 if (login == null)
@@ -296,11 +308,11 @@ namespace Client
                     label9.Text = User.Fullname;
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 if ((login == null) && (password == null))
                 {
-                    MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND"));
+                    MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND") + ex.Message);
                     ExitApp();
                 }
             }
@@ -326,10 +338,10 @@ namespace Client
             PingServer();
             if (isServerOnline)
             {
-                if (User == null)
-                {
-                    Authorize(server);
-                }
+                //if (User == null)
+                //{
+                //    Authorize(server);
+                //}
                 AddEventForm addEventForm = new AddEventForm(server, User);
                 addEventForm.ShowDialog();
                 if (addEventForm.Event != null)
@@ -513,11 +525,12 @@ namespace Client
             }
             if (NewEventRowIndexes.Contains(e.RowIndex))
             {
-                EventList[e.RowIndex].IsAdmited = true;
-                RowCommonFont(e.RowIndex);
+                EventList[e.RowIndex].IsAdmited = true;               
                 NewEventRowIndexes.Remove(e.RowIndex);
                 SetEventsCountInPanel();
+                SerializeEvents();
             }
+            RowCommonFont(e.RowIndex);
             SelectedRowIndex = e.RowIndex;
             SetSelectedEventToControls(EventList[e.RowIndex]);
         }
@@ -608,8 +621,7 @@ namespace Client
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SerializeEvents();
-            notifyIcon.Visible = false;
+
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -626,6 +638,16 @@ namespace Client
             this.ShowInTaskbar = false;
             this.Hide();
             e.Cancel = true;
+        }
+
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            try
+            {
+                SerializeEvents();
+                notifyIcon.Visible = false;
+            }
+            catch { }
         }
     }
 }

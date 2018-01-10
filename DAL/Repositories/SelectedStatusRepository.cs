@@ -26,6 +26,11 @@ namespace DAL.Repositories
             return res;
         }
 
+        public SelectedStatus CreateAndReturnOrm(IDalSelectedEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Delete(int id)
         {
             throw new NotImplementedException();
@@ -58,6 +63,16 @@ namespace DAL.Repositories
         }
 
         public void Update(IDalSelectedEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDalSelectedEntity IRepository<IDalSelectedEntity, SelectedStatus>.Create(IDalSelectedEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDalSelectedEntity IRepository<IDalSelectedEntity, SelectedStatus>.Update(IDalSelectedEntity entity)
         {
             throw new NotImplementedException();
         }

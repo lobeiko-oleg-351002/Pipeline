@@ -29,7 +29,7 @@ namespace BLL.Services
 
         public new TEntity Create(TEntity entity)
         {
-            var ormLib = repository.Create(mapper.MapToDal(entity));
+            var ormLib = repository.CreateAndReturnOrm(mapper.MapToDal(entity));
             uow.Commit();
             entity.Id = ormLib.id;
             var EntityMapper = (EntityMapper)Activator.CreateInstance(typeof(EntityMapper), uow);
@@ -37,7 +37,7 @@ namespace BLL.Services
             {
                 var dalEntity = EntityMapper.MapToDal(Entity);
                 dalEntity.Lib_id = entity.Id;
-                var ormEntity = entityRepository.Create(dalEntity);
+                var ormEntity = entityRepository.CreateAndReturnOrm(dalEntity);
                 uow.Commit();
                 Entity.Id = ormEntity.id;
             }
@@ -59,7 +59,7 @@ namespace BLL.Services
                 dalEntity.Lib_id = entity.Id;
                 if (Entity.Id == 0)
                 {
-                    var ormEntity = entityRepository.Create(dalEntity);
+                    var ormEntity = entityRepository.CreateAndReturnOrm(dalEntity);
                     uow.Commit();
                     Entity.Id = ormEntity.id;
                 }

@@ -23,7 +23,7 @@ namespace BLL.Services
 
         public BllFilepathLib Create(BllFilepathLib entity)
         {
-            var ormLib = uow.FilepathLibs.Create(mapper.MapToDal(entity));
+            var ormLib = uow.FilepathLibs.CreateAndReturnOrm(mapper.MapToDal(entity));
             uow.Commit();
             entity.Id = ormLib.id;
             FilepathMapper EntityMapper = new FilepathMapper(uow);
@@ -31,7 +31,7 @@ namespace BLL.Services
             {
                 var dalEntity = EntityMapper.MapToDal(Entity);
                 dalEntity.Lib_id = entity.Id;
-                var ormEntity = uow.Filepaths.Create(dalEntity);
+                var ormEntity = uow.Filepaths.CreateAndReturnOrm(dalEntity);
                 uow.Commit();
                 Entity.Id = ormEntity.id;
             }
@@ -63,7 +63,7 @@ namespace BLL.Services
                 dalEntity.Lib_id = entity.Id;
                 if (Entity.Id == 0)
                 {
-                    var ormEntity = uow.Filepaths.Create(dalEntity);
+                    var ormEntity = uow.Filepaths.CreateAndReturnOrm(dalEntity);
                     uow.Commit();
                     Entity.Id = ormEntity.id;
                 }

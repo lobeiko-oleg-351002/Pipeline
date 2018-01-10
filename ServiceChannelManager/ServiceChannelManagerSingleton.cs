@@ -14,9 +14,9 @@ namespace ServiceChannelManager
 
         private static ServiceChannelManagerSingleton instance;
 
-        public IBusinessService GetServerMethods(IServerCallBack handler)
+        public IBusinessService GetServerMethods(IClientCallBack handler, string hostIP)
         {
-            return (SourceChannel = CreateChannel<IBusinessService>("net.tcp://192.168.2.144:8080/ServerInterface/", handler));
+            return (SourceChannel = CreateChannel<IBusinessService>("net.tcp://" + hostIP + "/ServerInterface/", handler));
         }
 
 
@@ -31,7 +31,7 @@ namespace ServiceChannelManager
                 return instance;
             }
         }
-        private static T CreateChannel<T>(string serviceAddress, IServerCallBack handler)
+        private static T CreateChannel<T>(string serviceAddress, IClientCallBack handler)
         {
             NetTcpBinding binding = new NetTcpBinding("businessTcpBinding");
             DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), binding, serviceAddress);

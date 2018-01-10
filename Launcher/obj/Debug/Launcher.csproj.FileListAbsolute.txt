@@ -9,3 +9,4 @@ E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csproj.GenerateRe
 E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csproj.CoreCompileInputs.cache
 E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.exe
 E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.pdb
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Launcher.exe.config

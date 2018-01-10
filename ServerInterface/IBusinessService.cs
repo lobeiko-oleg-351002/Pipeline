@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using ServerInterface.DataInteface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,23 +9,11 @@ using System.Threading.Tasks;
 
 namespace ServerInterface
 {
-    [ServiceContract(CallbackContract = typeof(IServerCallBack))]
-    public interface IBusinessService
+    [ServiceContract(CallbackContract = typeof(IClientCallBack))]
+    public interface IBusinessService : IStatusService, IEventTypeService, IAttributeService, IGroupService, IUserService
     {
         [OperationContract]
         BllUser SignIn(string login, string password);
-
-        [OperationContract]
-        List<BllStatus> GetAllStatuses();
-
-        [OperationContract]
-        IEnumerable<BllEventType> GetAllEventTypes();
-
-        [OperationContract]
-        IEnumerable<BllAttribute> GetAllAttributes();
-
-        [OperationContract]
-        IEnumerable<BllGroup> GetAllGroups();
 
         [OperationContract]
         IEnumerable<BllUser> GetUsersByGroup(BllGroup group);

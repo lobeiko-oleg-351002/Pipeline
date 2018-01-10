@@ -11,7 +11,9 @@ namespace DAL.Repositories.Interface
             where TEntity : IDalEntity
             where UEntity : IOrmEntity
     {
-        UEntity Create(TEntity entity);
+        TEntity Create(TEntity entity);
+
+        UEntity CreateAndReturnOrm(TEntity entity);
 
         IEnumerable<TEntity> GetAll();
 
@@ -19,6 +21,6 @@ namespace DAL.Repositories.Interface
 
         void Delete(int id);
 
-        void Update(TEntity entity);
+        TEntity Update(TEntity entity);
     }
 }

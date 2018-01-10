@@ -9,5 +9,6 @@ namespace BLL.Services.Interface
     public interface ISelectedEntityService<UEntity> : IService<IBllSelectedEntity<UEntity>>
             where UEntity : IBllEntity
     {
+       
     }
 }

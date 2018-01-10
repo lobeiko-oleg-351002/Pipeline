@@ -23,10 +23,14 @@ namespace DAL.Repositories
             mapper = new Mapper();
         }
 
-        public UEntity Create(TEntity entity)
+        public TEntity Create(TEntity entity)
         {
-            var res = context.Set<UEntity>().Add(mapper.MapToOrm(entity));
-            return res;
+            return mapper.MapToDal(context.Set<UEntity>().Add(mapper.MapToOrm(entity)));
+        }
+
+        public UEntity CreateAndReturnOrm(TEntity entity)
+        {
+            return context.Set<UEntity>().Add(mapper.MapToOrm(entity));
         }
 
         public void Delete(int id)
@@ -56,13 +60,14 @@ namespace DAL.Repositories
             return retElemets;
         }
 
-        public void Update(TEntity entity)
+        public TEntity Update(TEntity entity)
         {
             var ormEntity = context.Set<UEntity>().Find(entity.Id);
             if (ormEntity != null)
             {
                 context.Entry(ormEntity).CurrentValues.SetValues(mapper.MapToOrm(entity));
             }
+            return mapper.MapToDal(ormEntity);
         }
     }
 }

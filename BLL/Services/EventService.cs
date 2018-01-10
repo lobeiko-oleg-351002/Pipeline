@@ -36,7 +36,7 @@ namespace BLL.Services
             entity.AttributeLib = attributeLibService.Create(entity.AttributeLib);
             entity.FilepathLib = filepathLibService.Create(entity.FilepathLib);
 
-            var ormEntity = uow.Events.Create(mapper.MapToDal(entity));
+            var ormEntity = uow.Events.CreateAndReturnOrm(mapper.MapToDal(entity));
             uow.Commit();
 
             entity.Date = ormEntity.date;

@@ -32,10 +32,11 @@ namespace BLL.Services
             mapper = new Mapper();
         }
 
-        public virtual void Create(T entity)
+        public virtual T Create(T entity)
         {
-            repository.Create(mapper.MapToDal(entity));
+            var newEntity = repository.Create(mapper.MapToDal(entity));
             uow.Commit();
+            return mapper.MapToBll(newEntity);
         }
 
         public virtual void Delete(int id)
@@ -60,10 +61,11 @@ namespace BLL.Services
             return mapper.MapToBll(repository.Get(id));
         }
 
-        public virtual void Update(T entity)
+        public virtual T Update(T entity)
         {
-            repository.Update(mapper.MapToDal(entity));
+            var newEntity = repository.Update(mapper.MapToDal(entity));
             uow.Commit();
+            return mapper.MapToBll(newEntity);
         }
     }
 }

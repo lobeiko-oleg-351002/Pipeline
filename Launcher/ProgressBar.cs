@@ -54,8 +54,8 @@ namespace Launcher
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
                 string appVersion = (config.GetSection("appSettings") as AppSettingsSection).Settings["Version"].Value;
 
-
-                ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://192.168.2.144:8082/LauncherService/");
+                string ip = ConfigurationManager.AppSettings["hostIP"];
+                ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://" + ip + ":/LauncherService/");
 
                 string currentVersion = SourceChannel.GetCurrentVersion();
                 if (appVersion != currentVersion)

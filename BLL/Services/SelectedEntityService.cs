@@ -60,5 +60,15 @@ namespace BLL.Services
         {
             return bllMapper.MapToBll(repository.Get(id));
         }
+
+        IBllSelectedEntity<UEntity> IService<IBllSelectedEntity<UEntity>>.Create(IBllSelectedEntity<UEntity> entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        IBllSelectedEntity<UEntity> IService<IBllSelectedEntity<UEntity>>.Update(IBllSelectedEntity<UEntity> entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

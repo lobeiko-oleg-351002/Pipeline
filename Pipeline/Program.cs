@@ -15,18 +15,24 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            BusinessService.Init();
             Console.ReadLine();
-            ServiceHost host = new ServiceHost(typeof(BusinessService));
-            host.Open();
-            ServiceHost fileService = new ServiceHost(typeof(FileService));
-            fileService.Open();
-            ServiceHost launcherService = new ServiceHost(typeof(LauncherService));
-            launcherService.Open();
-
+            try
+            {
+                BusinessService.Init();
+                ServiceHost host = new ServiceHost(typeof(BusinessService));
+                host.Open();
+                ServiceHost fileService = new ServiceHost(typeof(FileService));
+                fileService.Open();
+                ServiceHost launcherService = new ServiceHost(typeof(LauncherService));
+                launcherService.Open();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             while(true)
             {
-                Console.WriteLine("Host is working.");
+                Console.WriteLine("[" + DateTime.Now.ToString("HH:mm") + "]: Host is working.");
                 Thread.Sleep(10000);
                 BusinessService.PingClients();
 

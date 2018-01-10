@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F019A899-2D4B-4D3E-89A3-AABB0F2FC34C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>AdminClient</RootNamespace>
+    <AssemblyName>AdminClient</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Forms\Directories\AttributeDirectory\AddAttributeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AddAttributeForm.Designer.cs">
+      <DependentUpon>AddAttributeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AmendAttributeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AmendAttributeForm.Designer.cs">
+      <DependentUpon>AmendAttributeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AttributeDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AttributeDataForm.Designer.cs">
+      <DependentUpon>AttributeDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AttributeDirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\AttributeDirectory\AttributeDirectoryForm.Designer.cs">
+      <DependentUpon>AttributeDirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\EntityDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\EntityDataForm.Designer.cs">
+      <DependentUpon>EntityDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\DirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\DirectoryForm.Designer.cs">
+      <DependentUpon>DirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\AddEventTypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\AddEventTypeForm.Designer.cs">
+      <DependentUpon>AddEventTypeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\AmendEventTypeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\AmendEventTypeForm.Designer.cs">
+      <DependentUpon>AmendEventTypeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\EventTypeDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\EventTypeDataForm.Designer.cs">
+      <DependentUpon>EventTypeDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\EventTypeDirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\EventTypeDirectory\EventTypeDirectoryForm.Designer.cs">
+      <DependentUpon>EventTypeDirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\AddGroupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\AddGroupForm.Designer.cs">
+      <DependentUpon>AddGroupForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\AmendGroupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\AmendGroupForm.Designer.cs">
+      <DependentUpon>AmendGroupForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\GroupDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\GroupDataForm.Designer.cs">
+      <DependentUpon>GroupDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\GroupDirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\GroupDirectory\GroupDirectoryForm.Designer.cs">
+      <DependentUpon>GroupDirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\AddStatusForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\AddStatusForm.Designer.cs">
+      <DependentUpon>AddStatusForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\AmendStatusForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\AmendStatusForm.Designer.cs">
+      <DependentUpon>AmendStatusForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\StatusDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\StatusDataForm.Designer.cs">
+      <DependentUpon>StatusDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\StatusDirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\StatusDirectory\StatusDirectoryForm.Designer.cs">
+      <DependentUpon>StatusDirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\AddUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\AddUserForm.Designer.cs">
+      <DependentUpon>AddUserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\AmendUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\AmendUserForm.Designer.cs">
+      <DependentUpon>AmendUserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\UserDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\UserDataForm.Designer.cs">
+      <DependentUpon>UserDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\UserDirectoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Directories\UserDirectory\UserDirectoryForm.Designer.cs">
+      <DependentUpon>UserDirectoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ParentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ParentForm.Designer.cs">
+      <DependentUpon>ParentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sha1.cs" />
+    <EmbeddedResource Include="Forms\Directories\AttributeDirectory\AttributeDataForm.resx">
+      <DependentUpon>AttributeDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\AttributeDirectory\AttributeDirectoryForm.resx">
+      <DependentUpon>AttributeDirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\EntityDataForm.resx">
+      <DependentUpon>EntityDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\DirectoryForm.resx">
+      <DependentUpon>DirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\EventTypeDirectory\EventTypeDataForm.resx">
+      <DependentUpon>EventTypeDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\EventTypeDirectory\EventTypeDirectoryForm.resx">
+      <DependentUpon>EventTypeDirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\GroupDirectory\GroupDataForm.resx">
+      <DependentUpon>GroupDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\GroupDirectory\GroupDirectoryForm.resx">
+      <DependentUpon>GroupDirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\StatusDirectory\AmendStatusForm.resx">
+      <DependentUpon>AmendStatusForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\StatusDirectory\StatusDataForm.resx">
+      <DependentUpon>StatusDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\StatusDirectory\StatusDirectoryForm.resx">
+      <DependentUpon>StatusDirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\UserDirectory\UserDataForm.resx">
+      <DependentUpon>UserDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\UserDirectory\UserDirectoryForm.resx">
+      <DependentUpon>UserDirectoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ParentForm.resx">
+      <DependentUpon>ParentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="App.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BllEntities\BllEntities.csproj">
+      <Project>{964af979-ff92-4e79-a810-afc81eeaa6b6}</Project>
+      <Name>BllEntities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServerInterface\ServerInterface.csproj">
+      <Project>{f749265d-39cd-4cd3-810f-cf2496b47841}</Project>
+      <Name>ServerInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceChannelManager\ServiceChannelManager.csproj">
+      <Project>{2ce8a8af-d617-4f80-a799-cb922c51d88d}</Project>
+      <Name>ServiceChannelManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

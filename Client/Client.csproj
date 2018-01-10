@@ -73,6 +73,7 @@
     <Compile Include="Forms\SignInForm.Designer.cs">
       <DependentUpon>SignInForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Sha1.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </EmbeddedResource>

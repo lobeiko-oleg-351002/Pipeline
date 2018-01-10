@@ -66,10 +66,10 @@
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(373, 4);
+            this.textBox1.Location = new System.Drawing.Point(582, 4);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(411, 20);
+            this.textBox1.Size = new System.Drawing.Size(202, 20);
             this.textBox1.TabIndex = 0;
             // 
             // menuStrip1
@@ -375,7 +375,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(115, 7);
+            this.label9.Location = new System.Drawing.Point(129, 7);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(80, 13);
             this.label9.TabIndex = 24;

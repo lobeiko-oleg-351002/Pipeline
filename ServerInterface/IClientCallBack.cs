@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ServerInterface
 {
-    public interface IServerCallBack
+    public interface IClientCallBack
     {
         [OperationContract(IsOneWay = true)]
         void GetEvent(BllEvent Event);

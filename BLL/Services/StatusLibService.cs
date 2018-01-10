@@ -26,7 +26,7 @@ namespace BLL.Services
 
         public BllStatusLib Create(BllStatusLib entity)
         {
-            var ormLibEntity = uow.StatusLibs.Create(libMapper.MapToDal(entity));
+            var ormLibEntity = uow.StatusLibs.CreateAndReturnOrm(libMapper.MapToDal(entity));
             var lib = entity;
             uow.Commit();
             entity.Id = ormLibEntity.id;
@@ -50,7 +50,7 @@ namespace BLL.Services
 
         public BllStatusLib Get(int id)
         {
-            return libMapper.MapToBll((DalStatusLib)uow.StatusLibs.Get(id));
+            return libMapper.MapToBll(uow.StatusLibs.Get(id));
         }
 
         public IEnumerable<BllStatusLib> GetAll()
@@ -67,7 +67,7 @@ namespace BLL.Services
                 dalEntity.Lib_id = entity.Id;
                 if (Entity.Id == 0)
                 {
-                   var en =  uow.SelectedStatuses.Create(dalEntity);
+                    var en =  uow.SelectedStatuses.Create(dalEntity);
                     uow.Commit();
                     Entity.Id = en.id;
                 }
