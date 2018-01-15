@@ -20,6 +20,8 @@ namespace AdminClient.Forms.Directories.UserDirectory
         }
 
         protected List<BllGroup> Groups;
+        protected List<BllStatus> Statuses;
+        protected List<BllEventType> EventTypes;
 
         public UserDataForm(DirectoryForm parent, IBusinessService server, IBllEntity entity) : base(parent, server, entity)
         {
@@ -35,8 +37,20 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 comboBox1.SelectedIndex = 0;
             }
 
-            checkedListBox1.Items.Add("Создание");
-            checkedListBox1.Items.Add("Редактирование");
+            Statuses = server.GetAllStatuses();
+            foreach(var item in Statuses)
+            {
+                checkedListBox3.Items.Add(item.Name);
+            }
+
+            EventTypes = server.GetAllEventTypes();
+            foreach (var item in EventTypes)
+            {
+                checkedListBox2.Items.Add(item.Name);
+            }
+
+
+
         }
     }
 }

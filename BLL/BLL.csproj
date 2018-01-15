@@ -59,11 +59,14 @@
     <Compile Include="Mapping\Interface\IMapper.cs" />
     <Compile Include="Mapping\Interface\ISelectedEntityMapper.cs" />
     <Compile Include="Mapping\Interface\IStatusMapper.cs" />
+    <Compile Include="Mapping\Interface\IUserLibMapper.cs" />
     <Compile Include="Mapping\Interface\IUserMapper.cs" />
     <Compile Include="Mapping\SelectedStatusMapper.cs" />
     <Compile Include="Mapping\SelectedEntityMapper.cs" />
+    <Compile Include="Mapping\SelectedUserMapper.cs" />
     <Compile Include="Mapping\StatusLibMapper.cs" />
     <Compile Include="Mapping\StatusMapper.cs" />
+    <Compile Include="Mapping\UserLibMapper.cs" />
     <Compile Include="Mapping\UserMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AttributeLibService.cs" />
@@ -71,6 +74,7 @@
     <Compile Include="Services\EntityLibService.cs" />
     <Compile Include="Services\EntitySimpleLibService.cs" />
     <Compile Include="Services\EventService.cs" />
+    <Compile Include="Services\EventTypeLibService.cs" />
     <Compile Include="Services\EventTypeService.cs" />
     <Compile Include="Services\FilepathLibService.cs" />
     <Compile Include="Services\FilepathService.cs" />
@@ -103,7 +107,7 @@
       <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{3A394037-9F9B-43DE-8710-46F22AF7114C}</Project>
+      <Project>{cc99b2c4-1cde-4232-a64a-340dcf395f65}</Project>
       <Name>ORM</Name>
     </ProjectReference>
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace ORM
         public int id { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(50)]
         public string path { get; set; }
 
         public int lib_id { get; set; }

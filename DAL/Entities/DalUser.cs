@@ -14,12 +14,12 @@ namespace DAL.Entities
 
         public string Password { get; set; }
 
-        public int? Group_id { get; set; }
+        public int Group_id { get; set; }
 
         public string Fullname { get; set; }
 
-        public bool CreateRights { get; set; }
+        public int EventTypeLib_id { get; set; }
 
-        public bool ChangeRights { get; set; }
+        public int StatusLib_id { get; set; }
     }
 }

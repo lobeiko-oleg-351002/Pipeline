@@ -16,10 +16,12 @@ namespace ORM
         public virtual DbSet<AttributeLib> AttributeLibs { get; set; }
         public virtual DbSet<Event> Events { get; set; }
         public virtual DbSet<EventType> EventTypes { get; set; }
+        public virtual DbSet<EventTypeLib> EventTypeLibs { get; set; }
         public virtual DbSet<Filepath> Filepaths { get; set; }
         public virtual DbSet<FilepathLib> FilepathLibs { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<SelectedAttribute> SelectedAttributes { get; set; }
+        public virtual DbSet<SelectedEventType> SelectedEventTypes { get; set; }
         public virtual DbSet<SelectedStatus> SelectedStatuses { get; set; }
         public virtual DbSet<SelectedUser> SelectedUsers { get; set; }
         public virtual DbSet<Status> Statuses { get; set; }
@@ -30,14 +32,9 @@ namespace ORM
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Attribute>()
-                .Property(e => e.name)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Attribute>()
                 .HasMany(e => e.SelectedAttribute)
                 .WithRequired(e => e.Attribute)
-                .HasForeignKey(e => e.entity_id)
-                .WillCascadeOnDelete(false);
+                .HasForeignKey(e => e.entity_id);
 
             modelBuilder.Entity<AttributeLib>()
                 .HasMany(e => e.Event)
@@ -50,26 +47,26 @@ namespace ORM
                 .WithRequired(e => e.AttributeLib)
                 .HasForeignKey(e => e.lib_id);
 
-            modelBuilder.Entity<Event>()
-                .Property(e => e.name)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Event>()
-                .Property(e => e.description)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<EventType>()
-                .Property(e => e.name)
-                .IsUnicode(false);
-
             modelBuilder.Entity<EventType>()
                 .HasMany(e => e.Event)
                 .WithRequired(e => e.EventType)
                 .HasForeignKey(e => e.type_id);
 
-            modelBuilder.Entity<Filepath>()
-                .Property(e => e.path)
-                .IsUnicode(false);
+            modelBuilder.Entity<EventType>()
+                .HasMany(e => e.SelectedEventType)
+                .WithRequired(e => e.EventType)
+                .HasForeignKey(e => e.entity_id);
+
+            modelBuilder.Entity<EventTypeLib>()
+                .HasMany(e => e.SelectedEventType)
+                .WithRequired(e => e.EventTypeLib)
+                .HasForeignKey(e => e.lib_id);
+
+            modelBuilder.Entity<EventTypeLib>()
+                .HasMany(e => e.User)
+                .WithRequired(e => e.EventTypeLib)
+                .HasForeignKey(e => e.eventTypeLib_id)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<FilepathLib>()
                 .HasMany(e => e.Event)
@@ -83,12 +80,8 @@ namespace ORM
 
             modelBuilder.Entity<Group>()
                 .HasMany(e => e.User)
-                .WithOptional(e => e.Group)
+                .WithRequired(e => e.Group)
                 .HasForeignKey(e => e.group_id);
-
-            modelBuilder.Entity<Status>()
-                .Property(e => e.name)
-                .IsUnicode(false);
 
             modelBuilder.Entity<Status>()
                 .HasMany(e => e.SelectedStatus)
@@ -102,19 +95,25 @@ namespace ORM
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<StatusLib>()
+                .HasMany(e => e.User)
+                .WithRequired(e => e.StatusLib)
+                .HasForeignKey(e => e.statusLib_id)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<StatusLib>()
                 .HasMany(e => e.SelectedStatus)
                 .WithRequired(e => e.StatusLib)
                 .HasForeignKey(e => e.lib_id);
 
             modelBuilder.Entity<User>()
-                .HasMany(e => e.SelectedUser)
-                .WithRequired(e => e.User)
-                .HasForeignKey(e => e.entity_id);
-
-            modelBuilder.Entity<User>()
                 .HasMany(e => e.Event)
                 .WithRequired(e => e.User)
                 .HasForeignKey(e => e.sender_id);
+
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.SelectedUser)
+                .WithRequired(e => e.User)
+                .HasForeignKey(e => e.entity_id);
 
             modelBuilder.Entity<UserLib>()
                 .HasMany(e => e.Event)

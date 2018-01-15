@@ -46,9 +46,31 @@ namespace BLL.Services
             var testEntity = uow.Users.GetUserByLogin(entity.Login);
             if (testEntity == null)
             {
-                uow.Users.Create(mapper.MapToDal(entity));
+                StatusLibService statusLibService = new StatusLibService(uow);
+                EventTypeLibService eventTypeLibService = new EventTypeLibService(uow);
+                entity.StatusLib = statusLibService.Create(entity.StatusLib);
+                entity.EventTypeLib = eventTypeLibService.Create(entity.EventTypeLib);
+                var ormEntity = uow.Users.CreateAndReturnOrm(mapper.MapToDal(entity));
                 uow.Commit();
+                entity.Id = ormEntity.id;
                 return entity;
+            }
+            return null;
+        }
+
+        public new BllUser Update(BllUser entity)
+        {
+            var testEntity = uow.Users.GetUserByLogin(entity.Login);
+            if (testEntity != null)
+            {
+                StatusLibService statusLibService = new StatusLibService(uow);
+                EventTypeLibService eventTypeLibService = new EventTypeLibService(uow);
+                entity.StatusLib = statusLibService.Update(entity.StatusLib);
+                entity.EventTypeLib = eventTypeLibService.Update(entity.EventTypeLib);
+                var ormEntity = uow.Users.Update(mapper.MapToDal(entity));
+                uow.Commit();
+
+                return mapper.MapToBll(uow.Users.Get(entity.Id));
             }
             return null;
         }

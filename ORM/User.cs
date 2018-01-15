@@ -12,8 +12,8 @@ namespace ORM
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public User()
         {
-            SelectedUser = new HashSet<SelectedUser>();
             Event = new HashSet<Event>();
+            SelectedUser = new HashSet<SelectedUser>();
         }
 
         public int id { get; set; }
@@ -30,18 +30,26 @@ namespace ORM
         [StringLength(50)]
         public string fullName { get; set; }
 
-        public int? group_id { get; set; }
+        public int group_id { get; set; }
 
         public bool createRights { get; set; }
 
         public bool changeRights { get; set; }
 
+        public int statusLib_id { get; set; }
+
+        public int eventTypeLib_id { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Event> Event { get; set; }
+
+        public virtual EventTypeLib EventTypeLib { get; set; }
+
+        public virtual StatusLib StatusLib { get; set; }
+
         public virtual Group Group { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SelectedUser> SelectedUser { get; set; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Event> Event { get; set; }
     }
 }

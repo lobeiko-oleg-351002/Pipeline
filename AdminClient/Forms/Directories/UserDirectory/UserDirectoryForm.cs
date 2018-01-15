@@ -77,8 +77,6 @@ namespace AdminClient.Forms.Directories.UserDirectory
             row.Cells[0].Value = data.Fullname;
             row.Cells[1].Value = data.Login;
             row.Cells[2].Value = data.Group.Name;
-            row.Cells[3].Value += data.CreateRights ? "Create" : "";
-            row.Cells[3].Value += data.ChangeRights ? "Update" : "";
             return row;
         }
 

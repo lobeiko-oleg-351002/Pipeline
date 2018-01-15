@@ -115,6 +115,16 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon NewEventTray {
+            get {
+                object obj = ResourceManager.GetObject("NewEventTray", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Сервер недоступен.
         /// </summary>
         internal static string SERVER_NOT_FOUND {

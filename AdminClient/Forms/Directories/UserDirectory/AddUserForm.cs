@@ -25,14 +25,24 @@ namespace AdminClient.Forms.Directories.UserDirectory
 
         protected override void button1_Click(object sender, EventArgs e)
         {
+            BllStatusLib statusLib = new BllStatusLib();
+            foreach(int item in checkedListBox3.CheckedIndices)
+            {
+                statusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[item] });
+            }
+            BllEventTypeLib eventTypeLib = new BllEventTypeLib();
+            foreach (int item in checkedListBox2.CheckedIndices)
+            {
+                eventTypeLib.SelectedEntities.Add(new BllSelectedEntity<BllEventType> { Entity = EventTypes[item] });
+            }
             Entity = new BllUser
             {
                 Fullname = textBox1.Text,
                 Login = textBox2.Text,
                 Password = Sha1.Encrypt(textBox3.Text),
-                CreateRights = checkedListBox1.CheckedIndices.Contains(0),
-                ChangeRights = checkedListBox1.CheckedIndices.Contains(1),
-                Group = Groups[comboBox1.SelectedIndex]
+                Group = Groups[comboBox1.SelectedIndex],
+                StatusLib = statusLib,
+                EventTypeLib = eventTypeLib
             };
             Entity = server.CreateUser((BllUser)Entity);
             base.button1_Click(sender, e);

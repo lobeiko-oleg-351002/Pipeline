@@ -15,6 +15,8 @@ namespace ORM
 
         public int entity_id { get; set; }
 
+        public bool isEventAccepted { get; set; }
+
         public virtual User User { get; set; }
 
         public virtual UserLib UserLib { get; set; }

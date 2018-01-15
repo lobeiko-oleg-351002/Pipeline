@@ -13,6 +13,7 @@ namespace ORM
         public EventType()
         {
             Event = new HashSet<Event>();
+            SelectedEventType = new HashSet<SelectedEventType>();
         }
 
         public int id { get; set; }
@@ -23,5 +24,8 @@ namespace ORM
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Event> Event { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SelectedEventType> SelectedEventType { get; set; }
     }
 }

@@ -98,7 +98,7 @@
       <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{3A394037-9F9B-43DE-8710-46F22AF7114C}</Project>
+      <Project>{CC99B2C4-1CDE-4232-A64A-340DCF395F65}</Project>
       <Name>ORM</Name>
     </ProjectReference>
     <ProjectReference Include="..\ServerInterfaceForLauncher\ServerInterfaceForLauncher.csproj">
@@ -132,6 +132,5 @@
       <DependentUpon>ServiceDB.mdf</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

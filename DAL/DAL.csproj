@@ -53,11 +53,13 @@
     <Compile Include="Entities\DalAttributeLib.cs" />
     <Compile Include="Entities\DalEntityLib.cs" />
     <Compile Include="Entities\DalEvent.cs" />
+    <Compile Include="Entities\DalEventTypeLib.cs" />
     <Compile Include="Entities\DalFilepath.cs" />
     <Compile Include="Entities\DalFilepathLib.cs" />
     <Compile Include="Entities\DalGroup.cs" />
     <Compile Include="Entities\DalSelectedEntity.cs" />
     <Compile Include="Entities\DalSelectedStatus.cs" />
+    <Compile Include="Entities\DalSelectedUser.cs" />
     <Compile Include="Entities\DalStatusLib.cs" />
     <Compile Include="Entities\DalUser.cs" />
     <Compile Include="Entities\DalUserLib.cs" />
@@ -67,7 +69,6 @@
     <Compile Include="Entities\Interface\IDalEntityLib.cs" />
     <Compile Include="Entities\Interface\IDalEntityWithLibId.cs" />
     <Compile Include="Entities\Interface\IDalSelectedEntity.cs" />
-    <Compile Include="Mapping\AttributeLibMapper.cs" />
     <Compile Include="Mapping\AttributeMapper.cs" />
     <Compile Include="Mapping\EntityLibMapper.cs" />
     <Compile Include="Mapping\EventMapper.cs" />
@@ -86,8 +87,10 @@
     <Compile Include="Mapping\Interface\IUserMapper.cs" />
     <Compile Include="Mapping\SelectedEntityMapper.cs" />
     <Compile Include="Mapping\SelectedStatusMapper.cs" />
+    <Compile Include="Mapping\SelectedUserMapper.cs" />
     <Compile Include="Mapping\StatusLibMapper.cs" />
     <Compile Include="Mapping\StatusMapper.cs" />
+    <Compile Include="Mapping\UserLibMapper.cs" />
     <Compile Include="Mapping\UserMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AttributeRepository.cs" />
@@ -111,9 +114,11 @@
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Repositories\SelectedEntityRepository.cs" />
     <Compile Include="Repositories\SelectedStatusRepository.cs" />
+    <Compile Include="Repositories\SelectedUserRepository.cs" />
     <Compile Include="Repositories\StatusLibRepository.cs" />
     <Compile Include="Repositories\StatusRepository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
+    <Compile Include="Repositories\UserLibRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{3A394037-9F9B-43DE-8710-46F22AF7114C}</Project>
+      <Project>{CC99B2C4-1CDE-4232-A64A-340DCF395F65}</Project>
       <Name>ORM</Name>
     </ProjectReference>
   </ItemGroup>

@@ -21,8 +21,12 @@ namespace ServerInterface
         [OperationContract]
         BllEvent CreateAndSendOutEvent(BllEvent Event);
 
+
         [OperationContract]
-        BllEvent UpdateAndSendOutEvent(BllEvent Event, BllUser updater);
+        BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser updater);
+
+        [OperationContract]
+        BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater);
 
         [OperationContract]
         List<BllEvent> GetEventsForUser(BllUser user);

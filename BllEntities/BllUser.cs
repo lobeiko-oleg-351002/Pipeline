@@ -18,8 +18,8 @@ namespace BllEntities
 
         public string Fullname { get; set; }
 
-        public bool CreateRights { get; set; }
+        public BllEventTypeLib EventTypeLib { get; set; }
 
-        public bool ChangeRights { get; set; }
+        public BllStatusLib StatusLib { get; set; }
     }
 }

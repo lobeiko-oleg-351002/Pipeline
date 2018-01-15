@@ -36,17 +36,19 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.checkedListBox2 = new System.Windows.Forms.CheckedListBox();
+            this.checkedListBox3 = new System.Windows.Forms.CheckedListBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(58, 297);
+            this.button1.Location = new System.Drawing.Point(174, 297);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(139, 297);
+            this.button2.Location = new System.Drawing.Point(255, 297);
             // 
             // label1
             // 
@@ -67,7 +69,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(32, 66);
+            this.label2.Location = new System.Drawing.Point(33, 186);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 7;
@@ -75,7 +77,7 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(35, 82);
+            this.textBox2.Location = new System.Drawing.Point(36, 202);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(213, 20);
             this.textBox2.TabIndex = 6;
@@ -83,7 +85,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 112);
+            this.label3.Location = new System.Drawing.Point(35, 232);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(45, 13);
             this.label3.TabIndex = 9;
@@ -91,7 +93,7 @@
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(35, 128);
+            this.textBox3.Location = new System.Drawing.Point(36, 248);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(213, 20);
             this.textBox3.TabIndex = 8;
@@ -99,7 +101,7 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(82, 165);
+            this.comboBox1.Location = new System.Drawing.Point(83, 66);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(166, 21);
             this.comboBox1.TabIndex = 10;
@@ -107,36 +109,55 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 168);
+            this.label4.Location = new System.Drawing.Point(32, 69);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(42, 13);
             this.label4.TabIndex = 11;
             this.label4.Text = "Группа";
             // 
-            // label5
+            // label6
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(34, 204);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(39, 13);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Права";
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(277, 24);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(151, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Права на создание событий";
             // 
-            // checkedListBox1
+            // checkedListBox2
             // 
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(82, 204);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(166, 64);
-            this.checkedListBox1.TabIndex = 12;
+            this.checkedListBox2.FormattingEnabled = true;
+            this.checkedListBox2.Location = new System.Drawing.Point(280, 40);
+            this.checkedListBox2.Name = "checkedListBox2";
+            this.checkedListBox2.Size = new System.Drawing.Size(188, 94);
+            this.checkedListBox2.TabIndex = 15;
+            // 
+            // checkedListBox3
+            // 
+            this.checkedListBox3.FormattingEnabled = true;
+            this.checkedListBox3.Location = new System.Drawing.Point(280, 174);
+            this.checkedListBox3.Name = "checkedListBox3";
+            this.checkedListBox3.Size = new System.Drawing.Size(188, 94);
+            this.checkedListBox3.TabIndex = 17;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(277, 158);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(156, 13);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Права на установку статусов";
             // 
             // UserDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 332);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.checkedListBox1);
+            this.ClientSize = new System.Drawing.Size(508, 332);
+            this.Controls.Add(this.checkedListBox3);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.checkedListBox2);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label3);
@@ -155,10 +176,12 @@
             this.Controls.SetChildIndex(this.label3, 0);
             this.Controls.SetChildIndex(this.comboBox1, 0);
             this.Controls.SetChildIndex(this.label4, 0);
-            this.Controls.SetChildIndex(this.checkedListBox1, 0);
-            this.Controls.SetChildIndex(this.label5, 0);
             this.Controls.SetChildIndex(this.button1, 0);
             this.Controls.SetChildIndex(this.button2, 0);
+            this.Controls.SetChildIndex(this.label6, 0);
+            this.Controls.SetChildIndex(this.checkedListBox2, 0);
+            this.Controls.SetChildIndex(this.label7, 0);
+            this.Controls.SetChildIndex(this.checkedListBox3, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -173,8 +196,10 @@
         protected System.Windows.Forms.Label label3;
         protected System.Windows.Forms.TextBox textBox3;
         protected System.Windows.Forms.Label label4;
-        protected System.Windows.Forms.Label label5;
         protected System.Windows.Forms.ComboBox comboBox1;
-        protected System.Windows.Forms.CheckedListBox checkedListBox1;
+        protected System.Windows.Forms.Label label6;
+        protected System.Windows.Forms.Label label7;
+        protected System.Windows.Forms.CheckedListBox checkedListBox2;
+        protected System.Windows.Forms.CheckedListBox checkedListBox3;
     }
 }

@@ -19,11 +19,13 @@ namespace DAL.Repositories.Interface
 
         SelectedStatusRepository SelectedStatuses { get; }
         ISelectedEntityRepository<SelectedAttribute> SelectedAttributes { get; }
-        ISelectedEntityRepository<SelectedUser> SelectedUsers { get; }
+        SelectedUserRepository SelectedUsers { get; }
+        ISelectedEntityRepository<SelectedEventType> SelectedEventTypes { get; }
 
         StatusLibRepository StatusLibs { get; }
         IRepository<IDalEntityLib, AttributeLib> AttributeLibs { get; }
-        IRepository<IDalEntityLib, UserLib> UserLibs { get; }
+        IRepository<IDalEntityLib, EventTypeLib> EventTypeLibs { get; }
+        UserLibRepository UserLibs { get; }
         FilepathLibRepository FilepathLibs { get; }
 
         void Commit();

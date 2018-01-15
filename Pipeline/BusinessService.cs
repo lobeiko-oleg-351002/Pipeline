@@ -42,7 +42,6 @@ namespace Server
         {
             var datetime = DateTime.Now;
             Event.Date = datetime;
-            Event.StatusLib.SelectedEntities.Last().Date = datetime;
             IEventService eventService = new EventService(uow);
             BllEvent res = eventService.Create(Event);
             new Thread(() =>
@@ -66,18 +65,36 @@ namespace Server
         }
 
 
-        public BllEvent UpdateAndSendOutEvent(BllEvent Event, BllUser updater)
+        public BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser updater)
         {
-            var datetime = DateTime.Now;
-            Event.StatusLib.SelectedEntities.Last().Date = datetime;
-            StatusLibService service = new StatusLibService(uow);
-            Event.StatusLib = service.Update(Event.StatusLib);
+            UserLibService userservice = new UserLibService(uow);
+            Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
             new Thread(() =>
             {
                 UpdateEventWithUsers(Event, updater);
             }).Start();
             return Event;
         }
+
+        public BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater)
+        {
+            var datetime = DateTime.Now;
+            Event.StatusLib.SelectedEntities.Last().Date = datetime;
+            StatusLibService service = new StatusLibService(uow);
+            Event.StatusLib = service.Update(Event.StatusLib);
+
+            UserLibService userservice = new UserLibService(uow);
+            Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
+            new Thread(() =>
+            {
+                UpdateEventWithUsers(Event, updater);
+            }).Start();
+            return Event;
+        }
+
+
 
         private void UpdateEventWithUsers(BllEvent Event, BllUser updater)
         {

@@ -40,7 +40,6 @@ namespace Client
 
         BllUser User = null;
         List<BllEvent> EventList;
-        List<BllStatus> Statuses;
         int SelectedRowIndex;
         List<int> NewEventRowIndexes = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
@@ -94,6 +93,7 @@ namespace Client
         private void SetControlsServerOffline()
         {
             textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
+            textBox1.ForeColor = Color.Red;
             создатьСобытиеToolStripMenuItem.Enabled = false;
             button1.Enabled = false;
         }
@@ -109,15 +109,10 @@ namespace Client
             textBox3.Text = Event.Name;
             textBox4.Text = Event.Date.ToString(DATE_FORMAT);
             textBox5.Text = Event.Date.ToString(TIME_FORMAT);
-            listBox1.Items.Clear();
+            dataGridView2.Rows.Clear();
             foreach(var status in Event.StatusLib.SelectedEntities)
             {
-                listBox1.Items.Add(status.Entity.Name + " " + status.Date);
-            }
-            listBox3.Items.Clear();
-            foreach (var attr in Event.AttributeLib.SelectedEntities)
-            {
-                listBox3.Items.Add(attr.Entity.Name);
+                AddStatusToDataGrid(status.Entity.Name, status.Date);
             }
             listBox2.Items.Clear();
             foreach (var filename in Event.FilepathLib.Entities)
@@ -127,6 +122,15 @@ namespace Client
             richTextBox1.Text = Event.Description;
 
             comboBox1.SelectedIndex = 0;
+        }
+
+        private void AddStatusToDataGrid(string name, DateTime date)
+        {
+            DataGridViewRow row = new DataGridViewRow();
+            row.CreateCells(dataGridView2);
+            row.Cells[0].Value = name;
+            row.Cells[1].Value = date;
+            dataGridView2.Rows.Add(row);
         }
 
 
@@ -184,6 +188,10 @@ namespace Client
                     
                 }
                 server.PingServer();
+                if (User.Id == 0)
+                {
+                    Authorize(server);
+                }
                 isServerOnline = true;
             }
             catch(Exception ex)
@@ -195,10 +203,12 @@ namespace Client
 
         private void InitStatuses()
         {
-            Statuses = server.GetAllStatuses();
-            foreach (var item in Statuses)
+            if (User.StatusLib != null)
             {
-                comboBox1.Items.Add(item.Name);
+                foreach (var item in User.StatusLib.SelectedEntities)
+                {
+                    comboBox1.Items.Add(item.Entity.Name);
+                }
             }
         }
 
@@ -265,14 +275,25 @@ namespace Client
             row.Cells[1].Value = Event.Name;
             row.Cells[2].Value = Event.Date.Date.ToString(DATE_FORMAT);
             row.Cells[3].Value = Event.Date.ToString(TIME_FORMAT);
-            var status = Event.StatusLib.SelectedEntities.Last();
-            row.Cells[4].Value = status.Entity.Name + " " + status.Date;
+            if (Event.StatusLib.SelectedEntities.Count > 0)
+            {
+                var status = Event.StatusLib.SelectedEntities.Last();
+                row.Cells[4].Value = status.Entity.Name + " " + status.Date;
+            }
            
             foreach (var attr in Event.AttributeLib.SelectedEntities)
             {
                 row.Cells[5].Value += attr.Entity.Name + "; ";
             }
-            ((DataGridViewButtonCell)row.Cells[6]).Value += " " + Event.FilepathLib.Entities.Count + " ф.";
+            if (Event.FilepathLib.Entities.Count == 0)
+            {
+                ((DataGridViewButtonCell)row.Cells[6]).Value = "-";
+                ((DataGridViewButtonCell)row.Cells[6]).ReadOnly = true;
+            }
+            else
+            {
+                ((DataGridViewButtonCell)row.Cells[6]).Value += " " + Event.FilepathLib.Entities.Count + " ф.";
+            }
             row.Cells[7].Value = Event.Description;
 
             dataGridView1.Rows.Add(row);
@@ -305,7 +326,10 @@ namespace Client
                 }
                 if (User != null)
                 {
-                    label9.Text = User.Fullname;
+                    Invoke(new Action(() =>
+                    {
+                        label9.Text = User.Fullname;
+                    }));
                 }
             }
             catch(Exception ex)
@@ -381,6 +405,7 @@ namespace Client
             HighlightRow(dataGridView1.RowCount - 1);
             NewEventRowIndexes.Add(dataGridView1.Rows.Count - 1);
             SetEventsCountInPanel();
+            TurnOutForm();
             SystemSounds.Beep.Play();
             FlashWindow.Start(this);
         }
@@ -523,6 +548,8 @@ namespace Client
             {
                 return;
             }
+            EnableStatusControls();
+            checkBox1.Checked = false;
             if (NewEventRowIndexes.Contains(e.RowIndex))
             {
                 EventList[e.RowIndex].IsAdmited = true;               
@@ -533,6 +560,24 @@ namespace Client
             RowCommonFont(e.RowIndex);
             SelectedRowIndex = e.RowIndex;
             SetSelectedEventToControls(EventList[e.RowIndex]);
+            if (User != null)
+            {
+                if ((IsUserInChecklistByLogin(User, EventList[e.RowIndex].RecieverLib.SelectedEntities)) || (User.Login == EventList[e.RowIndex].Sender.Login))
+                {
+                    ShowChecklist();
+                    FillUserChecklist(EventList[e.RowIndex].RecieverLib.SelectedEntities);
+                }
+                else
+                {
+                    ShowCheckbox();
+                }
+            }
+        }
+
+        private void EnableStatusControls()
+        {
+            comboBox1.Enabled = true;
+            button1.Enabled = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -541,11 +586,11 @@ namespace Client
             
             if (isServerOnline)
             {
-                EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex - 1] });
-                EventList[SelectedRowIndex] = server.UpdateAndSendOutEvent(EventList[SelectedRowIndex], User);
+                EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = User.StatusLib.SelectedEntities[comboBox1.SelectedIndex - 1].Entity });
+                EventList[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventList[SelectedRowIndex], User);
                 EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
                 var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
-                listBox1.Items.Add(newStatus.Entity.Name + " " + newStatus.Date);
+                AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
                 UpdateEventStatusInDataGrid(newStatus, dataGridView1.SelectedRows[0].Index, false);
                 comboBox1.SelectedIndex = 0;
             }
@@ -574,21 +619,50 @@ namespace Client
             {
                 if (EventList[i].Id == Event.Id)
                 {
+                    if (Event.StatusLib.SelectedEntities.Count > 0)
+                    {
+                        var newstatus = Event.StatusLib.SelectedEntities.Last();
+                        if (EventList[i].StatusLib.SelectedEntities.Count > 0)
+                        {                          
+                            var oldstatus = EventList[i].StatusLib.SelectedEntities.Last();
+                            if (newstatus.Entity.Id != oldstatus.Entity.Id)
+                            {
+                                UpdateEventStatusInDataGrid(newstatus, i, true);
+                            }
+                        }
+                        else
+                        {
+                            UpdateEventStatusInDataGrid(newstatus, i, true);
+                        }
+
+                    }
                     EventList[i] = Event;
                     break;
                 }
             }
-            var status = Event.StatusLib.SelectedEntities.Last();
-            UpdateEventStatusInDataGrid(status, i, true);
+
             if (dataGridView1.SelectedRows.Count > 0)
             {
                 if (dataGridView1.SelectedRows[0].Index == i)
                 {
-                    listBox1.Items.Add(status.Entity.Name + " " + status.Date);
+                    Invoke(new Action(() =>
+                    {
+                        FillStatusDataGrid(Event.StatusLib);
+                        FillUserChecklist(Event.RecieverLib.SelectedEntities);
+                    }));
                 }
             }
             SerializeEventsBackground();
             SystemSounds.Beep.Play();
+        }
+
+        private void FillStatusDataGrid(BllStatusLib lib)
+        {
+            dataGridView2.Rows.Clear();
+            foreach(var item in lib.SelectedEntities)
+            {
+                AddStatusToDataGrid(item.Entity.Name, item.Date);
+            }
         }
 
         private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index, bool isBold)
@@ -600,18 +674,6 @@ namespace Client
                 cell.Style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
             }
 
-        }
-
-        private void listBox2_DoubleClick(object sender, EventArgs e)
-        {
-            try
-            {
-                Process.Start(DownloadFile(EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path, EventList[SelectedRowIndex].FilepathLib.FolderName));
-            }
-            catch
-            {
-                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path);
-            }
         }
 
         private void comboBox1_TextChanged(object sender, EventArgs e)
@@ -626,17 +688,46 @@ namespace Client
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            TurnOutForm();
+        }
+
+        private void SetTrayNewEventIcon()
+        {
+            notifyIcon.Icon = new Icon(Properties.Resources.NewEventTray, new Size(32, 32));
+        }
+
+        private void SetTrayCommontIcon()
+        {
+            notifyIcon.Icon = this.Icon;
+        }
+
+        private void TurnInForm()
+        {
+            notifyIcon.Visible = true;
+            notifyIcon.ShowBalloonTip(3000);
+            if (NewEventRowIndexes.Count != 0)
+            {
+                SetTrayNewEventIcon();
+            }
+            else
+            {
+                SetTrayCommontIcon();
+            }
+            this.ShowInTaskbar = false;
+            this.Hide();
+        }
+
+        private void TurnOutForm()
+        {
             this.Show();
             this.ShowInTaskbar = true;
             notifyIcon.Visible = false;
         }
+            
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            notifyIcon.Visible = true;
-            notifyIcon.ShowBalloonTip(3000);
-            this.ShowInTaskbar = false;
-            this.Hide();
+            TurnInForm();
             e.Cancel = true;
         }
 
@@ -648,6 +739,113 @@ namespace Client
                 notifyIcon.Visible = false;
             }
             catch { }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                button2.Enabled = true;
+            }
+            else
+            {
+                button2.Enabled = false;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var currentEvent = EventList[dataGridView1.SelectedRows[0].Index];
+            if (checkBox1.Checked)
+            {
+                ShowChecklist();
+                foreach(var item in currentEvent.RecieverLib.SelectedEntities)
+                {
+                    if (item.Entity.Id == User.Id)
+                    {
+                        item.IsEventAccepted = true;
+                    }
+                }
+                currentEvent = server.UpdateAcceptedUsersAndSendOutEvent(currentEvent, User);
+                FillUserChecklist(currentEvent.RecieverLib.SelectedEntities);
+
+            }
+        }
+
+        private bool IsUserInChecklistByLogin(BllUser user, List<BllSelectedUser> list)
+        {
+            foreach (var item in list)
+            {
+                if (item.Entity.Login == user.Login)
+                {
+                    if (item.IsEventAccepted)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void ShowChecklist()
+        {
+            groupBox4.Visible = false;
+            groupBox1.Visible = true;
+        }
+
+        private void ShowCheckbox()
+        {
+            groupBox4.Visible = true;
+            groupBox1.Visible = false;
+        }
+
+        
+
+        private void AddUserToChecklist(BllUser user)
+        {
+            listBox4.Items.Add(user.Fullname);
+        }
+
+        private void FillUserChecklist(List<BllSelectedUser> users)
+        {
+            listBox4.Items.Clear();
+            foreach(var item in users)
+            {
+                if (item.IsEventAccepted)
+                {
+                    AddUserToChecklist(item.Entity);
+                }
+            }
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void listBox2_DoubleClick(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (checkBox2.Checked == false)
+                {
+                    Process.Start(DownloadFile(EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path, EventList[SelectedRowIndex].FilepathLib.FolderName));
+                }
+                else
+                {
+                    string path = DownloadFile(EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path, EventList[SelectedRowIndex].FilepathLib.FolderName);
+                    Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                }
+                
+            }
+            catch
+            {
+                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path);
+            }
         }
     }
 }

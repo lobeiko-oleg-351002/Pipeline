@@ -41,13 +41,16 @@
   <ItemGroup>
     <Compile Include="BllAttribute.cs" />
     <Compile Include="BllAttributeLib.cs" />
+    <Compile Include="BllEntityComparer.cs" />
     <Compile Include="BllEvent.cs" />
     <Compile Include="BllEventType.cs" />
+    <Compile Include="BllEventTypeLib.cs" />
     <Compile Include="BllFilepath.cs" />
     <Compile Include="BllFilepathLib.cs" />
     <Compile Include="BllGroup.cs" />
     <Compile Include="BllSelectedEntity.cs" />
     <Compile Include="BllSelectedStatus.cs" />
+    <Compile Include="BllSelectedUser.cs" />
     <Compile Include="BllStatus.cs" />
     <Compile Include="BllStatusLib.cs" />
     <Compile Include="BllUser.cs" />

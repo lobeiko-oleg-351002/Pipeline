@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using BllEntities.Interface;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
@@ -17,8 +18,6 @@ namespace Client.Forms
     {
         IBusinessService server;
         public BllEvent Event { get; private set; }
-        List<BllStatus> Statuses;
-        List<BllEventType> EventTypes;
         List<BllAttribute> Attributes;
         List<BllUser> Users = new List<BllUser>();
         List<string> Filepaths = new List<string>();
@@ -36,24 +35,13 @@ namespace Client.Forms
             this.Sender = sender;
 
 
-            EventTypes = server.GetAllEventTypes();
-            foreach (var EventType in EventTypes)
+            foreach (var EventType in sender.EventTypeLib.SelectedEntities)
             {
-                comboBox2.Items.Add(EventType.Name);
+                 comboBox2.Items.Add(EventType.Entity.Name);            
             }
             if (comboBox2.Items.Count > 0)
             {
                 comboBox2.SelectedIndex = 0;
-            }
-
-            Statuses = server.GetAllStatuses();
-            foreach(var status in Statuses)
-            {
-                comboBox1.Items.Add(status.Name);
-            }
-            if (comboBox1.Items.Count > 0)
-            {
-                comboBox1.SelectedIndex = 0;
             }
 
             Attributes = server.GetAllAttributes();
@@ -92,6 +80,7 @@ namespace Client.Forms
         {
             Event = new BllEvent();
             Event.Name = textBox1.Text;
+            Event.IsAdmited = true;
             Event.FilepathLib = new BllFilepathLib();
             bool success = UploadFiles(Event.FilepathLib);
             if (!success)
@@ -99,17 +88,16 @@ namespace Client.Forms
                 return;
             }
 
-            Event.Type = EventTypes[comboBox2.SelectedIndex];
+            Event.Type = Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity;
             Event.Description = richTextBox1.Text;
             Event.StatusLib = new BllStatusLib();
-            Event.StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = Statuses[comboBox1.SelectedIndex] });
             Event.AttributeLib = new BllAttributeLib();
             foreach(var item in checkedListBox1.CheckedIndices.Cast<int>().ToArray())
             {
                 Event.AttributeLib.SelectedEntities.Add(new BllSelectedEntity<BllAttribute>() { Entity = Attributes[item]});
             }
             Event.RecieverLib = new BllUserLib();
-            Event.RecieverLib.SelectedEntities.Add(new BllSelectedEntity<BllUser>() { Entity = Sender });
+            Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Sender, IsEventAccepted = true });
             int nodeCount = 0;
             foreach (TreeNode groupNode in treeView1.Nodes)
             {
@@ -117,13 +105,11 @@ namespace Client.Forms
                 {
                     if (userNode.Checked)
                     {
-                        Event.RecieverLib.SelectedEntities.Add(new BllSelectedEntity<BllUser>() { Entity = Users[userNode.Index + nodeCount] });
+                        Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Users[userNode.Index + nodeCount] });
                     }
                 }
                 nodeCount += groupNode.GetNodeCount(false);
             }
-
-
 
             Event.Sender = this.Sender;
             Event = server.CreateAndSendOutEvent(Event);
@@ -132,25 +118,6 @@ namespace Client.Forms
 
         private bool UploadFiles(BllFilepathLib lib)
         {
-            //List<string> matchedFiles = new List<string>();
-            //FileServiceClient fileService = new FileServiceClient();
-            //foreach (var path in Filepaths)
-            //{
-            //    string name = Path.GetFileName(path);
-            //    if(fileService.IsFileExists(name))
-            //    {
-            //        matchedFiles.Add(name);
-            //    }
-            //}
-
-            //if (matchedFiles.Count > 0)
-            //{
-            //    MessageBox.Show(Properties.Resources.ResourceManager.GetString("FILE_ALREADY_EXISTS") + string.Join(", ", matchedFiles) + ".");
-            //    return false;
-            //}
-            //else
-            //{
-
             string foldername = Event.Name + " " + DateTime.Now.ToString("dd.MM.yy H-mm-ss");
             Event.FilepathLib.FolderName = foldername;
             foreach (var path in Filepaths)

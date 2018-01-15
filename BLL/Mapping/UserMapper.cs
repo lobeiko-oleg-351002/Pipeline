@@ -14,11 +14,15 @@ namespace BLL.Mapping
     {
         IUnitOfWork uow;
         GroupService groupService;
+        StatusLibService statusLibService;
+        EventTypeLibService eventTypeLibService;
 
         public UserMapper(IUnitOfWork uow)
         {
             this.uow = uow;
             groupService = new GroupService(uow);
+            statusLibService = new StatusLibService(uow);
+            eventTypeLibService = new EventTypeLibService(uow);
         }
 
         public UserMapper() { }
@@ -29,11 +33,11 @@ namespace BLL.Mapping
             {
                 Id = entity.Id,
                 Login = entity.Login,
-                ChangeRights = entity.ChangeRights,
-                CreateRights = entity.CreateRights,
                 Fullname = entity.Fullname,
-                Group_id = entity.Group != null ? entity.Group.Id : (int?)null,
+                Group_id = entity.Group.Id,
                 Password = entity.Password,
+                EventTypeLib_id = entity.EventTypeLib.Id,
+                StatusLib_id = entity.StatusLib.Id
             };
 
             return dalEntity;
@@ -46,11 +50,11 @@ namespace BLL.Mapping
             {
                 Id = entity.Id,
                 Login = entity.Login,
-                CreateRights = entity.CreateRights,
-                ChangeRights = entity.ChangeRights,
                 Fullname = entity.Fullname,
                 Password = entity.Password,
-                Group = entity.Group_id != null ? groupService.Get(entity.Group_id.Value) : null
+                Group =  groupService.Get(entity.Group_id),
+                EventTypeLib = eventTypeLibService.Get(entity.EventTypeLib_id),
+                StatusLib = statusLibService.Get(entity.StatusLib_id)
             };
 
             return bllEntity;

@@ -23,11 +23,13 @@ namespace DAL.Repositories
 
         private SelectedStatusRepository selectedStatusRepository;
         private SelectedEntityRepository<SelectedAttribute> selectedAttributeRepository;
-        private SelectedEntityRepository<SelectedUser> selectedUserRepository;
+        private SelectedEntityRepository<SelectedEventType> selectedEventTypeRepository;
+        private SelectedUserRepository selectedUserRepository;
 
         private StatusLibRepository statusLibRepository;
         private EntityLibRepository<AttributeLib> attributeLibRepository;
-        private EntityLibRepository<UserLib> userLibRepository;
+        private EntityLibRepository<EventTypeLib> eventTypeLibRepository;
+        private UserLibRepository userLibRepository;
         private FilepathLibRepository filepathLibRepository;
 
         public IGroupRepository Groups
@@ -47,15 +49,19 @@ namespace DAL.Repositories
 
         public SelectedStatusRepository SelectedStatuses => selectedStatusRepository ?? (selectedStatusRepository = new SelectedStatusRepository(context));
 
+        public ISelectedEntityRepository<SelectedEventType> SelectedEventTypes => selectedEventTypeRepository ?? (selectedEventTypeRepository = new SelectedEntityRepository<SelectedEventType>(context));
+
         public ISelectedEntityRepository<SelectedAttribute> SelectedAttributes => selectedAttributeRepository ?? (selectedAttributeRepository = new SelectedEntityRepository<SelectedAttribute>(context));
 
-        public ISelectedEntityRepository<SelectedUser> SelectedUsers => selectedUserRepository ?? (selectedUserRepository = new SelectedEntityRepository<SelectedUser>(context));
+        public SelectedUserRepository SelectedUsers => selectedUserRepository ?? (selectedUserRepository = new SelectedUserRepository(context));
 
         public StatusLibRepository StatusLibs => statusLibRepository ?? (statusLibRepository = new StatusLibRepository(context));
 
         public IRepository<IDalEntityLib, AttributeLib> AttributeLibs => attributeLibRepository ?? (attributeLibRepository = new EntityLibRepository<AttributeLib>(context));
 
-        public IRepository<IDalEntityLib, UserLib> UserLibs => userLibRepository ?? (userLibRepository = new EntityLibRepository<UserLib>(context));
+        public IRepository<IDalEntityLib, EventTypeLib> EventTypeLibs => eventTypeLibRepository ?? (eventTypeLibRepository = new EntityLibRepository<EventTypeLib>(context));
+
+        public UserLibRepository UserLibs => userLibRepository ?? (userLibRepository = new UserLibRepository(context));
 
         public FilepathLibRepository FilepathLibs => filepathLibRepository ?? (filepathLibRepository = new FilepathLibRepository(context));
 

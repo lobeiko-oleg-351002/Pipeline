@@ -15,7 +15,7 @@ namespace ORM
         [StringLength(50)]
         public string name { get; set; }
 
-        [StringLength(200)]
+        [StringLength(50)]
         public string description { get; set; }
 
         public int status_lib_id { get; set; }
@@ -26,6 +26,7 @@ namespace ORM
 
         public int receiver_lib_id { get; set; }
 
+        [Column(TypeName = "datetime2")]
         public DateTime date { get; set; }
 
         public int sender_id { get; set; }
@@ -40,8 +41,8 @@ namespace ORM
 
         public virtual StatusLib StatusLib { get; set; }
 
-        public virtual UserLib UserLib { get; set; }
-
         public virtual User User { get; set; }
+
+        public virtual UserLib UserLib { get; set; }
     }
 }

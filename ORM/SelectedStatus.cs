@@ -14,6 +14,7 @@ namespace ORM
 
         public int entity_id { get; set; }
 
+        [Column(TypeName = "datetime2")]
         public DateTime date { get; set; }
 
         public virtual Status Status { get; set; }
