@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Globals;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,10 @@ namespace AdminClient.Forms.Directories.StatusDirectory
 
         protected override void button1_Click(object sender, EventArgs e)
         {
+            if ((textBox1.Text == Globals.Globals.STATUS_CLOSED) || (textBox1.Text == Globals.Globals.STATUS_DELETED))
+            {
+                MessageBox.Show("Такие статусы уже существуют");
+            }
             if (textBox1.Text == "")
             {
                 MessageBox.Show("Введите название", "Оповещение");

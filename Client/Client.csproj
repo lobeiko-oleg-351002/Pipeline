@@ -112,6 +112,10 @@
       <Project>{964AF979-FF92-4E79-A810-AFC81EEAA6B6}</Project>
       <Name>BllEntities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Globals\Globals.csproj">
+      <Project>{EDC15B56-D994-408A-B558-6A41BE66D37C}</Project>
+      <Name>Globals</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ServerInterface\ServerInterface.csproj">
       <Project>{F749265D-39CD-4CD3-810F-CF2496B47841}</Project>
       <Name>ServerInterface</Name>

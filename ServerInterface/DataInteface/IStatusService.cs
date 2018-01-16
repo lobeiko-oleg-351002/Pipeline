@@ -17,10 +17,22 @@ namespace ServerInterface.DataInteface
         List<BllStatus> GetAllStatuses();
 
         [OperationContract]
+        List<BllStatus> GetAllStatusesExceptDeletedAndClosed();
+
+        [OperationContract]
         void DeleteStatus(int id);
 
         [OperationContract]
         BllStatus UpdateStatus(BllStatus entity);
+
+        [OperationContract]
+        bool IsContainsWithName(string name);
+
+        [OperationContract]
+        BllStatus GetStatusDeleted();
+
+        [OperationContract]
+        BllStatus GetStatusClosed();
 
     }
 }

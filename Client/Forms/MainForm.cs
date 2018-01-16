@@ -1,5 +1,6 @@
 ﻿using BllEntities;
 using Client.Forms;
+using Globals;
 using ServerInterface;
 using ServiceChannelManager;
 using System;
@@ -40,9 +41,15 @@ namespace Client
 
         BllUser User = null;
         List<BllEvent> EventList;
+        List<BllStatus> SelectedEventAvailableStatuses = new List<BllStatus>();
+        BllStatus StatusDeleted = null;
+        BllStatus StatusClosed = null;
         int SelectedRowIndex;
-        List<int> NewEventRowIndexes = new List<int>();
+        List<int> NewEventRowIndecies = new List<int>();
+        List<int> DeletedEventsIndecies = new List<int>();
+        List<int> ClosedEventsIndecies = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
+        XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
 
         bool isAppClosed;
 
@@ -56,16 +63,7 @@ namespace Client
                 {
                     Invoke(new Action(() =>
                     {
-                        textBox1.Text = GetConstFromResources("SERVER_ONLINE");
-                        создатьСобытиеToolStripMenuItem.Enabled = true;
-                        if (comboBox1.SelectedIndex > 0)
-                        {
-                            button1.Enabled = true;
-                        }
-                        if (comboBox1.Items.Count == 1)
-                        {
-                            InitStatuses();
-                        }
+                        SetControlsServerOnline();
                         if (User == null)
                         {
                             Authorize(server);
@@ -92,15 +90,25 @@ namespace Client
 
         private void SetControlsServerOffline()
         {
-            textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
-            textBox1.ForeColor = Color.Red;
+            label4.Text = Properties.Resources.SERVER_OFFLINE;
+            label4.ForeColor = Color.Red;
             создатьСобытиеToolStripMenuItem.Enabled = false;
             button1.Enabled = false;
         }
 
-        private string GetConstFromResources(string name)
+        private void SetControlsServerOnline()
         {
-            return Properties.Resources.ResourceManager.GetString(name);
+            label4.Text = Properties.Resources.SERVER_ONLINE;
+            label4.ForeColor = Color.Black;
+            создатьСобытиеToolStripMenuItem.Enabled = true;
+            if (comboBox1.SelectedIndex > 0)
+            {
+                button1.Enabled = true;
+            }
+            if (comboBox1.Items.Count == 1)
+            {
+                InitStatuses();
+            }
         }
 
         private void SetSelectedEventToControls(BllEvent Event)
@@ -122,6 +130,18 @@ namespace Client
             richTextBox1.Text = Event.Description;
 
             comboBox1.SelectedIndex = 0;
+
+            comboBox1.Items.Remove(StatusDeleted.Name);
+            comboBox1.Items.Remove(StatusClosed.Name);
+            SelectedEventAvailableStatuses.Remove(StatusDeleted);
+            SelectedEventAvailableStatuses.Remove(StatusClosed);
+            if (Event.Sender.Id == User.Id)
+            {
+                comboBox1.Items.Add(StatusDeleted.Name);
+                comboBox1.Items.Add(StatusClosed.Name);
+                SelectedEventAvailableStatuses.Add(StatusDeleted);
+                SelectedEventAvailableStatuses.Add(StatusClosed);
+            }
         }
 
         private void AddStatusToDataGrid(string name, DateTime date)
@@ -143,9 +163,9 @@ namespace Client
 
             notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
             notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
-            notifyIcon.BalloonTipTitle = GetConstFromResources("CLIENT_NAME"); ;
+            notifyIcon.BalloonTipTitle = Properties.Resources.CLIENT_NAME; ;
             notifyIcon.Icon = this.Icon;
-            notifyIcon.Text = GetConstFromResources("CLIENT_NAME"); ;
+            notifyIcon.Text = Properties.Resources.CLIENT_NAME; ;
             notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
 
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
@@ -205,25 +225,70 @@ namespace Client
         {
             if (User.StatusLib != null)
             {
+                SelectedEventAvailableStatuses.Clear();
+                StatusDeleted = server.GetStatusDeleted();
+                StatusClosed =  server.GetStatusClosed();                    
+                
                 foreach (var item in User.StatusLib.SelectedEntities)
                 {
+                    SelectedEventAvailableStatuses.Add(item.Entity);
                     comboBox1.Items.Add(item.Entity.Name);
                 }
             }
         }
 
+
+
         private void GetEventList()
         {
+            var cachedEvents = DeserializeEvents();
             if (isServerOnline == false)
             {
-                DeserializeEventsToDataGrid();
+                EventList = cachedEvents;
             }
             else
             {
-                EventList = server.GetEventsForUser(User);
-                foreach (var item in EventList)
+                var serverEvents = server.GetEventsForUser(User);
+                foreach (var cachedItem in cachedEvents)
                 {
+                    bool isExists = false;
+                    foreach (var item in serverEvents)
+                    {
+                        if (item.Id == cachedItem.Id)
+                        {
+                            isExists = true;
+                            if (cachedItem.IsAdmited)
+                            {
+                                item.IsAdmited = true;
+                            }
+                        }
+                    }
+                    if (!isExists)
+                    {
+                        EventList.Add(cachedItem);
+                        AddEventToDataGrid(cachedItem);
+                        if (cachedItem.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED)
+                        {
+                            ClosedEventsIndecies.Add(EventList.Count-1);
+                            MarkEventInDataGridAsClosed(EventList.Count - 1);
+                        }
+                        if (cachedItem.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
+                        {
+                            DeletedEventsIndecies.Add(EventList.Count-1);
+                            MarkEventInDataGridAsDeleted(EventList.Count - 1);
+                        }
+                    }
+                }
+                int i = EventList.Count;
+                foreach(var item in serverEvents)
+                {
+                    EventList.Add(item);
                     AddEventToDataGrid(item);
+                    if (!item.IsAdmited)
+                    {
+                        HighlightRow(i);
+                        NewEventRowIndecies.Add(i);
+                    }
                     foreach (var name in item.FilepathLib.Entities)
                     {
                         new Thread(delegate ()
@@ -232,39 +297,13 @@ namespace Client
                         }).Start();
 
                     }
+                    i++;
                 }
-                HighlightNewRows();
                 FlashWindow.Start(this);
                 SetEventsCountInPanel();
-                SerializeEvents();
+                SerializeEventsBackground();
             }
             
-        }
-
-        private void HighlightNewRows()
-        {
-            var EventsFromCache = DeserializeEvents();
-            for(int i = 0; i < EventList.Count; i++)
-            {
-                bool isAdmited = false;
-                foreach(var item in EventsFromCache)
-                {
-                    if (item.Id == EventList[i].Id)
-                    {
-                        if (item.IsAdmited)
-                        {
-                            EventList[i].IsAdmited = true;
-                            isAdmited = true;
-                        }
-                        break;
-                    }
-                }
-                if (!isAdmited)
-                {
-                    HighlightRow(i);
-                    NewEventRowIndexes.Add(i);
-                }
-            }
         }
 
         private void AddEventToDataGrid(BllEvent Event)
@@ -336,7 +375,7 @@ namespace Client
             {
                 if ((login == null) && (password == null))
                 {
-                    MessageBox.Show(GetConstFromResources("SERVER_NOT_FOUND") + ex.Message);
+                    MessageBox.Show(Properties.Resources.SERVER_NOT_FOUND + ex.Message);
                     ExitApp();
                 }
             }
@@ -403,7 +442,7 @@ namespace Client
             AddEventToDataGrid(Event);
             SerializeEventsBackground();
             HighlightRow(dataGridView1.RowCount - 1);
-            NewEventRowIndexes.Add(dataGridView1.Rows.Count - 1);
+            NewEventRowIndecies.Add(dataGridView1.Rows.Count - 1);
             SetEventsCountInPanel();
             TurnOutForm();
             SystemSounds.Beep.Play();
@@ -435,7 +474,7 @@ namespace Client
                     }
                     catch
                     {
-                        MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), name.Path);
+                        MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, name.Path);
                     }
                 }
             }
@@ -443,7 +482,7 @@ namespace Client
 
         private string DownloadFile(string name, string folderName)
         {
-            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + GetConstFromResources("DOWNLOADS_FOLDER");
+            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Properties.Resources.DOWNLOADS_FOLDER;
             string eventFolderPath = Path.Combine(downloadsPath, folderName);
             string filePath = Path.Combine(downloadsPath, folderName, name);
             if (!Directory.Exists(eventFolderPath))
@@ -476,9 +515,8 @@ namespace Client
         {
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
                 string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (FileStream stream = new FileStream(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Create))
+                using (FileStream stream = new FileStream(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Create))
                 {
                     serializer.Serialize(stream, EventList);
                 }
@@ -489,34 +527,13 @@ namespace Client
             }
         }
 
-        private void DeserializeEventsToDataGrid()
-        {
-            try
-            {
-                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (Stream stream = File.Open(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Open))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
-                    EventList = (List<BllEvent>)serializer.Deserialize(stream);
-                    foreach (BllEvent item in EventList)
-                    {
-                        AddEventToDataGrid(item);
-                    }
-                }
-            }
-            catch (IOException)
-            {
-            }
-        }
-
         private List<BllEvent> DeserializeEvents()
         {
             try
             {
                 string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (Stream stream = File.Open(mydoc + GetConstFromResources("CACHE_XML_FILE"), FileMode.Open))
+                using (Stream stream = File.Open(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Open))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
                     return (List<BllEvent>)serializer.Deserialize(stream);
                 }
             }
@@ -530,8 +547,8 @@ namespace Client
         
         private void SetEventsCountInPanel()
         {
-            int n = NewEventRowIndexes.Count;
-            Text = GetConstFromResources("CLIENT_NAME");
+            int n = NewEventRowIndecies.Count;
+            Text = Properties.Resources.CLIENT_NAME;
             if (n > 0)
             {
                 Text += " (" + n + ")";
@@ -542,42 +559,16 @@ namespace Client
             }
         }
 
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0)
-            {
-                return;
-            }
-            EnableStatusControls();
-            checkBox1.Checked = false;
-            if (NewEventRowIndexes.Contains(e.RowIndex))
-            {
-                EventList[e.RowIndex].IsAdmited = true;               
-                NewEventRowIndexes.Remove(e.RowIndex);
-                SetEventsCountInPanel();
-                SerializeEvents();
-            }
-            RowCommonFont(e.RowIndex);
-            SelectedRowIndex = e.RowIndex;
-            SetSelectedEventToControls(EventList[e.RowIndex]);
-            if (User != null)
-            {
-                if ((IsUserInChecklistByLogin(User, EventList[e.RowIndex].RecieverLib.SelectedEntities)) || (User.Login == EventList[e.RowIndex].Sender.Login))
-                {
-                    ShowChecklist();
-                    FillUserChecklist(EventList[e.RowIndex].RecieverLib.SelectedEntities);
-                }
-                else
-                {
-                    ShowCheckbox();
-                }
-            }
-        }
-
         private void EnableStatusControls()
         {
             comboBox1.Enabled = true;
             button1.Enabled = true;
+        }
+
+        private void DisableStatusControls()
+        {
+            comboBox1.Enabled = false;
+            button1.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -586,12 +577,12 @@ namespace Client
             
             if (isServerOnline)
             {
-                EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = User.StatusLib.SelectedEntities[comboBox1.SelectedIndex - 1].Entity });
+                EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = SelectedEventAvailableStatuses[comboBox1.SelectedIndex - 1] });
                 EventList[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventList[SelectedRowIndex], User);
-                EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
+               // EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
                 var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
                 AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
-                UpdateEventStatusInDataGrid(newStatus, dataGridView1.SelectedRows[0].Index, false);
+                UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex, false);
                 comboBox1.SelectedIndex = 0;
             }
         }
@@ -635,6 +626,15 @@ namespace Client
                             UpdateEventStatusInDataGrid(newstatus, i, true);
                         }
 
+                        if (newstatus.Entity.Name == Globals.Globals.STATUS_DELETED)
+                        {
+                            MarkEventInDataGridAsDeleted(i);
+                        }
+                        if (newstatus.Entity.Name == Globals.Globals.STATUS_CLOSED)
+                        {
+                            MarkEventInDataGridAsClosed(i);
+                        }
+
                     }
                     EventList[i] = Event;
                     break;
@@ -643,7 +643,7 @@ namespace Client
 
             if (dataGridView1.SelectedRows.Count > 0)
             {
-                if (dataGridView1.SelectedRows[0].Index == i)
+                if (SelectedRowIndex == i)
                 {
                     Invoke(new Action(() =>
                     {
@@ -654,6 +654,44 @@ namespace Client
             }
             SerializeEventsBackground();
             SystemSounds.Beep.Play();
+        }
+
+        private void MarkEventInDataGridAsClosed(int i)
+        {
+            ClosedEventsIndecies.Add(i);
+            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Gray;
+            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.LightGray;
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                if (SelectedRowIndex == i)
+                {
+                    EnableDeleteEventButton();
+                }
+            }
+        }
+
+        private void MarkEventInDataGridAsDeleted(int i)
+        {
+            DeletedEventsIndecies.Add(i);
+            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Red;
+            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.DarkRed;
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                if (SelectedRowIndex == i)
+                {
+                    EnableDeleteEventButton();
+                }
+            }
+        }
+
+        private void EnableDeleteEventButton()
+        {
+            удалитьСобытиеToolStripMenuItem.Enabled = true;
+        }
+
+        private void DisableDeleteEventButton()
+        {
+            удалитьСобытиеToolStripMenuItem.Enabled = false;
         }
 
         private void FillStatusDataGrid(BllStatusLib lib)
@@ -705,7 +743,7 @@ namespace Client
         {
             notifyIcon.Visible = true;
             notifyIcon.ShowBalloonTip(3000);
-            if (NewEventRowIndexes.Count != 0)
+            if (NewEventRowIndecies.Count != 0)
             {
                 SetTrayNewEventIcon();
             }
@@ -755,7 +793,7 @@ namespace Client
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var currentEvent = EventList[dataGridView1.SelectedRows[0].Index];
+            var currentEvent = EventList[SelectedRowIndex];
             if (checkBox1.Checked)
             {
                 ShowChecklist();
@@ -803,6 +841,12 @@ namespace Client
             groupBox1.Visible = false;
         }
 
+        private void HideChecklistAndCheckbox()
+        {
+            groupBox4.Visible = false;
+            groupBox1.Visible = false;
+        }
+
         
 
         private void AddUserToChecklist(BllUser user)
@@ -844,8 +888,92 @@ namespace Client
             }
             catch
             {
-                MessageBox.Show(GetConstFromResources("CANNOT_OPEN_FILE"), EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path);
+                MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, EventList[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path);
             }
+        }
+
+        private void удалитьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EventList.RemoveAt(SelectedRowIndex);
+            dataGridView1.Rows.RemoveAt(SelectedRowIndex);
+
+            SerializeEventsBackground();
+        }
+
+        private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            SelectedRowIndex = -1;
+            if (e.StateChanged != DataGridViewElementStates.Selected) return;
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                ClearDataControls();
+                return;
+            }
+            SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
+            EnableStatusControls();
+            checkBox1.Checked = false;
+            if (ClosedEventsIndecies.Contains(SelectedRowIndex) || DeletedEventsIndecies.Contains(SelectedRowIndex))
+            {
+                EnableDeleteEventButton();
+            }
+            else
+            {
+                DisableDeleteEventButton();
+            }
+            if (NewEventRowIndecies.Contains(SelectedRowIndex))
+            {
+                EventList[SelectedRowIndex].IsAdmited = true;
+                NewEventRowIndecies.Remove(SelectedRowIndex);
+                SetEventsCountInPanel();
+                SerializeEventsBackground();
+            }
+            RowCommonFont(SelectedRowIndex);
+            SetSelectedEventToControls(EventList[SelectedRowIndex]);
+            if (User != null)
+            {
+                if ((IsUserInChecklistByLogin(User, EventList[SelectedRowIndex].RecieverLib.SelectedEntities)) || (User.Login == EventList[SelectedRowIndex].Sender.Login))
+                {
+                    ShowChecklist();
+                    FillUserChecklist(EventList[SelectedRowIndex].RecieverLib.SelectedEntities);
+
+                    if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
+                    {
+                        if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED ||
+                            EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
+                        {
+                            if (User.Login == EventList[SelectedRowIndex].Sender.Login)
+                            {
+                                EnableStatusControls();
+                            }
+                            else
+                            {
+                                DisableStatusControls();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ShowCheckbox();
+                }
+            }
+        }
+
+        private void ClearDataControls()
+        {
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            textBox5.Text = "";
+            richTextBox1.Text = "";
+            dataGridView2.Rows.Clear();
+            comboBox1.Enabled = false;
+            comboBox1.SelectedIndex = 0;
+            button1.Enabled = false;
+            listBox2.Items.Clear();
+            checkBox1.Checked = false;
+            HideChecklistAndCheckbox();
+            удалитьСобытиеToolStripMenuItem.Enabled = false;
         }
     }
 }

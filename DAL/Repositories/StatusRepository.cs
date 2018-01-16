@@ -16,5 +16,34 @@ namespace DAL.Repositories
         {
             this.context = context;
         }
+
+        public List<DalStatus> GetAllStatusesExceptDeletedAndClosed()
+        {
+            var items = context.Set<Status>().Where(e => (e.name != Globals.Globals.STATUS_CLOSED) && (e.name != Globals.Globals.STATUS_DELETED));
+            List<DalStatus> res = new List<DalStatus>();
+            if (items.Any())
+            {
+                foreach (var item in items)
+                {
+                    res.Add(mapper.MapToDal(item));
+                }
+            }
+            return res;
+        }
+
+        public DalStatus GetStatusClosed()
+        {
+            return mapper.MapToDal(context.Set<Status>().FirstOrDefault(e => e.name == Globals.Globals.STATUS_CLOSED));
+        }
+
+        public DalStatus GetStatusDeleted()
+        {
+            return mapper.MapToDal(context.Set<Status>().FirstOrDefault(e => e.name == Globals.Globals.STATUS_DELETED));
+        }
+
+        public bool IsContainsWithName(string name)
+        {
+            return context.Set<Status>().Any(e => e.name == name);
+        }
     }
 }

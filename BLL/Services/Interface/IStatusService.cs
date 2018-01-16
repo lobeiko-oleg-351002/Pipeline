@@ -8,6 +8,9 @@ namespace BLL.Services.Interface
 {
     public interface IStatusService : IService<BllStatus>
     {
-
+        bool IsContainsWithName(string name);
+        List<BllStatus> GetAllStatusesExceptDeletedAndClosed();
+        BllStatus GetStatusDeleted();
+        BllStatus GetStatusClosed();
     }
 }

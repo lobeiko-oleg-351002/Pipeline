@@ -25,6 +25,8 @@ namespace Server
                 fileService.Open();
                 ServiceHost launcherService = new ServiceHost(typeof(LauncherService));
                 launcherService.Open();
+
+                
             }
             catch(Exception ex)
             {

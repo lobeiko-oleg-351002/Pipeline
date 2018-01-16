@@ -79,7 +79,7 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pipeline.
+        ///   Looks up a localized string similar to EDOC.
         /// </summary>
         internal static string CLIENT_NAME {
             get {

@@ -1,8 +1,10 @@
 ﻿using BLL.Services;
 using BLL.Services.Interface;
 using BllEntities;
+using DAL.Entities;
 using DAL.Repositories;
 using DAL.Repositories.Interface;
+using Globals;
 using ORM;
 using ServerInterface;
 using System;
@@ -34,7 +36,14 @@ namespace Server
             serviceDB = new ServiceDB();
             uow = new UnitOfWork(serviceDB);
 
-            uow.Events.GetAll();
+            if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_CLOSED))
+            {
+                uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_CLOSED});
+            }
+            if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_DELETED))
+            {
+                uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_DELETED });
+            }
         }
 
   
@@ -220,6 +229,30 @@ namespace Server
         {
             IStatusService service = new StatusService(uow);
             return service.Update(entity);
+        }
+
+        public bool IsContainsWithName(string name)
+        {
+            IStatusService service = new StatusService(uow);
+            return service.IsContainsWithName(name);
+        }
+
+        public List<BllStatus> GetAllStatusesExceptDeletedAndClosed()
+        {
+            IStatusService service = new StatusService(uow);
+            return service.GetAllStatusesExceptDeletedAndClosed();
+        }
+
+        public BllStatus GetStatusDeleted()
+        {
+            IStatusService service = new StatusService(uow);
+            return service.GetStatusDeleted();
+        }
+
+        public BllStatus GetStatusClosed()
+        {
+            IStatusService service = new StatusService(uow);
+            return service.GetStatusClosed();
         }
         #endregion
 

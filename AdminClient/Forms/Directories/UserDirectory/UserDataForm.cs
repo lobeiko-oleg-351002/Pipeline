@@ -37,7 +37,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 comboBox1.SelectedIndex = 0;
             }
 
-            Statuses = server.GetAllStatuses();
+            Statuses = server.GetAllStatusesExceptDeletedAndClosed();
             foreach(var item in Statuses)
             {
                 checkedListBox3.Items.Add(item.Name);

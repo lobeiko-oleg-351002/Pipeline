@@ -47,17 +47,32 @@ namespace AdminClient.Forms.Directories.StatusDirectory
         protected override void button2_Click(object sender, EventArgs e)
         {
             int i = dataGridView1.SelectedRows[0].Index;
-            AmendStatusForm amendStatusForm = new AmendStatusForm(this, server, Statuses[i]);
-            amendStatusForm.ShowDialog(this);
-            UpdateRow(amendStatusForm.Entity, i);
+            if ((Statuses[i].Name != Globals.Globals.STATUS_CLOSED) && (Statuses[i].Name != Globals.Globals.STATUS_DELETED))
+            {
+                AmendStatusForm amendStatusForm = new AmendStatusForm(this, server, Statuses[i]);
+                amendStatusForm.ShowDialog(this);
+                UpdateRow(amendStatusForm.Entity, i);
+            }
+            else
+            {
+                MessageBox.Show("Эти статусы нельзя изменить");
+            }
         }
 
         protected override void button3_Click(object sender, EventArgs e)
         {
             int i = dataGridView1.SelectedRows[0].Index;
-            server.DeleteStatus(Statuses[i].Id);
-            dataGridView1.Rows.RemoveAt(i);
-            Statuses.RemoveAt(i);
+            if ((Statuses[i].Name != Globals.Globals.STATUS_CLOSED) && (Statuses[i].Name != Globals.Globals.STATUS_DELETED))
+            {
+                server.DeleteStatus(Statuses[i].Id);
+                dataGridView1.Rows.RemoveAt(i);
+                Statuses.RemoveAt(i);
+            }
+            else
+            {
+                MessageBox.Show("Эти статусы нельзя удалить");
+            }
+
             base.button3_Click(sender, e);
         }
 

@@ -18,5 +18,34 @@ namespace BLL.Services
         {
 
         }
+
+        public List<BllStatus> GetAllStatusesExceptDeletedAndClosed()
+        { 
+            var items = uow.Statuses.GetAllStatusesExceptDeletedAndClosed();
+            List<BllStatus> res = new List<BllStatus>();
+            if (items.Any())
+            {
+                foreach (var item in items)
+                {
+                    res.Add(mapper.MapToBll(item));
+                }
+            }
+            return res;
+        }
+
+        public BllStatus GetStatusClosed()
+        {
+            return mapper.MapToBll(uow.Statuses.GetStatusClosed());
+        }
+
+        public BllStatus GetStatusDeleted()
+        {
+            return mapper.MapToBll(uow.Statuses.GetStatusDeleted());
+        }
+
+        public bool IsContainsWithName(string name)
+        {
+            return uow.Statuses.IsContainsWithName(name);
+        }
     }
 }

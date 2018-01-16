@@ -9,5 +9,9 @@ namespace DAL.Repositories.Interface
 {
     public interface IStatusRepository : IRepository<DalStatus, Status>
     {
+        bool IsContainsWithName(string name);
+        List<DalStatus> GetAllStatusesExceptDeletedAndClosed();
+        DalStatus GetStatusDeleted();
+        DalStatus GetStatusClosed();
     }
 }
