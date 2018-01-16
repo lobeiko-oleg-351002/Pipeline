@@ -19,3 +19,4 @@ E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.SignInForm.resources
 E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.Forms.AddEventForm.resources
 E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\Globals.dll
 E:\Projects\Visual Studio\Pipeline\Client\bin\Debug\Globals.pdb
+E:\Projects\Visual Studio\Pipeline\Client\obj\Debug\Client.Forms.Settings.resources

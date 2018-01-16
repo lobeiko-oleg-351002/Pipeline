@@ -152,6 +152,42 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SOUND_EVENT.
+        /// </summary>
+        internal static string TAG_SOUND_EVENT {
+            get {
+                return ResourceManager.GetString("TAG_SOUND_EVENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SOUND_STATUS.
+        /// </summary>
+        internal static string TAG_SOUND_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_SOUND_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TURNOUT_EVENT.
+        /// </summary>
+        internal static string TAG_TURNOUT_EVENT {
+            get {
+                return ResourceManager.GetString("TAG_TURNOUT_EVENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TURNOUT_STATUS.
+        /// </summary>
+        internal static string TAG_TURNOUT_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_TURNOUT_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Неверный логин/пароль.
         /// </summary>
         internal static string USER_NOT_FOUND {

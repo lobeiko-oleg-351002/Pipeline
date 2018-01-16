@@ -68,6 +68,14 @@ namespace Client
                         {
                             Authorize(server);
                         }
+                        if (StatusClosed == null)
+                        {
+                            StatusClosed = server.GetStatusClosed();
+                        }
+                        if (StatusDeleted == null)
+                        {
+                            StatusDeleted = server.GetStatusDeleted();
+                        }
                     }));
                 }
                 if ((value == false) && (_isServerOnline == true))
@@ -130,17 +138,22 @@ namespace Client
             richTextBox1.Text = Event.Description;
 
             comboBox1.SelectedIndex = 0;
+            comboBox1.Enabled = true;
+            button1.Enabled = false;
 
-            comboBox1.Items.Remove(StatusDeleted.Name);
-            comboBox1.Items.Remove(StatusClosed.Name);
-            SelectedEventAvailableStatuses.Remove(StatusDeleted);
-            SelectedEventAvailableStatuses.Remove(StatusClosed);
-            if (Event.Sender.Id == User.Id)
+            if (StatusDeleted != null)
             {
-                comboBox1.Items.Add(StatusDeleted.Name);
-                comboBox1.Items.Add(StatusClosed.Name);
-                SelectedEventAvailableStatuses.Add(StatusDeleted);
-                SelectedEventAvailableStatuses.Add(StatusClosed);
+                comboBox1.Items.Remove(StatusDeleted.Name);
+                comboBox1.Items.Remove(StatusClosed.Name);
+                SelectedEventAvailableStatuses.Remove(StatusDeleted);
+                SelectedEventAvailableStatuses.Remove(StatusClosed);
+                if (Event.Sender.Id == User.Id)
+                {
+                    comboBox1.Items.Add(StatusDeleted.Name);
+                    comboBox1.Items.Add(StatusClosed.Name);
+                    SelectedEventAvailableStatuses.Add(StatusDeleted);
+                    SelectedEventAvailableStatuses.Add(StatusClosed);
+                }
             }
         }
 
@@ -245,37 +258,34 @@ namespace Client
             if (isServerOnline == false)
             {
                 EventList = cachedEvents;
+                foreach(var item in EventList)
+                {
+                    AddEventToDataGrid(item);
+                }
             }
             else
             {
                 var serverEvents = server.GetEventsForUser(User);
-                foreach (var cachedItem in cachedEvents)
+                if (cachedEvents != null)
                 {
-                    bool isExists = false;
-                    foreach (var item in serverEvents)
+                    foreach (var cachedItem in cachedEvents)
                     {
-                        if (item.Id == cachedItem.Id)
+                        bool isExists = false;
+                        foreach (var item in serverEvents)
                         {
-                            isExists = true;
-                            if (cachedItem.IsAdmited)
+                            if (item.Id == cachedItem.Id)
                             {
-                                item.IsAdmited = true;
+                                isExists = true;
+                                if (cachedItem.IsAdmited)
+                                {
+                                    item.IsAdmited = true;
+                                }
                             }
                         }
-                    }
-                    if (!isExists)
-                    {
-                        EventList.Add(cachedItem);
-                        AddEventToDataGrid(cachedItem);
-                        if (cachedItem.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED)
+                        if (!isExists)
                         {
-                            ClosedEventsIndecies.Add(EventList.Count-1);
-                            MarkEventInDataGridAsClosed(EventList.Count - 1);
-                        }
-                        if (cachedItem.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
-                        {
-                            DeletedEventsIndecies.Add(EventList.Count-1);
-                            MarkEventInDataGridAsDeleted(EventList.Count - 1);
+                            EventList.Add(cachedItem);
+                            AddEventToDataGrid(cachedItem);
                         }
                     }
                 }
@@ -284,11 +294,6 @@ namespace Client
                 {
                     EventList.Add(item);
                     AddEventToDataGrid(item);
-                    if (!item.IsAdmited)
-                    {
-                        HighlightRow(i);
-                        NewEventRowIndecies.Add(i);
-                    }
                     foreach (var name in item.FilepathLib.Entities)
                     {
                         new Thread(delegate ()
@@ -336,6 +341,27 @@ namespace Client
             row.Cells[7].Value = Event.Description;
 
             dataGridView1.Rows.Add(row);
+            int i = dataGridView1.Rows.Count - 1;
+            if (!Event.IsAdmited && (Event.Sender.Id != User.Id))
+            {
+                HighlightRow(i);
+                NewEventRowIndecies.Add(i);
+            }
+
+            if (Event.StatusLib.SelectedEntities.Count > 0)
+            {
+                if (Event.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED)
+                {
+                    ClosedEventsIndecies.Add(i);
+                    MarkEventInDataGridAsClosed(i);
+                }
+                if (Event.StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
+                {
+                    DeletedEventsIndecies.Add(i);
+                    MarkEventInDataGridAsDeleted(i);
+                }
+            }
+            
         }
 
         private void Authorize(IBusinessService server)
@@ -426,6 +452,12 @@ namespace Client
 
         }
 
+        private void MakeCommonRowBackground(int i)
+        {
+            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Black;
+            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
+        }
+
         private void RowCommonFont(int i)
         {
             DataGridViewCellStyle style = new DataGridViewCellStyle();
@@ -438,16 +470,49 @@ namespace Client
 
         public void GetEvent(BllEvent Event)
         {
+            Event.IsAdmited = false;
             EventList.Add(Event);
-            AddEventToDataGrid(Event);
-            SerializeEventsBackground();
-            HighlightRow(dataGridView1.RowCount - 1);
-            NewEventRowIndecies.Add(dataGridView1.Rows.Count - 1);
-            SetEventsCountInPanel();
-            TurnOutForm();
-            SystemSounds.Beep.Play();
-            FlashWindow.Start(this);
+            Invoke(new Action(() =>
+            {
+                AddEventToDataGrid(Event);
+                SerializeEventsBackground();
+
+                SetEventsCountInPanel();
+                if (GetConfigBoolKeyValue(Properties.Resources.TAG_TURNOUT_EVENT) && notifyIcon.Visible)
+                {
+                    TurnOutForm();
+                }
+                else
+                {
+                    SetTrayNewEventIcon();
+                }
+
+                FlashWindow.Start(this);
+                if (GetConfigBoolKeyValue(Properties.Resources.TAG_SOUND_EVENT))
+                {
+                    SystemSounds.Beep.Play();
+                }
+            }));
+            
+
+
         }
+
+        private bool GetConfigBoolKeyValue(string tag)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+            if (ConfigurationManager.AppSettings[tag] != null)
+            {
+                 return bool.Parse(config.AppSettings.Settings[tag].Value);
+            }
+            else
+            {                
+                config.AppSettings.Settings.Add(tag, "false");
+                return false;
+            }
+        }
+
+        
 
         private void SerializeEventsBackground()
         {
@@ -616,7 +681,7 @@ namespace Client
                         if (EventList[i].StatusLib.SelectedEntities.Count > 0)
                         {                          
                             var oldstatus = EventList[i].StatusLib.SelectedEntities.Last();
-                            if (newstatus.Entity.Id != oldstatus.Entity.Id)
+                            if (newstatus.Date != oldstatus.Date)
                             {
                                 UpdateEventStatusInDataGrid(newstatus, i, true);
                             }
@@ -624,15 +689,6 @@ namespace Client
                         else
                         {
                             UpdateEventStatusInDataGrid(newstatus, i, true);
-                        }
-
-                        if (newstatus.Entity.Name == Globals.Globals.STATUS_DELETED)
-                        {
-                            MarkEventInDataGridAsDeleted(i);
-                        }
-                        if (newstatus.Entity.Name == Globals.Globals.STATUS_CLOSED)
-                        {
-                            MarkEventInDataGridAsClosed(i);
                         }
 
                     }
@@ -653,7 +709,16 @@ namespace Client
                 }
             }
             SerializeEventsBackground();
-            SystemSounds.Beep.Play();
+
+            if (GetConfigBoolKeyValue(Properties.Resources.TAG_TURNOUT_STATUS) && notifyIcon.Visible)
+            {
+                TurnOutForm();
+            }
+            //FlashWindow.Start(this);
+            if (GetConfigBoolKeyValue(Properties.Resources.TAG_SOUND_STATUS))
+            {
+                SystemSounds.Beep.Play();
+            }
         }
 
         private void MarkEventInDataGridAsClosed(int i)
@@ -711,6 +776,22 @@ namespace Client
             {
                 cell.Style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
             }
+            if (status.Entity.Name == Globals.Globals.STATUS_CLOSED)
+            {
+                MarkEventInDataGridAsClosed(index);
+            }
+            else
+            {
+                if (status.Entity.Name == Globals.Globals.STATUS_DELETED)
+                {
+                    MarkEventInDataGridAsDeleted(index);
+                }
+                else
+                {
+                    MakeCommonRowBackground(index);
+                }
+            }
+
 
         }
 
@@ -849,21 +930,35 @@ namespace Client
 
         
 
-        private void AddUserToChecklist(BllUser user)
+        private void AddUserToChecklist(BllUser user, bool isAccepted)
         {
-            listBox4.Items.Add(user.Fullname);
+            listView1.Items.Add(user.Fullname);
+            if (isAccepted)
+            {
+                listView1.Items[listView1.Items.Count - 1].ForeColor = Color.Green;
+            }
         }
 
         private void FillUserChecklist(List<BllSelectedUser> users)
         {
-            listBox4.Items.Clear();
+            listView1.Items.Clear();
+            foreach (var item in users)
+            {
+                if (!item.IsEventAccepted)
+                {
+                    AddUserToChecklist(item.Entity, false);
+                }
+            }
+            int acceptedEvents = 0;
             foreach(var item in users)
             {
                 if (item.IsEventAccepted)
                 {
-                    AddUserToChecklist(item.Entity);
+                    AddUserToChecklist(item.Entity, true);
+                    acceptedEvents++;
                 }
             }
+            groupBox1.Text = "Ознакомились " + acceptedEvents + " из " + users.Count;
         }
 
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -910,7 +1005,7 @@ namespace Client
                 return;
             }
             SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
-            EnableStatusControls();
+            
             checkBox1.Checked = false;
             if (ClosedEventsIndecies.Contains(SelectedRowIndex) || DeletedEventsIndecies.Contains(SelectedRowIndex))
             {
@@ -935,27 +1030,31 @@ namespace Client
                 {
                     ShowChecklist();
                     FillUserChecklist(EventList[SelectedRowIndex].RecieverLib.SelectedEntities);
-
-                    if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
-                    {
-                        if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED ||
-                            EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
-                        {
-                            if (User.Login == EventList[SelectedRowIndex].Sender.Login)
-                            {
-                                EnableStatusControls();
-                            }
-                            else
-                            {
-                                DisableStatusControls();
-                            }
-                        }
-                    }
                 }
                 else
                 {
-                    ShowCheckbox();
+                    if (isServerOnline)
+                    {
+                        ShowCheckbox();
+                    }
                 }
+                if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
+                {
+                    if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED ||
+                        EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
+                    {
+                        if (User.Login == EventList[SelectedRowIndex].Sender.Login)
+                        {
+                            EnableStatusControls();
+                        }
+                        else
+                        {
+                            DisableStatusControls();
+                            HideChecklistAndCheckbox();
+                        }
+                    }
+                }
+
             }
         }
 
@@ -967,13 +1066,18 @@ namespace Client
             textBox5.Text = "";
             richTextBox1.Text = "";
             dataGridView2.Rows.Clear();
-            comboBox1.Enabled = false;
             comboBox1.SelectedIndex = 0;
-            button1.Enabled = false;
+            DisableStatusControls();
             listBox2.Items.Clear();
             checkBox1.Checked = false;
             HideChecklistAndCheckbox();
             удалитьСобытиеToolStripMenuItem.Enabled = false;
+        }
+
+        private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings settings = new Settings();
+            settings.ShowDialog();
         }
     }
 }
