@@ -90,6 +90,65 @@ namespace Client
                 _isServerOnline = value;
             }
         }
+        
+        public static class AppConfigManager
+        {
+            public static string GetKeyValue(string tag)
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                if (config.AppSettings.Settings[tag] != null)
+                {
+                    return config.AppSettings.Settings[tag].Value;
+                }
+                return null;
+            }
+
+            public static void SetKeyValue(string tag, string value)
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                if (ConfigurationManager.AppSettings[tag] != null)
+                {
+                    config.AppSettings.Settings[tag].Value = value;
+                }
+                else
+                {
+                    config.AppSettings.Settings.Add(tag, value);
+                }
+                config.Save(ConfigurationSaveMode.Minimal);
+            }
+
+            public static bool GetBoolKeyValue(string tag)
+            {                
+                var value = GetKeyValue(tag);
+                if (value != null)
+                {
+                    return bool.Parse(value);
+                }
+                else
+                {
+                    Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                    config.AppSettings.Settings.Add(tag, bool.FalseString);
+                    return false;
+                }
+            }
+
+            public static void ClearTagValues(string tag)
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                if (config.AppSettings.Settings[tag] != null)
+                {
+                    config.AppSettings.Settings[tag].Value = "";
+                    config.Save(ConfigurationSaveMode.Minimal);
+                }
+            }
+
+            public static void AddKeyValue(string tag, string value)
+            {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                config.AppSettings.Settings.Add(tag, value);
+                config.Save(ConfigurationSaveMode.Minimal);
+            }
+        }
 
         private void LogMessage(string message)
         {
@@ -169,7 +228,7 @@ namespace Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            string ip = ConfigurationManager.AppSettings[IP_KEY];
+            string ip = AppConfigManager.GetKeyValue(IP_KEY);
             server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
             EventList = new List<BllEvent>();
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
@@ -216,15 +275,13 @@ namespace Client
             {
                 if (isServerOnline == false)
                 {
-                    string ip = ConfigurationManager.AppSettings[IP_KEY];
+                    string ip = AppConfigManager.GetKeyValue(IP_KEY);
                     server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
                     
                 }
                 server.PingServer();
-                if (User.Id == 0)
-                {
-                    Authorize(server);
-                }
+                Authorize(server);
+                
                 isServerOnline = true;
             }
             catch(Exception ex)
@@ -366,8 +423,8 @@ namespace Client
 
         private void Authorize(IBusinessService server)
         {
-            string login = ConfigurationManager.AppSettings[LOGIN_TAG];
-            string password = ConfigurationManager.AppSettings[PASSWORD_TAG];
+            string login = AppConfigManager.GetKeyValue(LOGIN_TAG);
+            string password = AppConfigManager.GetKeyValue(PASSWORD_TAG);
             User = new BllUser { Login = login, Password = password };
             try
             {
@@ -409,10 +466,8 @@ namespace Client
 
         private void WriteLoginAndPasswordToConfig(string login, string password)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-            config.AppSettings.Settings.Add(LOGIN_TAG, login);
-            config.AppSettings.Settings.Add(PASSWORD_TAG, password);
-            config.Save(ConfigurationSaveMode.Minimal);
+            AppConfigManager.SetKeyValue(LOGIN_TAG, login);
+            AppConfigManager.SetKeyValue(PASSWORD_TAG, password);
         }
 
         private void ExitApp()
@@ -478,7 +533,7 @@ namespace Client
                 SerializeEventsBackground();
 
                 SetEventsCountInPanel();
-                if (GetConfigBoolKeyValue(Properties.Resources.TAG_TURNOUT_EVENT) && notifyIcon.Visible)
+                if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_EVENT) && notifyIcon.Visible)
                 {
                     TurnOutForm();
                 }
@@ -488,7 +543,7 @@ namespace Client
                 }
 
                 FlashWindow.Start(this);
-                if (GetConfigBoolKeyValue(Properties.Resources.TAG_SOUND_EVENT))
+                if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_EVENT))
                 {
                     SystemSounds.Beep.Play();
                 }
@@ -498,19 +553,7 @@ namespace Client
 
         }
 
-        private bool GetConfigBoolKeyValue(string tag)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-            if (ConfigurationManager.AppSettings[tag] != null)
-            {
-                 return bool.Parse(config.AppSettings.Settings[tag].Value);
-            }
-            else
-            {                
-                config.AppSettings.Settings.Add(tag, "false");
-                return false;
-            }
-        }
+
 
         
 
@@ -710,12 +753,12 @@ namespace Client
             }
             SerializeEventsBackground();
 
-            if (GetConfigBoolKeyValue(Properties.Resources.TAG_TURNOUT_STATUS) && notifyIcon.Visible)
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_STATUS) && notifyIcon.Visible)
             {
                 TurnOutForm();
             }
             //FlashWindow.Start(this);
-            if (GetConfigBoolKeyValue(Properties.Resources.TAG_SOUND_STATUS))
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_STATUS))
             {
                 SystemSounds.Beep.Play();
             }
@@ -936,6 +979,10 @@ namespace Client
             if (isAccepted)
             {
                 listView1.Items[listView1.Items.Count - 1].ForeColor = Color.Green;
+            }
+            else
+            {
+                listView1.Items[listView1.Items.Count - 1].ForeColor = Color.Gray;
             }
         }
 

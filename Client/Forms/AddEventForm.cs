@@ -42,6 +42,7 @@ namespace Client.Forms
             if (comboBox2.Items.Count > 0)
             {
                 comboBox2.SelectedIndex = 0;
+                
             }
 
             Attributes = server.GetAllAttributes();
@@ -65,9 +66,53 @@ namespace Client.Forms
                     }
                 }
             }
+            CheckUserNodesAccordingEventType(sender.EventTypeLib.SelectedEntities[0].Entity.Id);
 
 
 
+        }
+
+        public void UncheckAllNodes(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.Checked = false;
+                CheckChildren(node, false);
+            }
+        }
+
+        private void CheckChildren(TreeNode rootNode, bool isChecked)
+        {
+            foreach (TreeNode node in rootNode.Nodes)
+            {
+                CheckChildren(node, isChecked);
+                node.Checked = isChecked;
+            }
+        }
+
+        private void CheckUserNodesAccordingEventType(int eventId)
+        {
+            UncheckAllNodes(treeView1.Nodes);
+            string nodesStr = MainForm.AppConfigManager.GetKeyValue(eventId.ToString());
+            if (nodesStr != null)
+            {
+                List<string> nodes = nodesStr.Split(',').ToList();
+
+                foreach (TreeNode groupNode in treeView1.Nodes)
+                {
+                    if (nodes.Contains(groupNode.Text))
+                    {
+                        groupNode.Checked = true;
+                    }
+                    foreach (TreeNode userNode in groupNode.Nodes)
+                    {
+                        if (nodes.Contains(userNode.Text))
+                        {
+                            userNode.Checked = true;
+                        }
+                    }
+                }
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -99,13 +144,19 @@ namespace Client.Forms
             Event.RecieverLib = new BllUserLib();
             Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Sender, IsEventAccepted = true });
             int nodeCount = 0;
+            MainForm.AppConfigManager.ClearTagValues(Event.Type.Id.ToString());
             foreach (TreeNode groupNode in treeView1.Nodes)
             {
+                if (groupNode.Checked)
+                {
+                    SaveUserNodeAccordingEventTypeInConfig(groupNode.Text);
+                }
                 foreach (TreeNode userNode in groupNode.Nodes)
                 {
                     if (userNode.Checked)
                     {
                         Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Users[userNode.Index + nodeCount] });
+                        SaveUserNodeAccordingEventTypeInConfig(userNode.Text);
                     }
                 }
                 nodeCount += groupNode.GetNodeCount(false);
@@ -147,6 +198,7 @@ namespace Client.Forms
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             textBox1.Text = comboBox2.Text;
+            CheckUserNodesAccordingEventType(Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity.Id);
         }
 
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
@@ -196,6 +248,14 @@ namespace Client.Forms
                 ToolTip tt = new ToolTip();
                 tt.Show(Properties.Resources.INVALID_INPUT, textBox1, 0, 0, 4000);
             }
+        }
+
+        private void SaveUserNodeAccordingEventTypeInConfig(string nodeName)
+        {
+            string eventTag = Event.Type.Id.ToString();
+            MainForm.AppConfigManager.AddKeyValue(eventTag, nodeName);
+                
+
         }
     }
 }

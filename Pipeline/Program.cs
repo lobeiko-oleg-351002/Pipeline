@@ -34,7 +34,7 @@ namespace Server
             }
             while(true)
             {
-                Console.WriteLine("[" + DateTime.Now.ToString("HH:mm") + "]: Host is working.");
+                Console.WriteLine("[" + DateTime.Now.ToString("HH:mm") + "]: Host is working. Users online: " + BusinessService.GetUsersOnlineCount() + ".");
                 Thread.Sleep(10000);
                 BusinessService.PingClients();
 

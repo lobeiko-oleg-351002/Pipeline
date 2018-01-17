@@ -163,6 +163,11 @@ namespace Server
             }
         }
 
+        public static int GetUsersOnlineCount()
+        {
+            return Clients.Count;
+        }
+
         public BllUser SignIn(string login, string password)
         {
             IUserService service = new UserService(uow);
