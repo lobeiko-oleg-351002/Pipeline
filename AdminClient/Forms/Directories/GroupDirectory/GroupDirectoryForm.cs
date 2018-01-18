@@ -41,7 +41,11 @@ namespace AdminClient.Forms.Directories.GroupDirectory
         {
             AddGroupForm addGroupForm = new AddGroupForm(this, server, null);
             addGroupForm.ShowDialog(this);
-            AddNewRow(addGroupForm.Entity);
+            if (addGroupForm.Entity != null)
+            {
+                AddNewRow(addGroupForm.Entity);
+                Groups.Add((BllGroup)addGroupForm.Entity);
+            }
         }
 
         protected override void button2_Click(object sender, EventArgs e)

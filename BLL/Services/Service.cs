@@ -34,9 +34,10 @@ namespace BLL.Services
 
         public virtual T Create(T entity)
         {
-            var newEntity = repository.Create(mapper.MapToDal(entity));
+            var newEntity = repository.CreateAndReturnOrm(mapper.MapToDal(entity));
             uow.Commit();
-            return mapper.MapToBll(newEntity);
+            entity.Id = newEntity.id;
+            return entity;
         }
 
         public virtual void Delete(int id)

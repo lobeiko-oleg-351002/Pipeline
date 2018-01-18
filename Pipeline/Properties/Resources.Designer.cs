@@ -77,14 +77,5 @@ namespace Pipeline.Properties {
                 return ResourceManager.GetString("UPDATE_PATH", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 0.36.
-        /// </summary>
-        internal static string VERSION {
-            get {
-                return ResourceManager.GetString("VERSION", resourceCulture);
-            }
-        }
     }
 }

@@ -21,6 +21,11 @@ namespace ServerInterface
         [OperationContract]
         BllEvent CreateAndSendOutEvent(BllEvent Event);
 
+        [OperationContract]
+        void SetClientVersion(string version);
+        
+        [OperationContract]
+        string GetClientVersion();
 
         [OperationContract]
         BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser updater);

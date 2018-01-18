@@ -33,7 +33,8 @@ namespace DAL.Repositories
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var ormEntity = context.Set<SelectedStatus>().Single(e => e.id == id);
+            context.Set<SelectedStatus>().Remove(ormEntity);
         }
 
         public IDalSelectedEntity Get(int id)

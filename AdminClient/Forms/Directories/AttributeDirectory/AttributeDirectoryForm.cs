@@ -41,7 +41,11 @@ namespace AdminClient.Forms.Directories.AttributeDirectory
         {
             AddAttributeForm addAttributeForm = new AddAttributeForm(this, server, null);
             addAttributeForm.ShowDialog(this);
-            AddNewRow(addAttributeForm.Entity);
+            if (addAttributeForm.Entity != null)
+            {
+                AddNewRow(addAttributeForm.Entity);
+                Attributes.Add((BllAttribute)addAttributeForm.Entity);
+            }
         }
 
         protected override void button2_Click(object sender, EventArgs e)

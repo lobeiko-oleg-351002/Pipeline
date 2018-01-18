@@ -9,6 +9,7 @@ using ORM;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
@@ -29,6 +30,7 @@ namespace Server
         private static object locker = new object();
 
         private const string SERVER_STATE = "Online";
+        private const string TAG_VERSION = "CLIENT_VERSION";
 
 
         public static void Init()
@@ -46,7 +48,31 @@ namespace Server
             }
         }
 
-  
+        public void SetClientVersion(string version)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings[TAG_VERSION] != null)
+            {
+                config.AppSettings.Settings[TAG_VERSION].Value = version;
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(TAG_VERSION, version);
+            }
+            config.Save(ConfigurationSaveMode.Minimal);
+        }
+
+        public string GetClientVersion()
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings[TAG_VERSION] != null)
+            {
+                return config.AppSettings.Settings[TAG_VERSION].Value;
+            }
+            return null;
+        }
+
+
         public BllEvent CreateAndSendOutEvent(BllEvent Event)
         {
             var datetime = DateTime.Now;
@@ -64,7 +90,9 @@ namespace Server
         public List<BllEvent> GetEventsForUser(BllUser user)
         {
             IEventService eventService = new EventService(uow);
-            return eventService.GetEventsForUser(user).ToList();
+            var events = eventService.GetEventsForUser(user).ToList();
+
+            return events;
         }
 
         public IEnumerable<BllUser> GetUsersByGroup(BllGroup group)
@@ -364,6 +392,8 @@ namespace Server
             return service.Update(entity);
         }
         #endregion
+
+
 
     }
 }

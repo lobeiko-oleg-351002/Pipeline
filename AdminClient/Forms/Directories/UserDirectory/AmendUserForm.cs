@@ -31,7 +31,6 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 if (i >= 0)
                 {
                     checkedListBox2.SetItemChecked(i, true);
-                    break;
                 }
             }
 
@@ -41,7 +40,6 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 if (i >= 0)
                 {
                     checkedListBox3.SetItemChecked(i, true);
-                    break;
                 }
             }
 
@@ -57,7 +55,10 @@ namespace AdminClient.Forms.Directories.UserDirectory
 
             User.Fullname = textBox1.Text;
             User.Login = textBox2.Text;
-            User.Password = Sha1.Encrypt(textBox3.Text);
+            if (checkBox1.Checked)
+            {
+                User.Password = Sha1.Encrypt(textBox3.Text);
+            }
             User.Group = Groups[comboBox1.SelectedIndex];
             UpdateEventTypeLib(User);
             UpdateStatusLib(User);
@@ -80,7 +81,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
 
             for (int i = 0; i < Statuses.Count; i++)
             {
-                if (checkedListBox2.GetItemChecked(i))
+                if (checkedListBox3.GetItemChecked(i))
                 {
                     checkedStatuses.Add(Statuses[i]);
                 }
@@ -96,11 +97,15 @@ namespace AdminClient.Forms.Directories.UserDirectory
                     User.StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = item });
                 }
             }
-            foreach (var item in User.StatusLib.SelectedEntities)
+            for (int i = 0; i < User.StatusLib.SelectedEntities.Count;)
             {
-                if (BllEntityComparer.GetItemIndex(item, uncheckedStatuses.ToList<IBllEntity>()) >= 0)
+                if (BllEntityComparer.GetItemIndex(User.StatusLib.SelectedEntities[i].Entity, uncheckedStatuses.ToList<IBllEntity>()) >= 0)
                 {
-                    User.StatusLib.SelectedEntities.Remove(item);
+                    User.StatusLib.SelectedEntities.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
                 }
             }
         }
@@ -133,15 +138,29 @@ namespace AdminClient.Forms.Directories.UserDirectory
                     User.EventTypeLib.SelectedEntities.Add(new BllSelectedEntity<BllEventType> { Entity = item });
                 }
             }
-            foreach (var item in User.EventTypeLib.SelectedEntities)
+            for(int i = 0; i < User.EventTypeLib.SelectedEntities.Count;)
             {
-                if (BllEntityComparer.GetItemIndex(item, uncheckedTypes.ToList<IBllEntity>()) >= 0)
+                if (BllEntityComparer.GetItemIndex(User.EventTypeLib.SelectedEntities[i].Entity, uncheckedTypes.ToList<IBllEntity>()) >= 0)
                 {
-                    User.EventTypeLib.SelectedEntities.Remove(item);
+                    User.EventTypeLib.SelectedEntities.RemoveAt(i);
+                }
+                else
+                {
+                    i++;
                 }
             }
         }
 
-        
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                textBox3.ReadOnly = false;
+            }
+            else
+            {
+                textBox3.ReadOnly = true;
+            }
+        }
     }
 }

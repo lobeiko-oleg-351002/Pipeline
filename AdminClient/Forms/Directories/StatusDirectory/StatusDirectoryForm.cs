@@ -41,7 +41,11 @@ namespace AdminClient.Forms.Directories.StatusDirectory
         {
             AddStatusForm addStatusForm = new AddStatusForm(this, server, null);
             addStatusForm.ShowDialog(this);
-            AddNewRow(addStatusForm.Entity);
+            if (addStatusForm != null)
+            {
+                AddNewRow(addStatusForm.Entity);
+                Statuses.Add((BllStatus)addStatusForm.Entity);
+            }
         }
 
         protected override void button2_Click(object sender, EventArgs e)
@@ -61,7 +65,7 @@ namespace AdminClient.Forms.Directories.StatusDirectory
 
         protected override void button3_Click(object sender, EventArgs e)
         {
-            int i = dataGridView1.SelectedRows[0].Index;
+            int i = dataGridView1.SelectedRows[0].Index ;
             if ((Statuses[i].Name != Globals.Globals.STATUS_CLOSED) && (Statuses[i].Name != Globals.Globals.STATUS_DELETED))
             {
                 server.DeleteStatus(Statuses[i].Id);

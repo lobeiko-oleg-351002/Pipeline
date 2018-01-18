@@ -224,6 +224,9 @@
     <EmbeddedResource Include="Forms\Directories\StatusDirectory\StatusDirectoryForm.resx">
       <DependentUpon>StatusDirectoryForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Directories\UserDirectory\AmendUserForm.resx">
+      <DependentUpon>AmendUserForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Directories\UserDirectory\UserDataForm.resx">
       <DependentUpon>UserDataForm.cs</DependentUpon>
     </EmbeddedResource>

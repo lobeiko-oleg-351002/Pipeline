@@ -241,7 +241,7 @@ namespace Client
             notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
 
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
-
+            checkBox2.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION);
 
 
              Authorize(server);
@@ -277,10 +277,11 @@ namespace Client
                 {
                     string ip = AppConfigManager.GetKeyValue(IP_KEY);
                     server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
-                    
+                    Authorize(server);
+
                 }
                 server.PingServer();
-                Authorize(server);
+
                 
                 isServerOnline = true;
             }
@@ -322,7 +323,18 @@ namespace Client
             }
             else
             {
-                var serverEvents = server.GetEventsForUser(User);
+                bool success = false;
+                List<BllEvent> serverEvents = null;
+                while (!success)
+                {
+                    success = true;
+                    try
+                    {
+                        serverEvents = server.GetEventsForUser(User);
+                    }
+                    catch { success = false; }
+
+                }
                 if (cachedEvents != null)
                 {
                     foreach (var cachedItem in cachedEvents)
@@ -428,7 +440,7 @@ namespace Client
             User = new BllUser { Login = login, Password = password };
             try
             {
-                if (login == null)
+                if (login == "" || login == null)
                 {
                     SignInForm signInForm = new SignInForm(server);
                     signInForm.ShowDialog();
@@ -624,6 +636,11 @@ namespace Client
             try
             {
                 string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                if (!Directory.Exists(mydoc + Properties.Resources.DOWNLOADS_FOLDER))
+                {
+                    Directory.CreateDirectory(mydoc + Properties.Resources.DOWNLOADS_FOLDER);
+                }
+
                 using (FileStream stream = new FileStream(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Create))
                 {
                     serializer.Serialize(stream, EventList);
@@ -1125,6 +1142,11 @@ namespace Client
         {
             Settings settings = new Settings();
             settings.ShowDialog();
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION, checkBox2.Checked.ToString());
         }
     }
 }

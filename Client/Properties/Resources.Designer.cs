@@ -61,7 +61,7 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \Pipeline\data.xml.
+        ///   Looks up a localized string similar to \EDOC\data.xml.
         /// </summary>
         internal static string CACHE_XML_FILE {
             get {
@@ -88,7 +88,7 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \Pipeline\Files.
+        ///   Looks up a localized string similar to \EDOC\Files.
         /// </summary>
         internal static string DOWNLOADS_FOLDER {
             get {
@@ -148,6 +148,15 @@ namespace Client.Properties {
         internal static string SERVER_ONLINE {
             get {
                 return ResourceManager.GetString("SERVER_ONLINE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OPEN_FILE_LOCATION.
+        /// </summary>
+        internal static string TAG_OPEN_FILE_LOCATION {
+            get {
+                return ResourceManager.GetString("TAG_OPEN_FILE_LOCATION", resourceCulture);
             }
         }
         

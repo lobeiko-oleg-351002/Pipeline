@@ -52,25 +52,39 @@ namespace Launcher
             {
                 ExeConfigurationFileMap map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
-                string appVersion = (config.GetSection("appSettings") as AppSettingsSection).Settings["Version"].Value;
 
                 string ip = ConfigurationManager.AppSettings["hostIP"];
-                ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://" + ip + ":/LauncherService/");
-
-                string currentVersion = SourceChannel.GetCurrentVersion();
+                ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://" + ip + "/LauncherService/");
+                var ver = (config.GetSection("appSettings") as AppSettingsSection).Settings["Version"];
+                string currentVersion = SourceChannel.GetClientVersion();
+                string appVersion = "";
+                if (ver != null)
+                {
+                    appVersion = ver.Value;
+                }
+    
                 if (appVersion != currentVersion)
                 {
                     string updatePath = SourceChannel.GetUpdatePath();
-                    string login = (config.GetSection("appSettings") as AppSettingsSection).Settings["login"].Value;
-                    string password = (config.GetSection("appSettings") as AppSettingsSection).Settings["password"].Value;
+                    var settings = (config.GetSection("appSettings") as AppSettingsSection);
+                    string login = "";
+                    string password = "";
+                    if (settings.Settings["login"] != null)
+                    {
+                        login = settings.Settings["login"].Value;
+                        password = settings.Settings["password"].Value;
+                    }
+                        
                     CopyDirectory(updatePath, currentLocation);
                     map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
                     config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
-                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("Version", currentVersion);
-                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("login", login);
-                    (config.GetSection("appSettings") as AppSettingsSection).Settings.Add("password", password);
+                    settings = (config.GetSection("appSettings") as AppSettingsSection);
+                    settings.Settings.Add("Version", currentVersion);
+                    settings.Settings.Add("login", login);
+                    settings.Settings.Add("password", password);
                     config.Save(ConfigurationSaveMode.Modified);
                 }
+                
             }
             catch(Exception ex)
             {

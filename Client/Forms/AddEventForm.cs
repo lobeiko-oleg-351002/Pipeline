@@ -66,7 +66,11 @@ namespace Client.Forms
                     }
                 }
             }
-            CheckUserNodesAccordingEventType(sender.EventTypeLib.SelectedEntities[0].Entity.Id);
+            if (sender.EventTypeLib.SelectedEntities.Count > 0)
+            {
+                CheckUserNodesAccordingEventType(sender.EventTypeLib.SelectedEntities[0].Entity.Id);
+            }
+
 
 
 

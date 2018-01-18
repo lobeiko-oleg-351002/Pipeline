@@ -10,7 +10,7 @@ namespace ServerInterfaceForLauncher
     public interface ILauncherMethods
     {
         [OperationContract]
-        string GetCurrentVersion();
+        string GetClientVersion();
 
         [OperationContract]
         string GetUpdatePath();

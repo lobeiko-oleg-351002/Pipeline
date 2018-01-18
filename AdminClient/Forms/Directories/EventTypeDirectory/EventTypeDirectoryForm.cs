@@ -41,7 +41,11 @@ namespace AdminClient.Forms.Directories.EventTypeDirectory
         {
             AddEventTypeForm addEventTypeForm = new AddEventTypeForm(this, server, null);
             addEventTypeForm.ShowDialog(this);
-            AddNewRow(addEventTypeForm.Entity);
+            if (addEventTypeForm.Entity != null)
+            {
+                AddNewRow(addEventTypeForm.Entity);
+                EventTypes.Add((BllEventType)addEventTypeForm.Entity);
+            }
         }
 
         protected override void button2_Click(object sender, EventArgs e)

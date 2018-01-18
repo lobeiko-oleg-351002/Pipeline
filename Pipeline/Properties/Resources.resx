@@ -123,7 +123,4 @@
   <data name="UPDATE_PATH" xml:space="preserve">
     <value>\\\\192.168.2.100\\share\\ish\\Олег\\PipelineUpdate</value>
   </data>
-  <data name="VERSION" xml:space="preserve">
-    <value>0.36</value>
-  </data>
 </root>

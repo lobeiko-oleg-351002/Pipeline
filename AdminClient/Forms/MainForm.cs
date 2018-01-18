@@ -95,6 +95,8 @@ namespace AdminClient.Forms
                     Thread.Sleep(PING_SLEEPTIME_MS);
                 }
             }).Start();
+
+            label2.Text = server.GetClientVersion();
         }
 
         private void PingServer()
@@ -166,6 +168,12 @@ namespace AdminClient.Forms
         {
             GroupDirectoryForm form = new GroupDirectoryForm(server);
             form.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            server.SetClientVersion((Double.Parse(label2.Text) + 0.01).ToString());
+            label2.Text = server.GetClientVersion();
         }
     }
 }

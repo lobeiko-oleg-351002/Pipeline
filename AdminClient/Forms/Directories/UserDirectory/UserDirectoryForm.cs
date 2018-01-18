@@ -44,6 +44,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
             if (addUserForm.Entity != null)
             {
                 AddNewRow(addUserForm.Entity);
+                Users.Add((BllUser)addUserForm.Entity);
             }
         }
 
