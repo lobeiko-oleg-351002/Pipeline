@@ -50,6 +50,7 @@ namespace Client
         List<int> ClosedEventsIndecies = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
         XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
+        AddEventForm addEventForm = null;
 
         bool isAppClosed;
 
@@ -244,7 +245,7 @@ namespace Client
             checkBox2.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION);
 
 
-             Authorize(server);
+             //Authorize(server);
             if (!isAppClosed)
             {
                 SetControlsServerOffline();
@@ -277,6 +278,10 @@ namespace Client
                 {
                     string ip = AppConfigManager.GetKeyValue(IP_KEY);
                     server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
+                    if (addEventForm != null)
+                    {
+                        addEventForm.server = server;
+                    }
                     Authorize(server);
 
                 }
@@ -328,11 +333,11 @@ namespace Client
                 while (!success)
                 {
                     success = true;
-                    try
+                   // try
                     {
                         serverEvents = server.GetEventsForUser(User);
                     }
-                    catch { success = false; }
+                    //catch { success = false; }
 
                 }
                 if (cachedEvents != null)
@@ -498,7 +503,7 @@ namespace Client
                 //{
                 //    Authorize(server);
                 //}
-                AddEventForm addEventForm = new AddEventForm(server, User);
+                addEventForm = new AddEventForm(server, User);
                 addEventForm.ShowDialog();
                 if (addEventForm.Event != null)
                 {
@@ -506,6 +511,7 @@ namespace Client
                     AddEventToDataGrid(addEventForm.Event);
                     SerializeEventsBackground();
                 }
+                addEventForm = null;
             }
         }
         private void HighlightRow(int i)
@@ -703,12 +709,21 @@ namespace Client
             if (isServerOnline)
             {
                 EventList[SelectedRowIndex].StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = SelectedEventAvailableStatuses[comboBox1.SelectedIndex - 1] });
-                EventList[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventList[SelectedRowIndex], User);
-               // EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
-                var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
-                AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
-                UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex, false);
-                comboBox1.SelectedIndex = 0;
+                try
+                {
+                    EventList[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventList[SelectedRowIndex], User);
+                    // EventList[dataGridView1.SelectedRows[0].Index] = EventList[SelectedRowIndex];
+                    var newStatus = EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last();
+                    AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
+                    UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex, false);
+                    comboBox1.SelectedIndex = 0;
+                    SerializeEventsBackground();
+                }
+                catch(Exception ex)
+                {
+                    EventList[SelectedRowIndex].StatusLib.SelectedEntities.RemoveAt(EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count - 1);
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
@@ -765,6 +780,7 @@ namespace Client
                     {
                         FillStatusDataGrid(Event.StatusLib);
                         FillUserChecklist(Event.RecieverLib.SelectedEntities);
+                        HandleStatusChanging();
                     }));
                 }
             }
@@ -938,7 +954,14 @@ namespace Client
             if (checkBox1.Checked)
             {
                 ShowChecklist();
-                foreach(var item in currentEvent.RecieverLib.SelectedEntities)
+                if (NewEventRowIndecies.Contains(SelectedRowIndex))
+                {
+                    EventList[SelectedRowIndex].IsAdmited = true;
+                    NewEventRowIndecies.Remove(SelectedRowIndex);
+                    SetEventsCountInPanel();
+                    SerializeEventsBackground();
+                }
+                foreach (var item in currentEvent.RecieverLib.SelectedEntities)
                 {
                     if (item.Entity.Id == User.Id)
                     {
@@ -1055,7 +1078,7 @@ namespace Client
         {
             EventList.RemoveAt(SelectedRowIndex);
             dataGridView1.Rows.RemoveAt(SelectedRowIndex);
-
+            dataGridView1.ClearSelection();
             SerializeEventsBackground();
         }
 
@@ -1079,14 +1102,8 @@ namespace Client
             {
                 DisableDeleteEventButton();
             }
-            if (NewEventRowIndecies.Contains(SelectedRowIndex))
-            {
-                EventList[SelectedRowIndex].IsAdmited = true;
-                NewEventRowIndecies.Remove(SelectedRowIndex);
-                SetEventsCountInPanel();
-                SerializeEventsBackground();
-            }
-            RowCommonFont(SelectedRowIndex);
+
+            //RowCommonFont(SelectedRowIndex);
             SetSelectedEventToControls(EventList[SelectedRowIndex]);
             if (User != null)
             {
@@ -1102,23 +1119,28 @@ namespace Client
                         ShowCheckbox();
                     }
                 }
-                if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
+
+                HandleStatusChanging();
+            }
+        }
+
+        private void HandleStatusChanging()
+        {
+            if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
+            {
+                if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED ||
+                    EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
                 {
-                    if (EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED ||
-                        EventList[SelectedRowIndex].StatusLib.SelectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
+                    if (User.Login == EventList[SelectedRowIndex].Sender.Login)
                     {
-                        if (User.Login == EventList[SelectedRowIndex].Sender.Login)
-                        {
-                            EnableStatusControls();
-                        }
-                        else
-                        {
-                            DisableStatusControls();
-                            HideChecklistAndCheckbox();
-                        }
+                        EnableStatusControls();
+                    }
+                    else
+                    {
+                        DisableStatusControls();
+                        HideChecklistAndCheckbox();
                     }
                 }
-
             }
         }
 

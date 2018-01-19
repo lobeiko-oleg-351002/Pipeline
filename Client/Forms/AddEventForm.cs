@@ -16,7 +16,7 @@ namespace Client.Forms
 {
     public partial class AddEventForm : ParentForm
     {
-        IBusinessService server;
+        public IBusinessService server { private get; set; }
         public BllEvent Event { get; private set; }
         List<BllAttribute> Attributes;
         List<BllUser> Users = new List<BllUser>();
@@ -104,6 +104,7 @@ namespace Client.Forms
 
                 foreach (TreeNode groupNode in treeView1.Nodes)
                 {
+                    bool toggle = false;
                     if (nodes.Contains(groupNode.Text))
                     {
                         groupNode.Checked = true;
@@ -113,7 +114,12 @@ namespace Client.Forms
                         if (nodes.Contains(userNode.Text))
                         {
                             userNode.Checked = true;
+                            toggle = true;
                         }
+                    }
+                    if (toggle)
+                    {
+                        groupNode.Toggle();
                     }
                 }
             }
@@ -131,7 +137,15 @@ namespace Client.Forms
             Event.Name = textBox1.Text;
             Event.IsAdmited = true;
             Event.FilepathLib = new BllFilepathLib();
-            bool success = UploadFiles(Event.FilepathLib);
+            bool success = false;
+            try
+            {
+                success = UploadFiles(Event.FilepathLib);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
             if (!success)
             {
                 return;
@@ -167,8 +181,15 @@ namespace Client.Forms
             }
 
             Event.Sender = this.Sender;
-            Event = server.CreateAndSendOutEvent(Event);
-            Close();
+            try
+            {
+                Event = server.CreateAndSendOutEvent(Event);
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private bool UploadFiles(BllFilepathLib lib)
@@ -234,9 +255,12 @@ namespace Client.Forms
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int selectedIndex = listBox1.SelectedIndex;
-            Filepaths.RemoveAt(selectedIndex);
-            listBox1.Items.RemoveAt(selectedIndex);
+            if (listBox1.SelectedIndex >= 0)
+            {
+                int selectedIndex = listBox1.SelectedIndex;
+                Filepaths.RemoveAt(selectedIndex);
+                listBox1.Items.RemoveAt(selectedIndex);
+            }
         }
 
 

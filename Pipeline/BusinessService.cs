@@ -75,79 +75,126 @@ namespace Server
 
         public BllEvent CreateAndSendOutEvent(BllEvent Event)
         {
-            var datetime = DateTime.Now;
-            Event.Date = datetime;
-            IEventService eventService = new EventService(uow);
-            BllEvent res = eventService.Create(Event);
-            new Thread(() =>
+            try
             {
-                InvokeEventWithUsers(Event);
-            }).Start();
-            return res;
+                var datetime = DateTime.Now;
+                Event.Date = datetime;
+                IEventService eventService = new EventService(uow);
+                BllEvent res = eventService.Create(Event);
+                new Thread(() =>
+                {
+                    InvokeEventWithUsers(Event);
+                }).Start();
+                return res;
+            }
+            catch(Exception ex)
+            {
+                LogManager.WriteMessage("CreateAndSendOutEvent", ex.Message, Event.Sender.Fullname);
+                return Event;
+            }
 
         }
 
         public List<BllEvent> GetEventsForUser(BllUser user)
         {
-            IEventService eventService = new EventService(uow);
-            var events = eventService.GetEventsForUser(user).ToList();
+            try
+            {
+                IEventService eventService = new EventService(uow);
+                var events = eventService.GetEventsForUser(user).ToList();
 
-            return events;
+                return events;
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("GetEventsForUser", ex.Message, user.Fullname);
+                return null;
+            }
         }
 
         public IEnumerable<BllUser> GetUsersByGroup(BllGroup group)
         {
-            IUserService userService = new UserService(uow);
-            return userService.GetUsersByGroup(group.Id);
+            try
+            {
+                IUserService userService = new UserService(uow);
+                return userService.GetUsersByGroup(group.Id);
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("GetEventsForUser", ex.Message, group.Name);
+                return null;
+            }
         }
 
 
         public BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser updater)
         {
-            UserLibService userservice = new UserLibService(uow);
-            Event.RecieverLib = userservice.Update(Event.RecieverLib);
-
-            new Thread(() =>
+            try
             {
-                UpdateEventWithUsers(Event, updater);
-            }).Start();
-            return Event;
+                UserLibService userservice = new UserLibService(uow);
+                Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
+                new Thread(() =>
+                {
+                    UpdateEventWithUsers(Event, updater);
+                }).Start();
+                return Event;
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message, updater.Fullname);
+                return Event;
+            }
         }
 
         public BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater)
         {
-            var datetime = DateTime.Now;
-            Event.StatusLib.SelectedEntities.Last().Date = datetime;
-            StatusLibService service = new StatusLibService(uow);
-            Event.StatusLib = service.Update(Event.StatusLib);
-
-            UserLibService userservice = new UserLibService(uow);
-            Event.RecieverLib = userservice.Update(Event.RecieverLib);
-
-            new Thread(() =>
+            try
             {
-                UpdateEventWithUsers(Event, updater);
-            }).Start();
-            return Event;
+                var datetime = DateTime.Now;
+                Event.StatusLib.SelectedEntities.Last().Date = datetime;
+                StatusLibService service = new StatusLibService(uow);
+                Event.StatusLib = service.Update(Event.StatusLib);
+
+                UserLibService userservice = new UserLibService(uow);
+                Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
+                new Thread(() =>
+                {
+                    UpdateEventWithUsers(Event, updater);
+                }).Start();
+                return Event;
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("UpdateStatusAndSendOutEvent", ex.Message, updater.Fullname);
+                return Event;
+            }
         }
 
 
 
         private void UpdateEventWithUsers(BllEvent Event, BllUser updater)
         {
-            foreach (var reciever in Event.RecieverLib.SelectedEntities)
+            try
             {
-                try
+                foreach (var reciever in Event.RecieverLib.SelectedEntities)
                 {
-                    if (updater.Id != reciever.Entity.Id)
+                    try
                     {
-                        Clients[reciever.Entity.Login].UpdateEvent(Event);
+                        if (updater.Id != reciever.Entity.Id)
+                        {
+                            Clients[reciever.Entity.Login].UpdateEvent(Event);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Clients.Remove(reciever.Entity.Login);
                     }
                 }
-                catch (Exception ex)
-                {
-                    Clients.Remove(reciever.Entity.Login);
-                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("UpdateEventWithUsers", ex.Message, updater.Fullname);
             }
         }
 
@@ -170,9 +217,9 @@ namespace Server
         }
 
 
-        public void RegisterClient(string login)
+        private void RegisterClient(string key)
         {
-            if (login != null && login != "")
+            if (key != null && key != "")
             {
                 try
                 {
@@ -180,13 +227,14 @@ namespace Server
                     lock (locker)
                     {
                         //remove the old client
-                        if (Clients.Keys.Contains(login))
-                            Clients.Remove(login);
-                        Clients.Add(login, callback);
+                        if (Clients.Keys.Contains(key))
+                            Clients.Remove(key);
+                        Clients.Add(key, callback);
                     }
                 }
                 catch (Exception ex)
                 {
+                    throw new Exception("RegisterClient", ex);
                 }
             }
         }
@@ -198,13 +246,28 @@ namespace Server
 
         public BllUser SignIn(string login, string password)
         {
-            IUserService service = new UserService(uow);
-            BllUser user =  service.Authorize(login, password);
-            if (user != null)
+            try
             {
-                RegisterClient(user.Login);
+                IUserService service = new UserService(uow);
+                BllUser user = service.Authorize(login, password);
+                if (user != null)
+                {
+                    //int key = 0;
+                    //do
+                    //{
+                    //    key++;
+                    //    user.InnerId = login + key.ToString();
+                    //}
+                    //while (Clients.Any(p => p.Key == user.InnerId));
+                    RegisterClient(user.Login);
+                }
+                return user;
             }
-            return user;
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("SignIn", ex.Message, login);
+                return null;
+            }
         }
 
         public static void PingClients()

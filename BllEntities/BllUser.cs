@@ -21,5 +21,7 @@ namespace BllEntities
         public BllEventTypeLib EventTypeLib { get; set; }
 
         public BllStatusLib StatusLib { get; set; }
+
+        public string InnerId { get; set; }
     }
 }

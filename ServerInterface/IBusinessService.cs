@@ -37,9 +37,6 @@ namespace ServerInterface
         List<BllEvent> GetEventsForUser(BllUser user);
 
         [OperationContract]
-        void RegisterClient(string clientName);
-
-        [OperationContract]
         string PingServer();
 
 
