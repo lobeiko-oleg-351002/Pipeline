@@ -157,6 +157,9 @@
   <data name="TAG_SOUND_STATUS" xml:space="preserve">
     <value>SOUND_STATUS</value>
   </data>
+  <data name="TAG_STARTUP_TRAY" xml:space="preserve">
+    <value>STARTUP_TRAY</value>
+  </data>
   <data name="TAG_TURNOUT_EVENT" xml:space="preserve">
     <value>TURNOUT_EVENT</value>
   </data>

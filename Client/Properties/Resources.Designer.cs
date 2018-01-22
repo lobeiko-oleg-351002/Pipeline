@@ -179,6 +179,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to STARTUP_TRAY.
+        /// </summary>
+        internal static string TAG_STARTUP_TRAY {
+            get {
+                return ResourceManager.GetString("TAG_STARTUP_TRAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TURNOUT_EVENT.
         /// </summary>
         internal static string TAG_TURNOUT_EVENT {

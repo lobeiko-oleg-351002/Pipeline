@@ -25,6 +25,7 @@ namespace Client
         {
             InitializeComponent();
             this.server = server;
+            User = new BllUser { Login = "" };
         }
 
         private void button2_Click(object sender, EventArgs e)

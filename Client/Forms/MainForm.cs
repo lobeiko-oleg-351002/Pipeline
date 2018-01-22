@@ -65,7 +65,7 @@ namespace Client
                     Invoke(new Action(() =>
                     {
                         SetControlsServerOnline();
-                        if (User == null)
+                        if (IsUserEmpty())
                         {
                             Authorize(server);
                         }
@@ -175,7 +175,10 @@ namespace Client
             }
             if (comboBox1.Items.Count == 1)
             {
-                InitStatuses();
+                if (!IsUserEmpty())
+                {
+                    InitStatuses();
+                }
             }
         }
 
@@ -226,6 +229,21 @@ namespace Client
             dataGridView2.Rows.Add(row);
         }
 
+        private bool IsUserEmpty()
+        {
+            if (User.Login == "")
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void SetUserEmpty()
+        {
+            User = new BllUser { Login = "" };
+        }
+
+       
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -244,13 +262,12 @@ namespace Client
             comboBox1.Items.Add(STATUS_NOT_CHANGED);
             checkBox2.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION);
 
+            SetUserEmpty();
+            SetControlsServerOffline();
+            PingServer();
 
-             //Authorize(server);
-            if (!isAppClosed)
+            if (!IsUserEmpty())
             {
-                SetControlsServerOffline();
-                PingServer();
-
                 new Thread(() =>
                 {
                     while (!isAppClosed)
@@ -266,8 +283,16 @@ namespace Client
                     dataGridView1.CurrentRow.Selected = false;
                 }
             }
+            else
+            {
+                ExitApp();
+            }
 
-
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_STARTUP_TRAY))
+            {
+                Close();
+            }
+           
         }
 
         private void PingServer()
@@ -287,8 +312,10 @@ namespace Client
                 }
                 server.PingServer();
 
-                
-                isServerOnline = true;
+                if (!IsUserEmpty())
+                {
+                    isServerOnline = true;
+                }
             }
             catch(Exception ex)
             {
@@ -416,10 +443,21 @@ namespace Client
 
             dataGridView1.Rows.Add(row);
             int i = dataGridView1.Rows.Count - 1;
-            if (!Event.IsAdmited && (Event.Sender.Id != User.Id))
+            if (!IsUserEmpty() && isServerOnline)
             {
-                HighlightRow(i);
-                NewEventRowIndecies.Add(i);
+                if (!Event.IsAdmited && (Event.Sender.Id != User.Id))
+                {
+                    HighlightRow(i);
+                    NewEventRowIndecies.Add(i);
+                }
+            }
+            else
+            {
+                if (!Event.IsAdmited)
+                {
+                    HighlightRow(i);
+                    NewEventRowIndecies.Add(i);
+                }
             }
 
             if (Event.StatusLib.SelectedEntities.Count > 0)
@@ -452,7 +490,9 @@ namespace Client
                     User = signInForm.User;
                     if (User == null)
                     {
+                        SetUserEmpty();
                         ExitApp();
+
                     }
                     else
                     {
@@ -463,7 +503,7 @@ namespace Client
                 {
                     User = server.SignIn(login, password);
                 }
-                if (User != null)
+                if (!IsUserEmpty())
                 {
                     Invoke(new Action(() =>
                     {
@@ -476,6 +516,7 @@ namespace Client
                 if ((login == null) && (password == null))
                 {
                     MessageBox.Show(Properties.Resources.SERVER_NOT_FOUND + ex.Message);
+                    SetUserEmpty();
                     ExitApp();
                 }
             }
@@ -899,7 +940,7 @@ namespace Client
         private void TurnInForm()
         {
             notifyIcon.Visible = true;
-            notifyIcon.ShowBalloonTip(3000);
+           // notifyIcon.ShowBalloonTip(3000);
             if (NewEventRowIndecies.Count != 0)
             {
                 SetTrayNewEventIcon();
@@ -958,6 +999,7 @@ namespace Client
                 {
                     EventList[SelectedRowIndex].IsAdmited = true;
                     NewEventRowIndecies.Remove(SelectedRowIndex);
+                    RowCommonFont(SelectedRowIndex);
                     SetEventsCountInPanel();
                     SerializeEventsBackground();
                 }

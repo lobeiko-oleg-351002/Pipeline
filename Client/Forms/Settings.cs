@@ -21,10 +21,12 @@ namespace Client.Forms
             checkedListBox1.Items.Add("Звуковое оповещение при изменении статуса");
             checkedListBox1.Items.Add("Вызов программы из фонового режима при получении нового события");
             checkedListBox1.Items.Add("Вызов программы из фонового режима при изменении статуса");
+            checkedListBox1.Items.Add("Автозапуск программы в фоновом режиме");
             SetCheckListItem(Properties.Resources.TAG_SOUND_EVENT, 0);
             SetCheckListItem(Properties.Resources.TAG_SOUND_STATUS, 1);
             SetCheckListItem(Properties.Resources.TAG_TURNOUT_EVENT, 2);
             SetCheckListItem(Properties.Resources.TAG_TURNOUT_STATUS, 3);
+            SetCheckListItem(Properties.Resources.TAG_STARTUP_TRAY, 4);
         }
 
         private void SetCheckListItem(string tag, int i)
@@ -39,6 +41,7 @@ namespace Client.Forms
             SetKeyValue(Properties.Resources.TAG_SOUND_STATUS, 1);
             SetKeyValue(Properties.Resources.TAG_TURNOUT_EVENT, 2);
             SetKeyValue(Properties.Resources.TAG_TURNOUT_STATUS, 3);
+            SetKeyValue(Properties.Resources.TAG_STARTUP_TRAY, 4);
             Close();
         }
 
