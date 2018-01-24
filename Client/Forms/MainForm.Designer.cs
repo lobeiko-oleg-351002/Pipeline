@@ -143,6 +143,7 @@
             this.dataGridView1.Size = new System.Drawing.Size(952, 384);
             this.dataGridView1.TabIndex = 2;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
             this.dataGridView1.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dataGridView1_RowStateChanged);
             // 
             // label1
@@ -278,7 +279,7 @@
             this.label9.AutoSize = true;
             this.label9.BackColor = System.Drawing.Color.WhiteSmoke;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label9.Location = new System.Drawing.Point(437, 2);
+            this.label9.Location = new System.Drawing.Point(539, 2);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(121, 20);
             this.label9.TabIndex = 24;
@@ -431,7 +432,7 @@
             this.Column7.HeaderText = "От";
             this.Column7.Name = "Column7";
             this.Column7.ReadOnly = true;
-            this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             // 
             // Column1
             // 
@@ -439,14 +440,14 @@
             this.Column1.HeaderText = "Заголовок";
             this.Column1.Name = "Column1";
             this.Column1.ReadOnly = true;
-            this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             // 
             // Column2
             // 
             this.Column2.HeaderText = "Дата";
             this.Column2.Name = "Column2";
             this.Column2.ReadOnly = true;
-            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             this.Column2.Width = 70;
             // 
             // Column3
@@ -464,14 +465,14 @@
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             this.Column4.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             // 
             // Column5
             // 
             this.Column5.HeaderText = "Атрибуты";
             this.Column5.Name = "Column5";
             this.Column5.ReadOnly = true;
-            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             this.Column5.Width = 90;
             // 
             // Column8

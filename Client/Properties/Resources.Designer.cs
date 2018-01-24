@@ -152,6 +152,33 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EDOC_LINK.
+        /// </summary>
+        internal static string STARTUP_LINK_NAME {
+            get {
+                return ResourceManager.GetString("STARTUP_LINK_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HIDE_ALLOWANCE.
+        /// </summary>
+        internal static string TAG_HIDE_ALLOWANCE {
+            get {
+                return ResourceManager.GetString("TAG_HIDE_ALLOWANCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HIDE_CLOSED.
+        /// </summary>
+        internal static string TAG_HIDE_CLOSED {
+            get {
+                return ResourceManager.GetString("TAG_HIDE_CLOSED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OPEN_FILE_LOCATION.
         /// </summary>
         internal static string TAG_OPEN_FILE_LOCATION {

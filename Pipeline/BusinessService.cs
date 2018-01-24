@@ -89,7 +89,7 @@ namespace Server
             }
             catch(Exception ex)
             {
-                LogManager.WriteMessage("CreateAndSendOutEvent", ex.Message, Event.Sender.Fullname);
+                LogManager.WriteMessage("CreateAndSendOutEvent", ex.Message + ex.InnerException, Event.Sender.Fullname);
                 return Event;
             }
 
@@ -106,7 +106,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("GetEventsForUser", ex.Message, user.Fullname);
+                LogManager.WriteMessage("GetEventsForUser", ex.Message + ex.InnerException, user.Fullname);
                 return null;
             }
         }
@@ -120,7 +120,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("GetEventsForUser", ex.Message, group.Name);
+                LogManager.WriteMessage("GetEventsForUser", ex.Message + ex.InnerException, group.Name);
                 return null;
             }
         }
@@ -141,7 +141,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message, updater.Fullname);
+                LogManager.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
                 return Event;
             }
         }
@@ -166,7 +166,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateStatusAndSendOutEvent", ex.Message, updater.Fullname);
+                LogManager.WriteMessage("UpdateStatusAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
                 return Event;
             }
         }
@@ -194,7 +194,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateEventWithUsers", ex.Message, updater.Fullname);
+                LogManager.WriteMessage("UpdateEventWithUsers", ex.Message + ex.InnerException, updater.Fullname);
             }
         }
 
@@ -265,7 +265,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("SignIn", ex.Message, login);
+                LogManager.WriteMessage("SignIn", ex.Message + ex.InnerException, login);
                 return null;
             }
         }

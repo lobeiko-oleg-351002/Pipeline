@@ -18,7 +18,7 @@ namespace Server
             }
             using (var tw = new StreamWriter(path, true))
             {
-                tw.WriteLine("[ " + DateTime.Now.ToString() + "] " + source + ": " + operation + " -- " + exception);
+                tw.WriteLine("[" + DateTime.Now.ToString() + "] " + source + ": " + operation + " -- " + exception);
                 tw.Close();
             }
 

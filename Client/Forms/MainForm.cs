@@ -1,6 +1,7 @@
 ﻿using BllEntities;
 using Client.Forms;
 using Globals;
+using Microsoft.Win32;
 using ServerInterface;
 using ServiceChannelManager;
 using System;
@@ -13,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -45,7 +47,7 @@ namespace Client
         BllStatus StatusDeleted = null;
         BllStatus StatusClosed = null;
         int SelectedRowIndex;
-        List<int> NewEventRowIndecies = new List<int>();
+        List<int> NewEventIndecies = new List<int>();
         List<int> DeletedEventsIndecies = new List<int>();
         List<int> ClosedEventsIndecies = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
@@ -107,7 +109,7 @@ namespace Client
             public static void SetKeyValue(string tag, string value)
             {
                 Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                if (ConfigurationManager.AppSettings[tag] != null)
+                if (config.AppSettings.Settings[tag] != null)
                 {
                     config.AppSettings.Settings[tag].Value = value;
                 }
@@ -132,6 +134,22 @@ namespace Client
                     return false;
                 }
             }
+
+            public static decimal GetDecimalKeyValue(string tag)
+            {
+                var value = GetKeyValue(tag);
+                if (value != null)
+                {
+                    return decimal.Parse(value);
+                }
+                else
+                {
+                    Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                    config.AppSettings.Settings.Add(tag, decimal.Zero.ToString());
+                    return decimal.Zero;
+                }
+            }
+
 
             public static void ClearTagValues(string tag)
             {
@@ -243,7 +261,43 @@ namespace Client
             User = new BllUser { Login = "" };
         }
 
-       
+        private void AppShortcutToStartup()
+        {
+            //string linkName = Properties.Resources.STARTUP_LINK_NAME;
+            //string startDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            //if (!System.IO.File.Exists(startDir + "\\" + linkName + ".url"))
+            //{
+            //    using (StreamWriter writer = new StreamWriter(startDir + "\\" + linkName + ".url", false, Encoding.UTF8))
+            //    {
+            //        string app = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            //        writer.WriteLine("[InternetShortcut]");
+            //        byte[] bytes = Encoding.Default.GetBytes("URL=file:///" + app);
+            //        string myString = Encoding.UTF8.GetString(bytes);
+            //        writer.WriteLine(myString);
+            //        writer.WriteLine("IconIndex=0");
+            //        string icon = Application.StartupPath + "\\backup (3).ico";
+            //        writer.WriteLine("IconFile=" + icon);
+            //        writer.Flush();
+            //    }
+            //}
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            {
+                if (key.GetValue(Properties.Resources.CLIENT_NAME) == null)
+                {
+                    key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + Application.ExecutablePath + "\"");
+                }
+            }
+        }
+
+        //private void DelAppShortcutFromStartup()
+        //{
+        //    string linkName = Properties.Resources.STARTUP_LINK_NAME;
+        //    string startDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        //    if (System.IO.File.Exists(startDir + "\\" + linkName + ".url"))
+        //    {
+        //        System.IO.File.Delete(startDir + "\\" + linkName + ".url");
+        //    }
+        //}
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -251,6 +305,7 @@ namespace Client
             server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
             EventList = new List<BllEvent>();
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+            AppShortcutToStartup();
 
             notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
             notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
@@ -348,10 +403,7 @@ namespace Client
             if (isServerOnline == false)
             {
                 EventList = cachedEvents;
-                foreach(var item in EventList)
-                {
-                    AddEventToDataGrid(item);
-                }
+                RefreshDataGrid();
             }
             else
             {
@@ -360,11 +412,15 @@ namespace Client
                 while (!success)
                 {
                     success = true;
-                   // try
+                    try
                     {
                         serverEvents = server.GetEventsForUser(User);
                     }
-                    //catch { success = false; }
+                    catch
+                    {
+                        success = false;
+                        PingServer();
+                    }
 
                 }
                 if (cachedEvents != null)
@@ -381,6 +437,7 @@ namespace Client
                                 {
                                     item.IsAdmited = true;
                                 }
+                                break;
                             }
                         }
                         if (!isExists)
@@ -409,8 +466,15 @@ namespace Client
                 SetEventsCountInPanel();
                 SerializeEventsBackground();
             }
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
+            {
+                HideClosedEvents();
+            }
+            OrderByDate();
             
         }
+
+
 
         private void AddEventToDataGrid(BllEvent Event)
         {
@@ -442,13 +506,14 @@ namespace Client
             row.Cells[7].Value = Event.Description;
 
             dataGridView1.Rows.Add(row);
+
             int i = dataGridView1.Rows.Count - 1;
             if (!IsUserEmpty() && isServerOnline)
             {
                 if (!Event.IsAdmited && (Event.Sender.Id != User.Id))
                 {
                     HighlightRow(i);
-                    NewEventRowIndecies.Add(i);
+                    NewEventIndecies.Add(i);
                 }
             }
             else
@@ -456,7 +521,7 @@ namespace Client
                 if (!Event.IsAdmited)
                 {
                     HighlightRow(i);
-                    NewEventRowIndecies.Add(i);
+                    NewEventIndecies.Add(i);
                 }
             }
 
@@ -548,8 +613,10 @@ namespace Client
                 addEventForm.ShowDialog();
                 if (addEventForm.Event != null)
                 {
+                    
                     EventList.Add(addEventForm.Event);
                     AddEventToDataGrid(addEventForm.Event);
+                    OrderFunc();
                     SerializeEventsBackground();
                 }
                 addEventForm = null;
@@ -607,7 +674,7 @@ namespace Client
                     SystemSounds.Beep.Play();
                 }
             }));
-            
+            OrderFunc();
 
 
         }
@@ -656,7 +723,7 @@ namespace Client
             {
                 Directory.CreateDirectory(eventFolderPath);
             }
-            if (!File.Exists(filePath))
+            if (!System.IO.File.Exists(filePath))
             {
                 using (FileStream output = new FileStream(filePath, FileMode.Create))
                 {
@@ -704,7 +771,7 @@ namespace Client
             try
             {
                 string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (Stream stream = File.Open(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Open))
+                using (Stream stream = System.IO.File.Open(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Open))
                 {
                     return (List<BllEvent>)serializer.Deserialize(stream);
                 }
@@ -719,7 +786,7 @@ namespace Client
         
         private void SetEventsCountInPanel()
         {
-            int n = NewEventRowIndecies.Count;
+            int n = NewEventIndecies.Count;
             Text = Properties.Resources.CLIENT_NAME;
             if (n > 0)
             {
@@ -941,7 +1008,7 @@ namespace Client
         {
             notifyIcon.Visible = true;
            // notifyIcon.ShowBalloonTip(3000);
-            if (NewEventRowIndecies.Count != 0)
+            if (NewEventIndecies.Count != 0)
             {
                 SetTrayNewEventIcon();
             }
@@ -995,10 +1062,10 @@ namespace Client
             if (checkBox1.Checked)
             {
                 ShowChecklist();
-                if (NewEventRowIndecies.Contains(SelectedRowIndex))
+                if (NewEventIndecies.Contains(SelectedRowIndex))
                 {
                     EventList[SelectedRowIndex].IsAdmited = true;
-                    NewEventRowIndecies.Remove(SelectedRowIndex);
+                    NewEventIndecies.Remove(SelectedRowIndex);
                     RowCommonFont(SelectedRowIndex);
                     SetEventsCountInPanel();
                     SerializeEventsBackground();
@@ -1205,12 +1272,144 @@ namespace Client
         private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Settings settings = new Settings();
+            bool prevHideClosed = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
             settings.ShowDialog();
+            if (prevHideClosed != AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
+            {
+                if (prevHideClosed)
+                {
+                    for (int i = 0; i < EventList.Count; i++)
+                    {
+                        if (ClosedEventsIndecies.Contains(i))
+                        {
+                            dataGridView1.Rows[i].Visible = true;
+                        }
+                    }
+                }
+                else
+                {
+                    HideClosedEvents();
+                }
+            }
+        }
+
+        private void HideClosedEvents()
+        {
+            int days = (int)AppConfigManager.GetDecimalKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
+            DateTime now = DateTime.Now;
+            for (int i = 0; i < EventList.Count; i++)
+            {
+                if (ClosedEventsIndecies.Contains(i) && (EventList[i].StatusLib.SelectedEntities.Last().Date.AddDays(days).CompareTo(now) < 0))
+                {
+                    dataGridView1.Rows[i].Visible = false;
+                }
+            }
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION, checkBox2.Checked.ToString());
         }
+
+
+        int dir0col = 1;
+        int dir1col = 1;
+        int dir2col = -1;
+        int dir4col = 1;
+        int dir5col = 1;
+        private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex == 0)
+            {
+                dir0col *= -1;
+                OrderBySender();                
+                SerializeEventsBackground();
+            }
+            if (e.ColumnIndex == 1)
+            {
+                dir1col *= -1;
+                OrderByName();               
+                SerializeEventsBackground();
+            }
+            if (e.ColumnIndex == 2)
+            {
+                dir2col *= -1;
+                OrderByDate();               
+                SerializeEventsBackground();
+            }
+            if (e.ColumnIndex == 4)
+            {
+                dir4col *= -1;
+                OrderByStatus();               
+                SerializeEventsBackground();
+            }
+            if (e.ColumnIndex == 5)
+            {
+                dir5col *= -1;
+                OrderByAttributes();               
+                SerializeEventsBackground();
+            }
+
+        }
+
+        Func<bool> OrderFunc;
+
+        private bool OrderBySender()
+        {
+            EventList.Sort((x, y) => dir0col * string.Compare(x.Sender.Fullname, y.Sender.Fullname));
+            RefreshDataGrid();
+            OrderFunc = OrderBySender;
+            return true;
+        }
+
+        private bool OrderByName()
+        {
+            EventList.Sort((x, y) => dir1col * string.Compare(x.Name, y.Name));
+            RefreshDataGrid();
+            OrderFunc = OrderByName;
+            return true;
+        }
+
+        private bool OrderByDate()
+        {
+            EventList.Sort((x, y) => dir2col * DateTime.Compare(x.Date, y.Date));
+            RefreshDataGrid();
+            OrderFunc = OrderByDate;
+            return true;
+        }
+
+        private bool OrderByStatus()
+        {
+            EventList.Sort((x, y) => dir4col * string.Compare(x.StatusLib.SelectedEntities.Count != 0 ? x.StatusLib.SelectedEntities.Last().Entity.Name : "",
+                                                        y.StatusLib.SelectedEntities.Count != 0 ? y.StatusLib.SelectedEntities.Last().Entity.Name : ""));
+            RefreshDataGrid();
+            OrderFunc = OrderByStatus;
+            return true;
+        }
+
+        private bool OrderByAttributes()
+        {
+            EventList.Sort((x, y) => dir5col * (x.AttributeLib.SelectedEntities.Count - y.AttributeLib.SelectedEntities.Count));
+            RefreshDataGrid();
+            OrderFunc = OrderByAttributes;
+            return true;
+        }
+
+        private void RefreshDataGrid()
+        {
+            dataGridView1.Rows.Clear();
+            ClosedEventsIndecies.Clear();
+            DeletedEventsIndecies.Clear();
+            NewEventIndecies.Clear();
+            foreach(var item in EventList)
+            {
+                AddEventToDataGrid(item);
+            }
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
+            {
+                HideClosedEvents();
+            }
+        }
+
     }
 }

@@ -148,6 +148,15 @@
   <data name="SERVER_ONLINE" xml:space="preserve">
     <value>Сервер доступен</value>
   </data>
+  <data name="STARTUP_LINK_NAME" xml:space="preserve">
+    <value>EDOC_LINK</value>
+  </data>
+  <data name="TAG_HIDE_ALLOWANCE" xml:space="preserve">
+    <value>HIDE_ALLOWANCE</value>
+  </data>
+  <data name="TAG_HIDE_CLOSED" xml:space="preserve">
+    <value>HIDE_CLOSED</value>
+  </data>
   <data name="TAG_OPEN_FILE_LOCATION" xml:space="preserve">
     <value>OPEN_FILE_LOCATION</value>
   </data>
