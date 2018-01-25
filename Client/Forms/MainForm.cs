@@ -217,6 +217,13 @@ namespace Client
                 listBox2.Items.Add(filename.Path);
             }
             richTextBox1.Text = Event.Description;
+            if (dataGridView1.RowCount > 0)
+            {
+                if (dataGridView1.Rows[SelectedRowIndex].Cells[8].Value != null)
+                {
+                    richTextBox2.Text = dataGridView1.Rows[SelectedRowIndex].Cells[8].Value.ToString();
+                }
+            }
 
             comboBox1.SelectedIndex = 0;
             comboBox1.Enabled = true;
@@ -228,14 +235,19 @@ namespace Client
                 comboBox1.Items.Remove(StatusClosed.Name);
                 SelectedEventAvailableStatuses.Remove(StatusDeleted);
                 SelectedEventAvailableStatuses.Remove(StatusClosed);
-                if (Event.Sender.Id == User.Id)
+                if (User != null)
                 {
-                    comboBox1.Items.Add(StatusDeleted.Name);
-                    comboBox1.Items.Add(StatusClosed.Name);
-                    SelectedEventAvailableStatuses.Add(StatusDeleted);
-                    SelectedEventAvailableStatuses.Add(StatusClosed);
+                    if (Event.Sender.Id == User.Id)
+                    {
+                        comboBox1.Items.Add(StatusDeleted.Name);
+                        comboBox1.Items.Add(StatusClosed.Name);
+                        SelectedEventAvailableStatuses.Add(StatusDeleted);
+                        SelectedEventAvailableStatuses.Add(StatusClosed);
+                    }
                 }
             }
+
+            richTextBox2.Enabled = true;
         }
 
         private void AddStatusToDataGrid(string name, DateTime date)
@@ -245,7 +257,7 @@ namespace Client
             row.Cells[0].Value = name;
             row.Cells[1].Value = date;
             dataGridView2.Rows.Add(row);
-        }
+        } 
 
         private bool IsUserEmpty()
         {
@@ -381,11 +393,25 @@ namespace Client
 
         private void InitStatuses()
         {
+
             if (User.StatusLib != null)
             {
                 SelectedEventAvailableStatuses.Clear();
-                StatusDeleted = server.GetStatusDeleted();
-                StatusClosed =  server.GetStatusClosed();                    
+                bool success = false;
+                while (!success)
+                {
+                    try
+                    {
+                        StatusDeleted = server.GetStatusDeleted();
+                        StatusClosed = server.GetStatusClosed();
+                        success = true;
+                    }
+                    catch
+                    {
+                        PingServer();
+                        success = false;
+                    }
+                }
                 
                 foreach (var item in User.StatusLib.SelectedEntities)
                 {
@@ -435,8 +461,9 @@ namespace Client
                                 isExists = true;
                                 if (cachedItem.IsAdmited)
                                 {
-                                    item.IsAdmited = true;
+                                    item.IsAdmited = true;                                    
                                 }
+                                item.Note = cachedItem.Note;
                                 break;
                             }
                         }
@@ -464,13 +491,45 @@ namespace Client
                 }
                 FlashWindow.Start(this);
                 SetEventsCountInPanel();
-                SerializeEventsBackground();
+                SerializeEvents();
             }
             if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
             {
                 HideClosedEvents();
             }
-            OrderByDate();
+            string sortNum = AppConfigManager.GetKeyValue(Properties.Resources.TAG_SORT_NUM);
+            decimal sortDir = AppConfigManager.GetDecimalKeyValue(Properties.Resources.TAG_SORT_DIR);
+            if (sortNum != null)
+            {
+                switch (sortNum)
+                {
+                    case "0":
+                        OrderFunc = OrderBySender;
+                        dir0col = decimal.ToInt32(sortDir);
+                        break;
+                    case "1":
+                        OrderFunc = OrderByName;
+                        dir1col = decimal.ToInt32(sortDir);
+                        break;
+                    case "2":
+                        OrderFunc = OrderByDate;
+                        dir2col = decimal.ToInt32(sortDir);
+                        break;
+                    case "3":
+                        OrderFunc = OrderByStatus;
+                        dir4col = decimal.ToInt32(sortDir);
+                        break;
+                    case "4":
+                        OrderFunc = OrderByAttributes;
+                        dir5col = decimal.ToInt32(sortDir);
+                        break;
+                }
+                OrderFunc();
+            }
+            else
+            {
+                OrderByDate();
+            }
             
         }
 
@@ -504,6 +563,11 @@ namespace Client
                 ((DataGridViewButtonCell)row.Cells[6]).Value += " " + Event.FilepathLib.Entities.Count + " ф.";
             }
             row.Cells[7].Value = Event.Description;
+
+            if (Event.Note != "")
+            {
+                row.Cells[8].Value = Event.Note;
+            }
 
             dataGridView1.Rows.Add(row);
 
@@ -745,6 +809,22 @@ namespace Client
             
         }
 
+        private void SetNotesForEvents()
+        {
+            for (int i = 0; i < dataGridView1.RowCount; i++)
+            {
+                EventList[i].Note = (string)dataGridView1.Rows[i].Cells[8].Value;
+            }
+        }
+
+        private void UnsetNotesForEvents()
+        {
+            for (int i = 0; i < dataGridView1.RowCount; i++)
+            {
+                EventList[i].Note = "";
+            }
+        }
+
         private void SerializeEvents()
         {
             try
@@ -757,7 +837,9 @@ namespace Client
 
                 using (FileStream stream = new FileStream(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Create))
                 {
+                    SetNotesForEvents();
                     serializer.Serialize(stream, EventList);
+                    UnsetNotesForEvents();
                 }
             }
             catch (IOException)
@@ -1185,10 +1267,18 @@ namespace Client
 
         private void удалитьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            EventList.RemoveAt(SelectedRowIndex);
-            dataGridView1.Rows.RemoveAt(SelectedRowIndex);
-            dataGridView1.ClearSelection();
-            SerializeEventsBackground();
+            if (SelectedRowIndex >= 0)
+            {
+                EventList.RemoveAt(SelectedRowIndex);
+                dataGridView1.Rows.RemoveAt(SelectedRowIndex);
+                dataGridView1.ClearSelection();
+                SerializeEventsBackground();
+                if (EventList.Count == 0)
+                {
+                    DisableDeleteEventButton();
+                    ClearDataControls();
+                }
+            }
         }
 
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
@@ -1267,26 +1357,33 @@ namespace Client
             checkBox1.Checked = false;
             HideChecklistAndCheckbox();
             удалитьСобытиеToolStripMenuItem.Enabled = false;
+            richTextBox2.Text = "";
+            richTextBox2.Enabled = false;
         }
 
         private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Settings settings = new Settings();
             bool prevHideClosed = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
+            int prevHideAllowance = decimal.ToInt32(AppConfigManager.GetDecimalKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE));
             settings.ShowDialog();
             if (prevHideClosed != AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
             {
                 if (prevHideClosed)
                 {
-                    for (int i = 0; i < EventList.Count; i++)
+                    foreach(var i in ClosedEventsIndecies)
                     {
-                        if (ClosedEventsIndecies.Contains(i))
-                        {
-                            dataGridView1.Rows[i].Visible = true;
-                        }
+                        dataGridView1.Rows[i].Visible = true;
                     }
                 }
                 else
+                {
+                    HideClosedEvents();
+                }
+            }
+            else
+            {
+                if (prevHideClosed && (prevHideAllowance != decimal.ToInt32(AppConfigManager.GetDecimalKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE))))
                 {
                     HideClosedEvents();
                 }
@@ -1302,6 +1399,10 @@ namespace Client
                 if (ClosedEventsIndecies.Contains(i) && (EventList[i].StatusLib.SelectedEntities.Last().Date.AddDays(days).CompareTo(now) < 0))
                 {
                     dataGridView1.Rows[i].Visible = false;
+                }
+                else
+                {
+                    dataGridView1.Rows[i].Visible = true;
                 }
             }
         }
@@ -1356,47 +1457,67 @@ namespace Client
 
         private bool OrderBySender()
         {
+            SetNotesForEvents();
             EventList.Sort((x, y) => dir0col * string.Compare(x.Sender.Fullname, y.Sender.Fullname));
             RefreshDataGrid();
             OrderFunc = OrderBySender;
+            UnsetNotesForEvents();
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, "0");
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir0col.ToString());
             return true;
         }
 
         private bool OrderByName()
         {
+            SetNotesForEvents();
             EventList.Sort((x, y) => dir1col * string.Compare(x.Name, y.Name));
             RefreshDataGrid();
             OrderFunc = OrderByName;
+            UnsetNotesForEvents();
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, "1");
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir1col.ToString());
             return true;
         }
 
         private bool OrderByDate()
         {
+            SetNotesForEvents();
             EventList.Sort((x, y) => dir2col * DateTime.Compare(x.Date, y.Date));
             RefreshDataGrid();
             OrderFunc = OrderByDate;
+            UnsetNotesForEvents();
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, "2");
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir2col.ToString());
             return true;
         }
 
         private bool OrderByStatus()
         {
+            SetNotesForEvents();
             EventList.Sort((x, y) => dir4col * string.Compare(x.StatusLib.SelectedEntities.Count != 0 ? x.StatusLib.SelectedEntities.Last().Entity.Name : "",
                                                         y.StatusLib.SelectedEntities.Count != 0 ? y.StatusLib.SelectedEntities.Last().Entity.Name : ""));
             RefreshDataGrid();
+            UnsetNotesForEvents();
             OrderFunc = OrderByStatus;
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, "3");
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir4col.ToString());
             return true;
         }
 
         private bool OrderByAttributes()
         {
+            SetNotesForEvents();
             EventList.Sort((x, y) => dir5col * (x.AttributeLib.SelectedEntities.Count - y.AttributeLib.SelectedEntities.Count));
             RefreshDataGrid();
+            UnsetNotesForEvents();
             OrderFunc = OrderByAttributes;
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, "4");
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir5col.ToString());
             return true;
         }
 
         private void RefreshDataGrid()
-        {
+        {           
             dataGridView1.Rows.Clear();
             ClosedEventsIndecies.Clear();
             DeletedEventsIndecies.Clear();
@@ -1411,5 +1532,17 @@ namespace Client
             }
         }
 
+        private void richTextBox2_TextChanged(object sender, EventArgs e)
+        {
+            if (SelectedRowIndex >= 0)
+            {
+                dataGridView1.Rows[SelectedRowIndex].Cells[8].Value = richTextBox2.Text;
+            }
+        }
+
+        private void richTextBox2_Leave(object sender, EventArgs e)
+        {
+            SerializeEventsBackground();
+        }
     }
 }

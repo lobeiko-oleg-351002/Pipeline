@@ -94,17 +94,19 @@ namespace Launcher
                     //settings.Settings.Add("password", password);
                     config.Save(ConfigurationSaveMode.Modified);
                 }
-                
+
+                Process client = new Process();
+                client.StartInfo.FileName = currentLocation + "\\Client.exe";
+                client.Start();
+                Application.Exit();
+
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
 
-            Process client = new Process();
-            client.StartInfo.FileName = currentLocation + "\\Client.exe";
-            client.Start();
-            Application.Exit();
+
         }
     }
 }

@@ -188,6 +188,24 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SORT_DIR.
+        /// </summary>
+        internal static string TAG_SORT_DIR {
+            get {
+                return ResourceManager.GetString("TAG_SORT_DIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SORT_NUM.
+        /// </summary>
+        internal static string TAG_SORT_NUM {
+            get {
+                return ResourceManager.GetString("TAG_SORT_NUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SOUND_EVENT.
         /// </summary>
         internal static string TAG_SOUND_EVENT {
