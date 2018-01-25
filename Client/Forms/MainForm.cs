@@ -682,6 +682,10 @@ namespace Client
                     AddEventToDataGrid(addEventForm.Event);
                     OrderFunc();
                     SerializeEventsBackground();
+                    if (SelectedRowIndex == -1)
+                    {
+                        dataGridView1.ClearSelection();
+                    }
                 }
                 addEventForm = null;
             }

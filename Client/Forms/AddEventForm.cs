@@ -44,8 +44,21 @@ namespace Client.Forms
                 comboBox2.SelectedIndex = 0;
                 
             }
-
-            Attributes = server.GetAllAttributes();
+            bool success = false;
+            while (!success)
+            {
+                try
+                {
+                    Attributes = server.GetAllAttributes();
+                    success = true;
+                }
+                catch
+                {
+                    server.PingServer();
+                    success = false;
+                }
+            }
+            
             foreach(var attribute in Attributes)
             {
                 checkedListBox1.Items.Add(attribute.Name);
@@ -56,7 +69,21 @@ namespace Client.Forms
             foreach(var group in groups)
             {
                 var node = treeView1.Nodes.Add(group.Name);
-                var users = server.GetUsersByGroup(group);
+                IEnumerable<BllUser> users = null;
+                success = false;
+                while (!success)
+                {
+                    try
+                    {
+                        users = server.GetUsersByGroup(group);
+                        success = true;
+                    }
+                    catch
+                    {
+                        server.PingServer();
+                        success = false;
+                    }
+                }
                 foreach(var user in users)
                 {
                     if (user.Id != Sender.Id)
