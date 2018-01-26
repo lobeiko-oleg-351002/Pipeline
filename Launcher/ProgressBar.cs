@@ -1,4 +1,5 @@
-﻿using ServerInterfaceForLauncher;
+﻿using Globals;
+using ServerInterfaceForLauncher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

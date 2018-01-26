@@ -9,5 +9,6 @@ namespace Globals
     {
         public const string STATUS_DELETED = "Удалено";
         public const string STATUS_CLOSED = "Закрыто";
+        public const string TAG_VERSION = "Version";
     }
 }

@@ -32,7 +32,7 @@ namespace Client.Forms
             SetCheckListItem(Properties.Resources.TAG_STARTUP_TRAY, 4);
 
             checkBox1.Checked = MainForm.AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
-            numericUpDown1.Value = MainForm.AppConfigManager.GetDecimalKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
+            numericUpDown1.Value = MainForm.AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
         }
 
         private void SetCheckListItem(string tag, int i)

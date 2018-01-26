@@ -23,8 +23,8 @@ namespace Server
     public class BusinessService : IBusinessService
     {
 
-        private static ServiceDB serviceDB;
-        private static IUnitOfWork uow;
+        //private static ServiceDB serviceDB;
+        //private static IUnitOfWork uow;
 
         private static Dictionary<string, IClientCallBack> Clients = new Dictionary<string, IClientCallBack>();
         private static object locker = new object();
@@ -35,16 +35,18 @@ namespace Server
 
         public static void Init()
         {
-            serviceDB = new ServiceDB();
-            uow = new UnitOfWork(serviceDB);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
 
-            if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_CLOSED))
-            {
-                uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_CLOSED});
-            }
-            if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_DELETED))
-            {
-                uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_DELETED });
+                if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_CLOSED))
+                {
+                    uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_CLOSED });
+                }
+                if (!uow.Statuses.IsContainsWithName(Globals.Globals.STATUS_DELETED))
+                {
+                    uow.Statuses.Create(new DalStatus { Name = Globals.Globals.STATUS_DELETED });
+                }
             }
         }
 
@@ -79,13 +81,17 @@ namespace Server
             {
                 var datetime = DateTime.Now;
                 Event.Date = datetime;
-                IEventService eventService = new EventService(uow);
-                BllEvent res = eventService.Create(Event);
-                new Thread(() =>
+                using (ServiceDB serviceDB = new ServiceDB())
                 {
-                    InvokeEventWithUsers(Event);
-                }).Start();
-                return res;
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    BllEvent res = eventService.Create(Event);
+                    new Thread(() =>
+                    {
+                        InvokeEventWithUsers(Event);
+                    }).Start();
+                    return res;
+                }
             }
             catch(Exception ex)
             {
@@ -99,10 +105,14 @@ namespace Server
         {
             try
             {
-                IEventService eventService = new EventService(uow);
-                var events = eventService.GetEventsForUser(user).ToList();
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    var events = eventService.GetEventsForUser(user).ToList();
 
-                return events;
+                    return events;
+                }
             }
             catch (Exception ex)
             {
@@ -115,8 +125,12 @@ namespace Server
         {
             try
             {
-                IUserService userService = new UserService(uow);
-                return userService.GetUsersByGroup(group.Id);
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IUserService userService = new UserService(uow);
+                    return userService.GetUsersByGroup(group.Id);
+                }
             }
             catch (Exception ex)
             {
@@ -130,14 +144,18 @@ namespace Server
         {
             try
             {
-                UserLibService userservice = new UserLibService(uow);
-                Event.RecieverLib = userservice.Update(Event.RecieverLib);
-
-                new Thread(() =>
+                using (ServiceDB serviceDB = new ServiceDB())
                 {
-                    UpdateEventWithUsers(Event, updater);
-                }).Start();
-                return Event;
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    UserLibService userservice = new UserLibService(uow);
+                    Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
+                    new Thread(() =>
+                    {
+                        UpdateEventWithUsers(Event, updater);
+                    }).Start();
+                    return Event;
+                }
             }
             catch (Exception ex)
             {
@@ -152,17 +170,21 @@ namespace Server
             {
                 var datetime = DateTime.Now;
                 Event.StatusLib.SelectedEntities.Last().Date = datetime;
-                StatusLibService service = new StatusLibService(uow);
-                Event.StatusLib = service.Update(Event.StatusLib);
-
-                UserLibService userservice = new UserLibService(uow);
-                Event.RecieverLib = userservice.Update(Event.RecieverLib);
-
-                new Thread(() =>
+                using (ServiceDB serviceDB = new ServiceDB())
                 {
-                    UpdateEventWithUsers(Event, updater);
-                }).Start();
-                return Event;
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    StatusLibService service = new StatusLibService(uow);
+                    Event.StatusLib = service.Update(Event.StatusLib);
+
+                    UserLibService userservice = new UserLibService(uow);
+                    Event.RecieverLib = userservice.Update(Event.RecieverLib);
+
+                    new Thread(() =>
+                    {
+                        UpdateEventWithUsers(Event, updater);
+                    }).Start();
+                    return Event;
+                }
             }
             catch (Exception ex)
             {
@@ -248,20 +270,24 @@ namespace Server
         {
             try
             {
-                IUserService service = new UserService(uow);
-                BllUser user = service.Authorize(login, password);
-                if (user != null)
+                using (ServiceDB serviceDB = new ServiceDB())
                 {
-                    //int key = 0;
-                    //do
-                    //{
-                    //    key++;
-                    //    user.InnerId = login + key.ToString();
-                    //}
-                    //while (Clients.Any(p => p.Key == user.InnerId));
-                    RegisterClient(user.Login);
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IUserService service = new UserService(uow);
+                    BllUser user = service.Authorize(login, password);
+                    if (user != null)
+                    {
+                        //int key = 0;
+                        //do
+                        //{
+                        //    key++;
+                        //    user.InnerId = login + key.ToString();
+                        //}
+                        //while (Clients.Any(p => p.Key == user.InnerId));
+                        RegisterClient(user.Login);
+                    }
+                    return user;
                 }
-                return user;
             }
             catch (Exception ex)
             {
@@ -305,154 +331,250 @@ namespace Server
         #region StatusService
         public List<BllStatus> GetAllStatuses()
         {
-            IStatusService statusService = new StatusService(uow);
-            return statusService.GetAll().ToList();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService statusService = new StatusService(uow);
+                return statusService.GetAll().ToList();
+            }
         }
 
         public BllStatus CreateStatus(BllStatus entity)
         {
-            IStatusService service = new StatusService(uow);
-            return service.Create(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.Create(entity);
+            }
         }
 
         public void DeleteStatus(int id)
         {
-            IStatusService service = new StatusService(uow);
-            service.Delete(id);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                service.Delete(id);
+            }
         }
 
         public BllStatus UpdateStatus(BllStatus entity)
         {
-            IStatusService service = new StatusService(uow);
-            return service.Update(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.Update(entity);
+            }
         }
 
         public bool IsContainsWithName(string name)
         {
-            IStatusService service = new StatusService(uow);
-            return service.IsContainsWithName(name);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.IsContainsWithName(name);
+            }
         }
 
         public List<BllStatus> GetAllStatusesExceptDeletedAndClosed()
         {
-            IStatusService service = new StatusService(uow);
-            return service.GetAllStatusesExceptDeletedAndClosed();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.GetAllStatusesExceptDeletedAndClosed();
+            }
         }
 
         public BllStatus GetStatusDeleted()
         {
-            IStatusService service = new StatusService(uow);
-            return service.GetStatusDeleted();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.GetStatusDeleted();
+            }
         }
 
         public BllStatus GetStatusClosed()
         {
-            IStatusService service = new StatusService(uow);
-            return service.GetStatusClosed();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IStatusService service = new StatusService(uow);
+                return service.GetStatusClosed();
+            }
         }
         #endregion
 
         #region AttributeService
         public List<BllAttribute> GetAllAttributes()
         {
-            IAttributeService AttributeService = new AttributeService(uow);
-            return AttributeService.GetAll().ToList();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IAttributeService AttributeService = new AttributeService(uow);
+                return AttributeService.GetAll().ToList();
+            }
         }
 
         public BllAttribute CreateAttribute(BllAttribute entity)
         {
-            IAttributeService service = new AttributeService(uow);
-            return service.Create(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IAttributeService service = new AttributeService(uow);
+                return service.Create(entity);
+            }
         }
 
         public void DeleteAttribute(int id)
         {
-            IAttributeService service = new AttributeService(uow);
-            service.Delete(id);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IAttributeService service = new AttributeService(uow);
+                service.Delete(id);
+            }
         }
 
         public BllAttribute UpdateAttribute(BllAttribute entity)
         {
-            IAttributeService service = new AttributeService(uow);
-            return service.Update(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IAttributeService service = new AttributeService(uow);
+                return service.Update(entity);
+            }
         }
         #endregion
 
         #region GroupService
         public List<BllGroup> GetAllGroups()
         {
-            IGroupService GroupService = new GroupService(uow);
-            return GroupService.GetAll().ToList();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IGroupService GroupService = new GroupService(uow);
+                return GroupService.GetAll().ToList();
+            }
         }
 
         public BllGroup CreateGroup(BllGroup entity)
         {
-            IGroupService service = new GroupService(uow);
-            return service.Create(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IGroupService service = new GroupService(uow);
+                return service.Create(entity);
+            }
         }
 
         public void DeleteGroup(int id)
         {
-            IGroupService service = new GroupService(uow);
-            service.Delete(id);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IGroupService service = new GroupService(uow);
+                service.Delete(id);
+            }
         }
 
         public BllGroup UpdateGroup(BllGroup entity)
         {
-            IGroupService service = new GroupService(uow);
-            return service.Update(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IGroupService service = new GroupService(uow);
+                return service.Update(entity);
+            }
         }
         #endregion
 
         #region UserService
         public List<BllUser> GetAllUsers()
         {
-            IUserService UserService = new UserService(uow);
-            return UserService.GetAll().ToList();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService UserService = new UserService(uow);
+                return UserService.GetAll().ToList();
+            }
         }
 
         public BllUser CreateUser(BllUser entity)
         {
-            IUserService service = new UserService(uow);
-            return service.Create(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService service = new UserService(uow);
+                return service.Create(entity);
+            }
         }
 
         public void DeleteUser(int id)
         {
-            IUserService service = new UserService(uow);
-            service.Delete(id);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService service = new UserService(uow);
+                service.Delete(id);
+            }
         }
 
         public BllUser UpdateUser(BllUser entity)
         {
-            IUserService service = new UserService(uow);
-            return service.Update(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService service = new UserService(uow);
+                return service.Update(entity);
+            }
         }
         #endregion
 
         #region EventTypeService
         public List<BllEventType> GetAllEventTypes()
         {
-            IEventTypeService EventTypeService = new EventTypeService(uow);
-            return EventTypeService.GetAll().ToList();
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IEventTypeService EventTypeService = new EventTypeService(uow);
+                return EventTypeService.GetAll().ToList();
+            }
         }
 
         public BllEventType CreateEventType(BllEventType entity)
         {
-            IEventTypeService service = new EventTypeService(uow);
-            return service.Create(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IEventTypeService service = new EventTypeService(uow);
+                return service.Create(entity);
+            }
         }
 
         public void DeleteEventType(int id)
         {
-            IEventTypeService service = new EventTypeService(uow);
-            service.Delete(id);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IEventTypeService service = new EventTypeService(uow);
+                service.Delete(id);
+            }
         }
 
         public BllEventType UpdateEventType(BllEventType entity)
         {
-            IEventTypeService service = new EventTypeService(uow);
-            return service.Update(entity);
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IEventTypeService service = new EventTypeService(uow);
+                return service.Update(entity);
+            }
         }
         #endregion
 

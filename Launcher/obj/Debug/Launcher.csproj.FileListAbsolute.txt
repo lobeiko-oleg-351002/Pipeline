@@ -10,3 +10,5 @@ E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.csproj.CoreCompil
 E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.exe
 E:\Projects\Visual Studio\Pipeline\Launcher\obj\Debug\Launcher.pdb
 E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Launcher.exe.config
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Globals.dll
+E:\Projects\Visual Studio\Pipeline\Launcher\bin\Debug\Globals.pdb
