@@ -22,7 +22,7 @@ namespace Client.Forms
         List<BllUser> Users = new List<BllUser>();
         List<string> Filepaths = new List<string>();
         BllUser Sender;
-
+        
         public AddEventForm()
         {
             InitializeComponent();

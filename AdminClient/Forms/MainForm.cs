@@ -48,15 +48,14 @@ namespace AdminClient.Forms
                 {
                     Invoke(new Action(() =>
                     {
-                        textBox1.Text = GetConstFromResources("SERVER_ONLINE");
-                        служебныеОбъектыToolStripMenuItem.Enabled = true;
+                        SetControlsAccordingToServerOnline();
                     }));
                 }
                 if ((value == false) && (_isServerOnline == true))
                 {
                     Invoke(new Action(() =>
                     {
-                        SetControlsServerOffline();
+                        SetControlsAccordingToServerOffline();
                     }));
 
 
@@ -65,7 +64,13 @@ namespace AdminClient.Forms
             }
         }
 
-        private void SetControlsServerOffline()
+        private void SetControlsAccordingToServerOnline()
+        {
+            textBox1.Text = GetConstFromResources("SERVER_ONLINE");
+            служебныеОбъектыToolStripMenuItem.Enabled = true;
+        }
+
+        private void SetControlsAccordingToServerOffline()
         {
             textBox1.Text = GetConstFromResources("SERVER_OFFLINE");
             служебныеОбъектыToolStripMenuItem.Enabled = false;
@@ -84,7 +89,7 @@ namespace AdminClient.Forms
             server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
             UserList = new List<BllUser>();
 
-            SetControlsServerOffline();
+            SetControlsAccordingToServerOffline();
             PingServer();
             new Thread(() =>
             {

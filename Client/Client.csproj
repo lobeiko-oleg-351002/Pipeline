@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectionFailedException.cs" />
     <Compile Include="FileServiceClient.cs" />
     <Compile Include="FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">
@@ -80,6 +81,7 @@
       <DependentUpon>SignInForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Sha1.cs" />
+    <Compile Include="UserIsNullException.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </EmbeddedResource>
