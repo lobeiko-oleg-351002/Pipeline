@@ -28,8 +28,6 @@ namespace BllEntities
 
         public DateTime Date { get; set; }
 
-        public bool IsAdmited { get; set; }
-
         public string Note { get; set; }
     }
 }

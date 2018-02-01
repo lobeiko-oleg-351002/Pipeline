@@ -65,7 +65,7 @@ namespace Client
 
 
 
-        IBusinessService server;
+        public IBusinessService server { get; private set; }
 
         BllUser User = null;
         List<BllEvent> EventSequence;
@@ -100,9 +100,6 @@ namespace Client
                 method();
             }));
         }
-
-       
-
         
         public static class AppConfigManager
         {
@@ -207,13 +204,7 @@ namespace Client
                     button1.Enabled = true;
                 }
             }));
-            //  if (AreUserStatusesSet())
-            //  {
-            //     if (HasUserLoginAndPassword())
-            //     {
             InitStatusesForSelectedEvent();
-           //     }
-           // }
         }
 
         private void PopulateTextBoxesUsingEvent(BllEvent Event)
@@ -265,8 +256,7 @@ namespace Client
                     comboBox1.Items.Add(StatusClosed.Name);
                     AvailableStatusesForSelectedEvent.Add(StatusDeleted);
                     AvailableStatusesForSelectedEvent.Add(StatusClosed);
-                }
-                
+                }               
             }
         }
 
@@ -300,16 +290,7 @@ namespace Client
 
         private bool HasUserLoginAndPassword()
         {
-            if (User == null)
-            {
-                return false;
-            }
             return User.Login != "";
-        }
-
-        private void SetUserEmpty()
-        {
-            User = new BllUser { Login = "" };
         }
 
         private void AddAppShortcutToStartup()
@@ -371,10 +352,9 @@ namespace Client
             TurnAppStartupInTrayAccordingToConfigValue();
         }
 
-        private void SetAppControlsAccordingToOfflineServerAndBlankUser()
+        private void SetAppControlsAccordingToOfflineServer()
         {
             SetControlsAccordingToServerOffline();
-            SetUserEmpty();
         }
 
         private void StartPingingServerBackground()
@@ -410,7 +390,7 @@ namespace Client
         private void Form1_Load(object sender, EventArgs e)
         {
             InitializeAppValues();
-            SetAppControlsAccordingToOfflineServerAndBlankUser();
+            SetAppControlsAccordingToOfflineServer();
             InitializeAppProperties();
             InitializeColumnSortOrder();
             try
@@ -439,7 +419,7 @@ namespace Client
             }
         }
 
-        private void ConnectToServer() 
+        public void ConnectToServer() 
         {
             GetServerInstance();
             SetServerToAddEventForm();
@@ -542,17 +522,25 @@ namespace Client
             return null;
         }
 
-        private bool IsEventListHaveItems(List<BllEvent> list)
+        private bool HasEventListItems(List<BllEvent> list)
         {
             return list != null;
         }
 
+        private bool IsEventAccepted(BllEvent Event)
+        {
+            foreach(var item in Event.RecieverLib.SelectedEntities)
+            {
+                if ((item.Entity.Id == User.Id) && item.IsEventAccepted)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void UpdateEventUsingCachedEvent(BllEvent Event, BllEvent cachedEvent)
         {
-            if (cachedEvent.IsAdmited)
-            {
-                Event.IsAdmited = true;
-            }
             Event.Note = cachedEvent.Note;
         }
 
@@ -618,7 +606,7 @@ namespace Client
             {
                 List<BllEvent> eventsFromServer = GetEventsFromServerForCurrentUser();
                 List<BllEvent> cachedEvents = DeserializeEventsFromCache();
-                if (IsEventListHaveItems(cachedEvents))
+                if (HasEventListItems(cachedEvents))
                 {
                     AddLocalCachedEventsAndUpdateEventsFromServerUsingCache(eventsFromServer, cachedEvents);
                 }
@@ -703,22 +691,11 @@ namespace Client
 
             dataGridView1.Rows.Add(row);
 
-            int i = dataGridView1.Rows.Count - 1;
-            if (HasUserLoginAndPassword() && isServerOnline)
+            int addedRowNum = dataGridView1.Rows.Count - 1;
+            if (!IsEventAccepted(Event))
             {
-                if (!Event.IsAdmited && (Event.Sender.Id != User.Id))
-                {
-                    HighlightRow(i);
-                    IndeciesOfNewEvents.Add(i);
-                }
-            }
-            else
-            {
-                if (!Event.IsAdmited)
-                {
-                    HighlightRow(i);
-                    IndeciesOfNewEvents.Add(i);
-                }
+                HighlightRow(addedRowNum);
+                IndeciesOfNewEvents.Add(addedRowNum);
             }
 
             var selectedEntities = Event.StatusLib.SelectedEntities;
@@ -726,19 +703,19 @@ namespace Client
             {
                 if (selectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED)
                 {
-                    IndeciesOfClosedEvents.Add(i);
-                    MarkEventInDataGridAsClosed(i);
+                    IndeciesOfClosedEvents.Add(addedRowNum);
+                    MarkEventInDataGridAsClosed(addedRowNum);
                 }
                 if (selectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
                 {
-                    IndeciesOfDeletedEvents.Add(i);
-                    MarkEventInDataGridAsDeleted(i);
+                    IndeciesOfDeletedEvents.Add(addedRowNum);
+                    MarkEventInDataGridAsDeleted(addedRowNum);
                 }
             }
             
         }
         
-        private BllUser CreateBlankUserAccordingLoginAndPasswordFromConfig()
+        private BllUser CreateBlankUserAccordingToLoginAndPasswordFromConfig()
         {
             string login = AppConfigManager.GetKeyValue(LOGIN_TAG);
             string password = AppConfigManager.GetKeyValue(PASSWORD_TAG);
@@ -750,7 +727,11 @@ namespace Client
                     Password = password
                 };
             }
-            return null;
+            return new BllUser
+            {
+                Login = "",
+                Password = ""
+            };
         }
 
         private void SetUserUsingSignInForm()
@@ -758,11 +739,6 @@ namespace Client
             SignInForm signInForm = new SignInForm(server);
             signInForm.ShowDialog();
             User = signInForm.User;
-        }
-
-        private bool IsUserNotNull()
-        {
-            return User != null;
         }
 
         private void SignInOnServer()
@@ -787,7 +763,7 @@ namespace Client
 
         private void Authorize()
         {
-            User = CreateBlankUserAccordingLoginAndPasswordFromConfig();
+            User = CreateBlankUserAccordingToLoginAndPasswordFromConfig();
             try
             {
                 if (HasUserLoginAndPassword())
@@ -827,7 +803,7 @@ namespace Client
 
         private BllEvent GetNewEventUsingAddEventForm()
         {
-            addEventForm = new AddEventForm(server, User);
+            addEventForm = new AddEventForm(this, User);
             addEventForm.ShowDialog();
             return addEventForm.Event;
         }
@@ -901,7 +877,6 @@ namespace Client
 
         public void GetEvent(BllEvent Event)
         {
-            Event.IsAdmited = false;
             EventSequence.Add(Event);
             Invoke(new Action(() =>
             {
@@ -1094,19 +1069,23 @@ namespace Client
                     DeleteFromIndexLists(SelectedRowIndex);
                 }
                 AddSelectedStatusToEvent();
-                try
+                bool success = false;
+                while (!success)
                 {
-                    EventSequence[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventSequence[SelectedRowIndex], User);
-                    var newStatus = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities.Last();
-                    AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
-                    UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex);
-                    SelectBlankStatus();
-                    SerializeEventsBackground();
-                }
-                catch(Exception ex)
-                {
-                    //statuses.RemoveAt(statuses.Count - 1);
-                    MessageBox.Show(ex.Message);
+                    try
+                    {
+                        EventSequence[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventSequence[SelectedRowIndex], User);
+                        var newStatus = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities.Last();
+                        AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
+                        UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex);
+                        SelectBlankStatus();
+                        SerializeEventsBackground();
+                        success = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        PingServerAndIndicateHisStateOnControls();
+                    }
                 }
             }
         }
@@ -1354,7 +1333,6 @@ namespace Client
 
         private void MakeSelectedEventAdmited()
         {
-            EventSequence[SelectedRowIndex].IsAdmited = true;
             IndeciesOfNewEvents.Remove(SelectedRowIndex);
             RowCommonFont(SelectedRowIndex);
             IndicateNewEventsOnTaskbar();
@@ -1571,24 +1549,21 @@ namespace Client
             }
           
             SetSelectedEventToControls();
-            if (IsUserNotNull())
+            var recievers = EventSequence[SelectedRowIndex].RecieverLib.SelectedEntities;
+            if ((IsUserInChecklistByLogin(User, recievers)) || (User.Login == EventSequence[SelectedRowIndex].Sender.Login))
             {
-                var recievers = EventSequence[SelectedRowIndex].RecieverLib.SelectedEntities;
-                if ((IsUserInChecklistByLogin(User, recievers)) || (User.Login == EventSequence[SelectedRowIndex].Sender.Login))
-                {
-                    ShowChecklist();
-                    FillUserChecklist(recievers);
-                }
-                else
-                {
-                    if (isServerOnline)
-                    {
-                        ShowCheckbox();
-                    }
-                }
-
-                HandleStatusChanging();
+                ShowChecklist();
+                FillUserChecklist(recievers);
             }
+            else
+            {
+                if (isServerOnline)
+                {
+                    ShowCheckbox();
+                }
+            }
+
+            HandleStatusChanging();
         }
 
         private void HandleStatusChanging()
