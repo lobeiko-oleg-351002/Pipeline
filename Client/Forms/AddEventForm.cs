@@ -102,13 +102,13 @@ namespace Client.Forms
             foreach (var group in groups)
             {
                 var node = treeView1.Nodes.Add(group.Name);
-                IEnumerable<BllUser> users = null;
+                List<BllUser> usersByGroup = null;
                 success = false;
                 while (!success)
                 {
                     try
                     {
-                        users = server.GetUsersByGroup(group);
+                        usersByGroup = server.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
                         success = true;
                     }
                     catch
@@ -117,7 +117,7 @@ namespace Client.Forms
                         success = false;
                     }
                 }
-                foreach (var user in users)
+                foreach (var user in usersByGroup)
                 {
                     if (user.Id != Sender.Id)
                     {

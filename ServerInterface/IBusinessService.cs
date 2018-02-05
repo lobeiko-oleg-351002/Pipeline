@@ -16,7 +16,10 @@ namespace ServerInterface
         BllUser SignIn(string login, string password);
 
         [OperationContract]
-        IEnumerable<BllUser> GetUsersByGroup(BllGroup group);
+        List<BllUser> GetUsersByGroup(BllGroup group);
+
+        [OperationContract]
+        List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
 
         [OperationContract]
         BllEvent CreateAndSendOutEvent(BllEvent Event);
@@ -41,9 +44,6 @@ namespace ServerInterface
 
         [OperationContract]
         string PingServer();
-
-
-
     }
 
 }

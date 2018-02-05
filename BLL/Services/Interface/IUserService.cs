@@ -10,6 +10,7 @@ namespace BLL.Services.Interface
     {
         BllUser GetUserByLogin(string login);
         BllUser Authorize(string login, string password);
-        IEnumerable<BllUser> GetUsersByGroup(int group_id);
+        List<BllUser> GetUsersByGroup(int group_id);
+        List<BllUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays);
     }
 }

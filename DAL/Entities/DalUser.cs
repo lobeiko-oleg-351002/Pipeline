@@ -21,5 +21,7 @@ namespace DAL.Entities
         public int EventTypeLib_id { get; set; }
 
         public int StatusLib_id { get; set; }
+
+        public DateTime? SignInDate { get; set; }
     }
 }

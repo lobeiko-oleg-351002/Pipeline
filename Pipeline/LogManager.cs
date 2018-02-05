@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Server
 {
-    public static class LogManager
+    public static class LogWriter
     {
         public static void WriteMessage(string operation, string exception, string source)
         {

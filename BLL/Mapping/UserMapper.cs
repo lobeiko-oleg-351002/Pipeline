@@ -37,7 +37,8 @@ namespace BLL.Mapping
                 Group_id = entity.Group.Id,
                 Password = entity.Password,
                 EventTypeLib_id = entity.EventTypeLib.Id,
-                StatusLib_id = entity.StatusLib.Id
+                StatusLib_id = entity.StatusLib.Id,
+                SignInDate = entity.SignInDate
             };
 
             return dalEntity;
@@ -54,7 +55,8 @@ namespace BLL.Mapping
                 Password = entity.Password,
                 Group =  groupService.Get(entity.Group_id),
                 EventTypeLib = eventTypeLibService.Get(entity.EventTypeLib_id),
-                StatusLib = statusLibService.Get(entity.StatusLib_id)
+                StatusLib = statusLibService.Get(entity.StatusLib_id),
+                SignInDate = entity.SignInDate
             };
 
             return bllEntity;

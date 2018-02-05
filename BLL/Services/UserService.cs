@@ -75,10 +75,20 @@ namespace BLL.Services
             return null;
         }
 
-        public IEnumerable<BllUser> GetUsersByGroup(int group_id)
+        public List<BllUser> GetUsersByGroup(int group_id)
         {
             List<BllUser> users = new List<BllUser>();
             foreach(var item in uow.Users.GetUsersByGroup(group_id))
+            {
+                users.Add(mapper.MapToBll(item));
+            }
+            return users;
+        }
+
+        public List<BllUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays)
+        {
+            List<BllUser> users = new List<BllUser>();
+            foreach (var item in uow.Users.GetUsersByGroupAndSignInDateRange(group_id, permissibleRangeInDays))
             {
                 users.Add(mapper.MapToBll(item));
             }

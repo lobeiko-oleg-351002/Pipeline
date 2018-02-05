@@ -38,7 +38,7 @@ namespace DAL.Repositories
             return mapper.MapToDal(ormEntity);
         }
 
-        public IEnumerable<DalUser> GetUsersByGroup(int group_id)
+        public List<DalUser> GetUsersByGroup(int group_id)
         {
             List<DalUser> users = new List<DalUser>();
             foreach (var item in context.Users.Where(entity => entity.group_id == group_id))
@@ -46,6 +46,29 @@ namespace DAL.Repositories
                 users.Add(mapper.MapToDal(item));
             }
             return users;
+        }
+
+        public List<DalUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays)
+        {
+            List<DalUser> users = new List<DalUser>();
+           
+            foreach (var item in context.Users.Where(entity => entity.group_id == group_id))
+            {
+                if (item.signInDate.Value != null)
+                {
+                    if (IsDateInPermissibleRange(item.signInDate.Value, permissibleRangeInDays))
+                    {
+                        users.Add(mapper.MapToDal(item));
+                    }
+                }
+            }
+            return users;
+        }
+
+        private bool IsDateInPermissibleRange(DateTime date, int rangeInDays)
+        {
+            //date + range > now
+            return DateTime.Now.CompareTo(date.AddDays(rangeInDays)) < 0;
         }
     }
 }

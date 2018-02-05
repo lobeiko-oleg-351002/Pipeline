@@ -380,7 +380,10 @@ namespace Client
         {
             if (dataGridView1.Rows.Count > 0)
             {
-                dataGridView1.CurrentRow.Selected = false;
+                if (dataGridView1.CurrentRow != null)
+                {
+                    dataGridView1.CurrentRow.Selected = false;
+                }
             }
         }
 

@@ -23,5 +23,7 @@ namespace BllEntities
         public BllStatusLib StatusLib { get; set; }
 
         public string InnerId { get; set; }
+
+        public DateTime? SignInDate { get; set; }
     }
 }

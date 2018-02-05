@@ -193,4 +193,7 @@
   <data name="TAG_TRAY_INDICATION_STATUS" xml:space="preserve">
     <value>TRAY_INDICATION_STATUS</value>
   </data>
+  <data name="PERMISSIBLE_DATE_RANGE_IN_DAYS" xml:space="preserve">
+    <value>14</value>
+  </data>
 </root>

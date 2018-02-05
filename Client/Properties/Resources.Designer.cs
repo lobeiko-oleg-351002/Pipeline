@@ -125,6 +125,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 14.
+        /// </summary>
+        internal static string PERMISSIBLE_DATE_RANGE_IN_DAYS {
+            get {
+                return ResourceManager.GetString("PERMISSIBLE_DATE_RANGE_IN_DAYS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Сервер недоступен.
         /// </summary>
         internal static string SERVER_NOT_FOUND {

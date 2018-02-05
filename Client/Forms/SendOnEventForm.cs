@@ -127,7 +127,7 @@ namespace Client.Forms
             {
                 try
                 {
-                    users = server.GetUsersByGroup(group);
+                    users = server.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
                     success = true;
                 }
                 catch

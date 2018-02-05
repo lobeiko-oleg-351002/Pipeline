@@ -95,7 +95,7 @@ namespace Server
             }
             catch(Exception ex)
             {
-                LogManager.WriteMessage("CreateAndSendOutEvent", ex.Message + ex.InnerException, Event.Sender.Fullname);
+                LogWriter.WriteMessage("CreateAndSendOutEvent", ex.Message + ex.InnerException, Event.Sender.Fullname);
                 return Event;
             }
 
@@ -116,12 +116,12 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("GetEventsForUser", ex.Message + ex.InnerException, user.Fullname);
+                LogWriter.WriteMessage("GetEventsForUser", ex.Message + ex.InnerException, user.Fullname);
                 return null;
             }
         }
 
-        public IEnumerable<BllUser> GetUsersByGroup(BllGroup group)
+        public List<BllUser> GetUsersByGroup(BllGroup group)
         {
             try
             {
@@ -134,7 +134,25 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("GetEventsForUser", ex.Message + ex.InnerException, group.Name);
+                LogWriter.WriteMessage("GetUsersByGroup", ex.Message + ex.InnerException, group.Name);
+                return null;
+            }
+        }
+
+        public List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IUserService userService = new UserService(uow);
+                    return userService.GetUsersByGroupAndSignInDateRange(group.Id, permissibleRangeInDays);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("GetUsersByGroupAndSignInDateRange", ex.Message + ex.InnerException, group.Name);
                 return null;
             }
         }
@@ -159,7 +177,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
+                LogWriter.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
                 return Event;
             }
         }
@@ -194,7 +212,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateEventWithRecieversExceptUsers", ex.Message + ex.InnerException, "");
+                LogWriter.WriteMessage("UpdateEventWithRecieversExceptUsers", ex.Message + ex.InnerException, "");
             }
         }
 
@@ -217,7 +235,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateRecieversAndSendOutEvent", ex.Message + ex.InnerException, "");
+                LogWriter.WriteMessage("UpdateRecieversAndSendOutEvent", ex.Message + ex.InnerException, "");
             }
         }
 
@@ -245,7 +263,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateStatusAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
+                LogWriter.WriteMessage("UpdateStatusAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
                 return Event;
             }
         }
@@ -273,7 +291,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("UpdateEventWithUsers", ex.Message + ex.InnerException, updater.Fullname);
+                LogWriter.WriteMessage("UpdateEventWithUsers", ex.Message + ex.InnerException, updater.Fullname);
             }
         }
 
@@ -349,21 +367,16 @@ namespace Server
                     BllUser user = service.Authorize(login, password);
                     if (user != null)
                     {
-                        //int key = 0;
-                        //do
-                        //{
-                        //    key++;
-                        //    user.InnerId = login + key.ToString();
-                        //}
-                        //while (Clients.Any(p => p.Key == user.InnerId));
                         RegisterClient(user.Login);
+                        user.SignInDate = DateTime.Now;
+                        service.Update(user);
                     }
                     return user;
                 }
             }
             catch (Exception ex)
             {
-                LogManager.WriteMessage("SignIn", ex.Message + ex.InnerException, login);
+                LogWriter.WriteMessage("SignIn", ex.Message + ex.InnerException, login);
                 return null;
             }
         }
