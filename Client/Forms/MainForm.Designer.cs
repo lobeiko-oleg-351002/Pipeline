@@ -30,6 +30,7 @@
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.создатьСобытиеToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.переслатьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.создатьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,6 +83,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.создатьСобытиеToolStripMenuItem1,
+            this.переслатьСобытиеToolStripMenuItem,
             this.удалитьСобытиеToolStripMenuItem,
             this.настройкиToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -96,6 +98,13 @@
             this.создатьСобытиеToolStripMenuItem1.Size = new System.Drawing.Size(112, 20);
             this.создатьСобытиеToolStripMenuItem1.Text = "Создать событие";
             this.создатьСобытиеToolStripMenuItem1.Click += new System.EventHandler(this.создатьСобытиеToolStripMenuItem_Click);
+            // 
+            // переслатьСобытиеToolStripMenuItem
+            // 
+            this.переслатьСобытиеToolStripMenuItem.Name = "переслатьСобытиеToolStripMenuItem";
+            this.переслатьСобытиеToolStripMenuItem.Size = new System.Drawing.Size(127, 20);
+            this.переслатьСобытиеToolStripMenuItem.Text = "Переслать событие";
+            this.переслатьСобытиеToolStripMenuItem.Click += new System.EventHandler(this.переслатьСобытиеToolStripMenuItem_Click);
             // 
             // удалитьСобытиеToolStripMenuItem
             // 
@@ -614,6 +623,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
         private System.Windows.Forms.RichTextBox richTextBox2;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ToolStripMenuItem переслатьСобытиеToolStripMenuItem;
     }
 }
 

@@ -81,6 +81,7 @@ namespace Client
         SortableColumn AttributeColumn;
 
         List<int> IndeciesOfNewEvents = new List<int>();
+        List<int> IndeciesOfNewStatuses = new List<int>();
         List<int> IndeciesOfDeletedEvents = new List<int>();
         List<int> IndeciesOfClosedEvents = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
@@ -184,6 +185,7 @@ namespace Client
                 label4.ForeColor = Color.Red;
                 создатьСобытиеToolStripMenuItem.Enabled = false;
                 button1.Enabled = false;
+                DealWithTrayIcon();
             }));
         }
 
@@ -203,8 +205,10 @@ namespace Client
                 {
                     button1.Enabled = true;
                 }
+                DealWithTrayIcon();
+                InitStatusesForSelectedEvent();
             }));
-            InitStatusesForSelectedEvent();
+            
         }
 
         private void PopulateTextBoxesUsingEvent(BllEvent Event)
@@ -241,7 +245,7 @@ namespace Client
             richTextBox2.Enabled = true;
         }
 
-        private void AddStatusesForOwnerAccordingToOwnerId(int senderId)
+        private void AddStatusesForOwnerAccordingToOwner(BllUser sender)
         {
             if (StatusDeleted != null)
             {
@@ -250,7 +254,7 @@ namespace Client
                 AvailableStatusesForSelectedEvent.Remove(StatusDeleted);
                 AvailableStatusesForSelectedEvent.Remove(StatusClosed);
 
-                if (senderId == User.Id)
+                if (AreUsersEqual(User, sender))
                 {
                     comboBox1.Items.Add(StatusDeleted.Name);
                     comboBox1.Items.Add(StatusClosed.Name);
@@ -276,7 +280,7 @@ namespace Client
             SetEventDescription(Event.Description);
             SetEventNoteUsingCellValue();
             SelectBlankStatus();
-            AddStatusesForOwnerAccordingToOwnerId(Event.Sender.Id);         
+            AddStatusesForOwnerAccordingToOwner(Event.Sender);         
         }
 
         private void AddStatusToDataGrid(string name, DateTime date)
@@ -295,12 +299,14 @@ namespace Client
 
         private void AddAppShortcutToStartup()
         {
+            const string launcher = "Launcher.exe";
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
-                if (key.GetValue(Properties.Resources.CLIENT_NAME) == null)
-                {
-                    key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + Application.ExecutablePath + "\"");
-                }
+                //if (key.GetValue(Properties.Resources.CLIENT_NAME) == null)
+                //{
+                string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + currentLocation + "\\" + launcher + "\"");
+               // }
             }
         }
 
@@ -427,13 +433,13 @@ namespace Client
             try
             {
                 Authorize();
-                SetControlsAccordingToServerOnline();
                 isServerOnline = true;
+                SetControlsAccordingToServerOnline();                
             }
             catch(ConnectionFailedException ex)
             {
-                SetControlsAccordingToServerOffline();
                 isServerOnline = false;
+                SetControlsAccordingToServerOffline();               
             }
             catch(UserIsNullException ex)
             {
@@ -493,6 +499,8 @@ namespace Client
             if (User.StatusLib != null)
             {
                 AvailableStatusesForSelectedEvent.Clear();
+                comboBox1.Items.Clear();
+                AddBlankStatusToComboBox();
                 GetStatusesForOwnerFromServer();
                 
                 foreach (var item in User.StatusLib.SelectedEntities)
@@ -531,7 +539,7 @@ namespace Client
         {
             foreach(var item in Event.RecieverLib.SelectedEntities)
             {
-                if ((item.Entity.Id == User.Id) && item.IsEventAccepted)
+                if (AreUsersEqual(item.Entity, User) && item.IsEventAccepted)
                 {
                     return true;
                 }
@@ -542,6 +550,7 @@ namespace Client
         private void UpdateEventUsingCachedEvent(BllEvent Event, BllEvent cachedEvent)
         {
             Event.Note = cachedEvent.Note;
+            Event.HasMissedStatus = cachedEvent.HasMissedStatus;
         }
 
         private void AddLocalCachedEventsAndUpdateEventsFromServerUsingCache(List<BllEvent> serverEvents, List<BllEvent> cachedEvents)
@@ -555,6 +564,10 @@ namespace Client
                     {
                         isCachedItemMatchsInListFromServer = true;
                         UpdateEventUsingCachedEvent(item, cachedItem);
+                        if (IsTargetStatusObsolete(item, cachedItem))
+                        {
+                            item.HasMissedStatus = true;
+                        }
                         break;
                     }
                 }
@@ -711,6 +724,11 @@ namespace Client
                     IndeciesOfDeletedEvents.Add(addedRowNum);
                     MarkEventInDataGridAsDeleted(addedRowNum);
                 }
+                if (Event.HasMissedStatus)
+                {
+                    IndeciesOfNewStatuses.Add(addedRowNum);
+                    MakeBoldFontToStatusInDataGrid(addedRowNum);
+                }
             }
             
         }
@@ -859,7 +877,7 @@ namespace Client
             }
         }
 
-        private void TurnOutFormIfHidden()
+        private void TurnOutWithEventFormIfHidden()
         {
             if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_EVENT) && notifyIcon.Visible)
             {
@@ -867,9 +885,25 @@ namespace Client
             }
         }
 
-        private void PlaySignalAccordingToConfigValue()
+        private void TurnOutWithStatusFormIfHidden()
+        {
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_STATUS) && notifyIcon.Visible)
+            {
+                TurnOutForm();
+            }
+        }
+
+        private void PlaySignalAccordingToEventConfigValue()
         {
             if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_EVENT))
+            {
+                SystemSounds.Beep.Play();
+            }
+        }
+
+        private void PlaySignalAccordingToStatusConfigValue()
+        {
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_STATUS))
             {
                 SystemSounds.Beep.Play();
             }
@@ -883,9 +917,9 @@ namespace Client
                 AddEventToDataGrid(Event);
                 SerializeEventsBackground();
                 IndicateNewEventsOnTaskbar();
-                TurnOutFormIfHidden();
-                SetTrayNewEventIcon();
-                PlaySignalAccordingToConfigValue();
+                TurnOutWithEventFormIfHidden();
+                DealWithTrayIcon();
+                PlaySignalAccordingToEventConfigValue();
             }));
             CurrentSorting.Sort(); ;
         }      
@@ -1015,16 +1049,13 @@ namespace Client
         {
             int n = IndeciesOfNewEvents.Count;
             Text = FormText;
-            if (n > 0)
+            if (n > 0 )
             {
                 Text += " (" + n + ")";
-                FlashWindow.Start(this);
             }
-            else
-            {
-                FlashWindow.Stop(this);
-            }
+            DealWithFlashing();
         }
+
 
         private void EnableStatusControls()
         {
@@ -1118,28 +1149,28 @@ namespace Client
             return -1;
         }
 
-        private void UpdateEventStatusIfObsolete(BllEvent source, int i)
+
+
+        private bool IsTargetStatusObsolete(BllEvent source, BllEvent target)
         {
             if (source.StatusLib.SelectedEntities.Count > 0)
             {
-                var selectedStatuses = EventSequence[i].StatusLib.SelectedEntities;
+                var selectedStatuses = target.StatusLib.SelectedEntities;
                 var newstatus = source.StatusLib.SelectedEntities.Last();
                 if (selectedStatuses.Count > 0)
                 {
                     var oldstatus = selectedStatuses.Last();
                     if (newstatus.Date != oldstatus.Date)
                     {
-                        UpdateEventStatusInDataGrid(newstatus, i);
-                        MakeBoldFontToStatusInDataGrid(i);
+                        return true;
                     }
                 }
                 else
                 {
-                    UpdateEventStatusInDataGrid(newstatus, i);
-                    MakeBoldFontToStatusInDataGrid(i);
+                    return true;
                 }
-
             }
+            return false;
         }
 
         public void UpdateSelectedEvent(BllEvent source, int rowNum)
@@ -1162,12 +1193,28 @@ namespace Client
         public void UpdateEvent(BllEvent Event)
         {
             int i = FindUpdatedEventInEventSequenceById(Event.Id);
-            EventSequence[i] = Event;
-            UpdateEventStatusIfObsolete(Event, i);
-            UpdateSelectedEvent(Event, i);
-            SerializeEventsBackground();
-            TurnOutFormIfHidden();
-            PlaySignalAccordingToConfigValue();
+            if (i >= 0)
+            {
+                if (IsTargetStatusObsolete(Event, EventSequence[i]))
+                {
+                    var newStatus = Event.StatusLib.SelectedEntities.Last();
+                    UpdateEventStatusInDataGrid(newStatus, i);
+                    MakeBoldFontToStatusInDataGrid(i);
+                    IndeciesOfNewStatuses.Add(i);
+                    Event.HasMissedStatus = false;
+                    DealWithFlashing();
+                    DealWithTrayIcon();
+                    TurnOutWithStatusFormIfHidden();
+                    PlaySignalAccordingToStatusConfigValue();
+                }
+                else
+                {
+                    Event.HasMissedStatus = true;
+                }
+                EventSequence[i] = Event;
+                UpdateSelectedEvent(Event, i);
+                SerializeEventsBackground();
+            }
         }
 
         private void MarkEventInDataGridAsClosed(int i)
@@ -1196,6 +1243,16 @@ namespace Client
                     EnableDeleteEventButton();
                 }
             }
+        }
+
+        private void EnableSendOnEventButton()
+        {
+            переслатьСобытиеToolStripMenuItem.Enabled = true;
+        }
+
+        private void DisableSendOnEventButton()
+        {
+            переслатьСобытиеToolStripMenuItem.Enabled = false;
         }
 
         private void EnableDeleteEventButton()
@@ -1266,6 +1323,11 @@ namespace Client
             notifyIcon.Icon = new Icon(Properties.Resources.NewEventTray, new Size(32, 32));
         }
 
+        private void SetTrayServerOfflineIcon()
+        {
+            notifyIcon.Icon = new Icon(Properties.Resources.ServerOfflineTray, new Size(32, 32));
+        }
+
         private void SetTrayCommontIcon()
         {
             notifyIcon.Icon = this.Icon;
@@ -1273,13 +1335,20 @@ namespace Client
 
         private void DealWithTrayIcon()
         {
-            if (IndeciesOfNewEvents.Count != 0)
+            if (!isServerOnline)
             {
-                SetTrayNewEventIcon();
+                SetTrayServerOfflineIcon();
             }
             else
             {
-                SetTrayCommontIcon();
+                if ((IndeciesOfNewEvents.Count != 0) || ((IndeciesOfNewStatuses.Count != 0) && AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS)))
+                {
+                    SetTrayNewEventIcon();
+                }
+                else
+                {
+                    SetTrayCommontIcon();
+                }
             }
         }
 
@@ -1297,6 +1366,7 @@ namespace Client
             this.Show();
             this.ShowInTaskbar = true;
             notifyIcon.Visible = false;
+            DealWithFlashing();
         }
             
 
@@ -1339,11 +1409,20 @@ namespace Client
             SerializeEventsBackground();
         }
 
+        private bool AreUsersEqual(BllUser user1, BllUser user2)
+        {
+            if (user1.Login == user2.Login)
+            {
+                return true;
+            }
+            return false;
+        }
+
         private void MarkRecieverInLib(BllUserLib RecieverLib)
         {
             foreach (var item in RecieverLib.SelectedEntities)
             {
-                if (item.Entity.Id == User.Id)
+                if (AreUsersEqual(item.Entity, User))
                 {
                     item.IsEventAccepted = true;
                     break;
@@ -1530,6 +1609,7 @@ namespace Client
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
         {
             SelectedRowIndex = -1;
+            DisableSendOnEventButton();
             if (e.StateChanged != DataGridViewElementStates.Selected) return;
             if (dataGridView1.SelectedRows.Count == 0)
             {
@@ -1537,7 +1617,8 @@ namespace Client
                 return;
             }
             SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
-            
+            EnableSendOnEventButton();
+
             checkBox1.Checked = false;
             if (IndeciesOfClosedEvents.Contains(SelectedRowIndex) || IndeciesOfDeletedEvents.Contains(SelectedRowIndex))
             {
@@ -1546,6 +1627,11 @@ namespace Client
             else
             {
                 DisableDeleteEventButton();
+            }
+
+            if (IndeciesOfNewStatuses.Contains(SelectedRowIndex))
+            {
+                RemoveNewStatusIndex(SelectedRowIndex);
             }
           
             SetSelectedEventToControls();
@@ -1564,6 +1650,31 @@ namespace Client
             }
 
             HandleStatusChanging();
+        }
+
+        private void DealWithFlashing()
+        {
+            if (IndeciesOfNewStatuses.Count == 0 && IndeciesOfNewStatuses.Count == 0)
+            {
+                FlashWindow.Stop(this);
+            }
+            else
+            {
+                if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS))
+                {
+                    FlashWindow.Start(this);
+                }
+            }
+        }
+
+        private void RemoveNewStatusIndex(int selectedRowIndex)
+        {
+            IndeciesOfNewStatuses.Remove(selectedRowIndex);
+            RowCommonFont(selectedRowIndex);
+            EventSequence[selectedRowIndex].HasMissedStatus = false;
+            DealWithFlashing();
+            DealWithTrayIcon();
+            SerializeEventsBackground();
         }
 
         private void HandleStatusChanging()
@@ -1595,6 +1706,7 @@ namespace Client
             dataGridView2.Rows.Clear();
             comboBox1.SelectedIndex = 0;
             DisableStatusControls();
+            DisableSendOnEventButton();
             listBox2.Items.Clear();
             checkBox1.Checked = false;
             HideChecklistAndCheckbox();
@@ -1754,6 +1866,16 @@ namespace Client
         private void richTextBox2_Leave(object sender, EventArgs e)
         {
             SerializeEventsBackground();
+        }
+
+        private void переслатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PingServerAndIndicateHisStateOnControls();
+            if (isServerOnline)
+            {
+                SendOnEventForm sendOnEventForm = new SendOnEventForm(this, EventSequence[SelectedRowIndex], User);
+                sendOnEventForm.ShowDialog();
+            }
         }
     }
 }

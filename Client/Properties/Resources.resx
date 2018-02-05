@@ -139,6 +139,9 @@
   <data name="NewEventTray" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\NewEventTray.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ServerOfflineTray" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ServerOfflineTray.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="SERVER_NOT_FOUND" xml:space="preserve">
     <value>Сервер недоступен</value>
   </data>
@@ -183,5 +186,11 @@
   </data>
   <data name="USER_NOT_FOUND" xml:space="preserve">
     <value>Неверный логин/пароль</value>
+  </data>
+  <data name="TAG_TASKBAR_INDICATION_STATUS" xml:space="preserve">
+    <value>TASKBAR_INDICATION_STATUS</value>
+  </data>
+  <data name="TAG_TRAY_INDICATION_STATUS" xml:space="preserve">
+    <value>TRAY_INDICATION_STATUS</value>
   </data>
 </root>

@@ -34,6 +34,9 @@ namespace ServerInterface
         BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater);
 
         [OperationContract]
+        void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers);
+
+        [OperationContract]
         List<BllEvent> GetEventsForUser(BllUser user);
 
         [OperationContract]

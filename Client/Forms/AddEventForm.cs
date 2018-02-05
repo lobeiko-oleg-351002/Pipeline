@@ -193,7 +193,7 @@ namespace Client.Forms
         {
             Event = new BllEvent();
             Event.Name = textBox1.Text;
-
+            Event.HasMissedStatus = true;
             Event.FilepathLib = new BllFilepathLib();
             try
             {
@@ -243,7 +243,7 @@ namespace Client.Forms
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                ConnectToServerUsingParent();
+                //ConnectToServerUsingParent();
             }
         }
 

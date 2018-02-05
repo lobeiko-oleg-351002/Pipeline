@@ -19,17 +19,22 @@ namespace Client.Forms
         public Settings()
         {
             InitializeComponent();
+
             checkedListBox1.Items.Add("Звуковое оповещение для новых событий");
             checkedListBox1.Items.Add("Звуковое оповещение при изменении статуса");
             checkedListBox1.Items.Add("Вызов программы из фонового режима при получении нового события");
             checkedListBox1.Items.Add("Вызов программы из фонового режима при изменении статуса");
             checkedListBox1.Items.Add("Автозапуск программы в фоновом режиме");
-            //checkedListBox1.Items.Add("Скрывать закрытые события");
+            checkedListBox1.Items.Add("Индикация на панели задач при изменении статуса");
+            checkedListBox1.Items.Add("Индикация в трэе при изменении статуса");
+
             SetCheckListItem(Properties.Resources.TAG_SOUND_EVENT, 0);
             SetCheckListItem(Properties.Resources.TAG_SOUND_STATUS, 1);
             SetCheckListItem(Properties.Resources.TAG_TURNOUT_EVENT, 2);
             SetCheckListItem(Properties.Resources.TAG_TURNOUT_STATUS, 3);
             SetCheckListItem(Properties.Resources.TAG_STARTUP_TRAY, 4);
+            SetCheckListItem(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
+            SetCheckListItem(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
 
             checkBox1.Checked = MainForm.AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
             numericUpDown1.Value = MainForm.AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
@@ -48,6 +53,8 @@ namespace Client.Forms
             SetKeyValue(Properties.Resources.TAG_TURNOUT_EVENT, 2);
             SetKeyValue(Properties.Resources.TAG_TURNOUT_STATUS, 3);
             SetKeyValue(Properties.Resources.TAG_STARTUP_TRAY, 4);
+            SetKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
+            SetKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
             MainForm.AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, hideClosedEvents.ToString());
             MainForm.AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE, numericUpDown1.Value.ToString());
             Close();

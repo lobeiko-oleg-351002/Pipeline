@@ -29,5 +29,7 @@ namespace BllEntities
         public DateTime Date { get; set; }
 
         public string Note { get; set; }
+
+        public bool HasMissedStatus { get; set; }
     }
 }

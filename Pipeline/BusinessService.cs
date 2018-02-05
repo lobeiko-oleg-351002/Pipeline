@@ -88,7 +88,7 @@ namespace Server
                     BllEvent res = eventService.Create(Event);
                     new Thread(() =>
                     {
-                        InvokeEventWithUsers(Event);
+                        InvokeEventWithRecievers(Event);
                     }).Start();
                     return res;
                 }
@@ -164,6 +164,63 @@ namespace Server
             }
         }
 
+        private BllUserLib AddUsersToLib(BllUserLib lib, List<BllUser> users)
+        {
+            foreach(var item in users)
+            {
+                lib.SelectedEntities.Add(new BllSelectedUser { Entity = item });
+            }
+            return lib;
+        }
+
+        private void UpdateEventWithRecieversExceptUsers(BllEvent Event, List<BllUser> users)
+        {
+            try
+            {
+                foreach (var reciever in Event.RecieverLib.SelectedEntities)
+                {
+                    try
+                    {
+                        if (!users.Contains(reciever.Entity))
+                        {
+                            Clients[reciever.Entity.Login].UpdateEvent(Event);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Clients.Remove(reciever.Entity.Login);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("UpdateEventWithRecieversExceptUsers", ex.Message + ex.InnerException, "");
+            }
+        }
+
+        public void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    UserLibService userservice = new UserLibService(uow);
+                    Event.RecieverLib = AddUsersToLib(Event.RecieverLib, newRecievers);
+                    Event.RecieverLib = userservice.Update(Event.RecieverLib);
+                    new Thread(() =>
+                    {
+                        InvokeEventWithUsers(Event, newRecievers);
+                        UpdateEventWithRecieversExceptUsers(Event, newRecievers);
+                    }).Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.WriteMessage("UpdateRecieversAndSendOutEvent", ex.Message + ex.InnerException, "");
+            }
+        }
+
         public BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater)
         {
             try
@@ -220,7 +277,7 @@ namespace Server
             }
         }
 
-        private void InvokeEventWithUsers(BllEvent Event)
+        private void InvokeEventWithRecievers(BllEvent Event)
         {
             foreach (var reciever in Event.RecieverLib.SelectedEntities)
             {
@@ -234,6 +291,21 @@ namespace Server
                 catch (Exception ex)
                 {
                     Clients.Remove(reciever.Entity.Login);
+                }
+            }
+        }
+
+        private void InvokeEventWithUsers(BllEvent Event, List<BllUser> users)
+        {
+            foreach (var user in users)
+            {
+                try
+                {
+                    Clients[user.Login].GetEvent(Event);
+                }
+                catch (Exception ex)
+                {
+                    Clients.Remove(user.Login);
                 }
             }
         }

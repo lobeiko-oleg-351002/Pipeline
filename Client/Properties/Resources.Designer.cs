@@ -152,6 +152,16 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon ServerOfflineTray {
+            get {
+                object obj = ResourceManager.GetObject("ServerOfflineTray", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EDOC_LINK.
         /// </summary>
         internal static string STARTUP_LINK_NAME {
@@ -229,6 +239,24 @@ namespace Client.Properties {
         internal static string TAG_STARTUP_TRAY {
             get {
                 return ResourceManager.GetString("TAG_STARTUP_TRAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TASKBAR_INDICATION_STATUS.
+        /// </summary>
+        internal static string TAG_TASKBAR_INDICATION_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_TASKBAR_INDICATION_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TRAY_INDICATION_STATUS.
+        /// </summary>
+        internal static string TAG_TRAY_INDICATION_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_TRAY_INDICATION_STATUS", resourceCulture);
             }
         }
         
