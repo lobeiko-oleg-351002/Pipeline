@@ -102,7 +102,7 @@ namespace Client.Forms
             foreach (var group in groups)
             {
                 var node = treeView1.Nodes.Add(group.Name);
-                List<BllUser> usersByGroup = null;
+                List<BllUser> usersByGroup = new List<BllUser>();
                 success = false;
                 while (!success)
                 {

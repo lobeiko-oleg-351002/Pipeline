@@ -32,10 +32,6 @@ namespace ORM
 
         public int group_id { get; set; }
 
-        public bool createRights { get; set; }
-
-        public bool changeRights { get; set; }
-
         public int statusLib_id { get; set; }
 
         public int eventTypeLib_id { get; set; }

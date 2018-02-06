@@ -54,7 +54,7 @@ namespace DAL.Repositories
            
             foreach (var item in context.Users.Where(entity => entity.group_id == group_id))
             {
-                if (item.signInDate.Value != null)
+                if (item.signInDate != null)
                 {
                     if (IsDateInPermissibleRange(item.signInDate.Value, permissibleRangeInDays))
                     {
