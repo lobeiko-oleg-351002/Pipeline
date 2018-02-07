@@ -1539,24 +1539,27 @@ namespace Client
 
         private void listBox2_DoubleClick(object sender, MouseEventArgs e)
         {
-            string filename = EventSequence[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path;
-            string foldername = EventSequence[SelectedRowIndex].FilepathLib.FolderName;
-            try
+            if (listBox2.SelectedIndex >= 0)
             {
-                if (checkBox2.Checked == false)
+                string filename = EventSequence[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path;
+                string foldername = EventSequence[SelectedRowIndex].FilepathLib.FolderName;
+                try
                 {
-                    Process.Start(DownloadFile(filename, foldername));
+                    if (checkBox2.Checked == false)
+                    {
+                        Process.Start(DownloadFile(filename, foldername));
+                    }
+                    else
+                    {
+                        string path = DownloadFile(filename, foldername);
+                        Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                    }
+
                 }
-                else
+                catch
                 {
-                    string path = DownloadFile(filename, foldername);
-                    Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                    MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
-                
-            }
-            catch
-            {
-                MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
             }
         }
 
@@ -1716,6 +1719,7 @@ namespace Client
             удалитьСобытиеToolStripMenuItem.Enabled = false;
             richTextBox2.Text = "";
             richTextBox2.Enabled = false;
+            dataGridView1.ClearSelection();
         }
 
         private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
