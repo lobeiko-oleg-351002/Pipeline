@@ -19,15 +19,7 @@ namespace Client
             InitializeComponent();
         }
 
-        IBusinessService server;
         public BllUser User;
-
-        public SignInForm(IBusinessService server)
-        {
-            InitializeComponent();
-            this.server = server;
-            User = new BllUser { Login = "" };
-        }
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -37,27 +29,14 @@ namespace Client
 
         private void button1_Click(object sender, EventArgs e)
         {
-            try
+            if ((textBox1.Text == "") || (textBox2.Text == ""))
             {
-                User = server.SignIn(textBox1.Text, Sha1.Encrypt(textBox2.Text));
-                if (User == null)
-                {
-                    MessageBox.Show(Properties.Resources.ResourceManager.GetString("USER_NOT_FOUND"));
-                }
-                else
-                {
-                    Close();
-                }
+                MessageBox.Show("Введите логин и пароль");
             }
-            catch(Exception)
+            else
             {
-                MessageBox.Show(Properties.Resources.SERVER_NOT_FOUND);
                 Close();
-                throw new UserIsNullException();
             }
-
         }
-
-
     }
 }

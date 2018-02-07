@@ -8,11 +8,11 @@ using System.Text;
 
 namespace ServiceChannelManager
 {
-    public class ServiceChannelManagerSingleton
+    public class ServiceChannelMakerSingleton
     {
         private static IBusinessService SourceChannel;
 
-        private static ServiceChannelManagerSingleton instance;
+        private static ServiceChannelMakerSingleton instance;
 
         public IBusinessService GetServerMethods(IClientCallBack handler, string hostIP)
         {
@@ -20,22 +20,22 @@ namespace ServiceChannelManager
         }
 
 
-        public static ServiceChannelManagerSingleton Instance
+        public static ServiceChannelMakerSingleton Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new ServiceChannelManagerSingleton();
+                    instance = new ServiceChannelMakerSingleton();
                 }
                 return instance;
             }
         }
+
         private static T CreateChannel<T>(string serviceAddress, IClientCallBack handler)
         {
-            NetTcpBinding binding = new NetTcpBinding("businessTcpBinding");
+            NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), binding, serviceAddress);
-            //factory.Credentials.Windows.AllowedImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.Impersonation;
             return factory.CreateChannel();
         }
 

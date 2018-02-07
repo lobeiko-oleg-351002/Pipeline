@@ -27,6 +27,15 @@ namespace Client
         public MainForm()
         {
             InitializeComponent();
+            ExecutablePath = Application.ExecutablePath;
+        }
+
+        //for tests
+        public MainForm(string pathToClient)
+        {
+            InitializeComponent();
+            ExecutablePath = pathToClient;
+            
         }
 
         private class SortableColumn
@@ -65,7 +74,7 @@ namespace Client
 
 
 
-        public IBusinessService server { get; private set; }
+        public ServerConnectionController server { get; private set; }
 
         BllUser User = null;
         List<BllEvent> EventSequence;
@@ -90,8 +99,8 @@ namespace Client
 
         int SelectedRowIndex;
         string FormText = Properties.Resources.CLIENT_NAME;
-        
-        bool isServerOnline;
+
+        public bool isServerOnline;
         bool isAppClosed = false;
 
         private void RunMethodBackground(Action method)
@@ -100,13 +109,16 @@ namespace Client
             {
                 method();
             }));
+            
         }
+
+        public static string ExecutablePath { get; set;}
         
         public static class AppConfigManager
-        {
+        { 
             public static string GetKeyValue(string tag)
             {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ExecutablePath);
                 if (config.AppSettings.Settings[tag] != null)
                 {
                     return config.AppSettings.Settings[tag].Value;
@@ -116,7 +128,7 @@ namespace Client
 
             public static void SetKeyValue(string tag, string value)
             {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ExecutablePath);
                 if (config.AppSettings.Settings[tag] != null)
                 {
                     config.AppSettings.Settings[tag].Value = value;
@@ -322,7 +334,7 @@ namespace Client
 
         private void InitializeAppValues()
         {
-            EventSequence = new List<BllEvent>();
+            EventSequence = new List<BllEvent>(); 
         }
 
         private void AddVersionToFormName()
@@ -402,9 +414,11 @@ namespace Client
             SetAppControlsAccordingToOfflineServer();
             InitializeAppProperties();
             InitializeColumnSortOrder();
+            GetServerInstance();
+            User = CreateBlankUserAccordingToLoginAndPasswordFromConfig();
             try
             {
-                ConnectToServer();
+                ConnectToServerAndIndicateServerStateOnControls();
                 StartPingingServerBackground();
                 GetEventList();
             }
@@ -414,10 +428,10 @@ namespace Client
             }           
         }
 
-        private void GetServerInstance()
+        private void GetServerInstance() 
         {
             string ip = AppConfigManager.GetKeyValue(IP_KEY);
-            server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
+            server = new ServerConnectionController(ip, this);
         }
 
         private void SetServerToAddEventForm()
@@ -428,34 +442,34 @@ namespace Client
             }
         }
 
-        public void ConnectToServer() 
+        private void ConnectToServerAndIndicateServerStateOnControls()
         {
-            GetServerInstance();
-            SetServerToAddEventForm();
-
             try
             {
-                Authorize();
-                isServerOnline = true;
-                SetControlsAccordingToServerOnline();                
+                ConnectToServer();
+                SetUserFullnameOnLabel();
+                SetControlsAccordingToServerOnline();
             }
-            catch(ConnectionFailedException ex)
+            catch (ConnectionFailedException ex)
             {
                 isServerOnline = false;
-                SetControlsAccordingToServerOffline();               
+                SetControlsAccordingToServerOffline();
             }
-            catch(UserIsNullException ex)
+            catch (UserIsNullException ex)
             {
                 throw ex;
-            }           
+            }
+
         }
+
+
 
         private void PingServerAndIndicateHisStateOnControls()
         {
             bool previousServerState = isServerOnline;
             if (isServerOnline == false)
             {
-                ConnectToServer();
+                ConnectToServerAndIndicateServerStateOnControls();
             }
             try
             {
@@ -755,11 +769,23 @@ namespace Client
             };
         }
 
-        private void SetUserUsingSignInForm()
+        private void SetLoginAndPasswordUsingSignInForm()
         {
-            SignInForm signInForm = new SignInForm(server);
-            signInForm.ShowDialog();
-            User = signInForm.User;
+            bool success = false;
+            while (success == false)
+            {
+                try
+                {
+                    SignInForm signInForm = new SignInForm();
+                    signInForm.ShowDialog();
+                    User = signInForm.User;
+                    success = true;
+                }
+                catch(UserIsNullException ex)
+                {
+                    throw ex;
+                }
+            }
         }
 
         private void SignInOnServer()
@@ -787,17 +813,13 @@ namespace Client
             User = CreateBlankUserAccordingToLoginAndPasswordFromConfig();
             try
             {
-                if (HasUserLoginAndPassword())
+                if (!HasUserLoginAndPassword())
                 {
-                    SignInOnServer();
-                    SetUserFullnameOnLabel();
+                    SetLoginAndPasswordUsingSignInForm();
                 }
-                else
-                {
-                    SetUserUsingSignInForm();
-                    WriteLoginAndPasswordToConfig();
-                    SetUserFullnameOnLabel();
-                }
+                User = server.SignIn(User);
+                WriteLoginAndPasswordToConfig();                   
+                
             }
             catch(ConnectionFailedException ex)
             {

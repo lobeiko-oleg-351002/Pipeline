@@ -86,7 +86,7 @@ namespace AdminClient.Forms
         private void Form1_Load(object sender, EventArgs e)
         {
             string ip = ConfigurationManager.AppSettings[IP_KEY];
-            server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
+            server = ServiceChannelMakerSingleton.Instance.GetServerMethods(this, ip);
             UserList = new List<BllUser>();
 
             SetControlsAccordingToServerOffline();
@@ -111,7 +111,7 @@ namespace AdminClient.Forms
                 if (isServerOnline == false)
                 {
                     string ip = ConfigurationManager.AppSettings[IP_KEY];
-                    server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
+                    server = ServiceChannelMakerSingleton.Instance.GetServerMethods(this, ip);
                 }
                 server.PingServer();
                 isServerOnline = true;
