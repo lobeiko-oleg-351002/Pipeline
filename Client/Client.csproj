@@ -86,7 +86,20 @@
     <Compile Include="Forms\SignInForm.Designer.cs">
       <DependentUpon>SignInForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ServerConnectionController.cs" />
+    <Compile Include="ServerManager\AttributeGetter.cs" />
+    <Compile Include="ServerManager\GroupGetter.cs" />
+    <Compile Include="ServerManager\Interface\IAttributeGetter.cs" />
+    <Compile Include="ServerManager\Interface\IAuthorizationManager.cs" />
+    <Compile Include="ServerManager\Interface\IGroupGetter.cs" />
+    <Compile Include="ServerManager\Interface\IEventCRUD.cs" />
+    <Compile Include="ServerManager\Interface\IServerInstance.cs" />
+    <Compile Include="ServerManager\Interface\IStatusGetter.cs" />
+    <Compile Include="ServerManager\Interface\IUserGetter.cs" />
+    <Compile Include="ServerManager\UserGetter.cs" />
+    <Compile Include="ServerManager\ServerInstance.cs" />
+    <Compile Include="ServerManager\AuthorizationManager.cs" />
+    <Compile Include="ServerManager\EventCRUD.cs" />
+    <Compile Include="ServerManager\StatusGetter.cs" />
     <Compile Include="Sha1.cs" />
     <Compile Include="CustomExceptions\UserIsNullException.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">

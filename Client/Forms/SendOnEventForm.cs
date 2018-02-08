@@ -1,4 +1,6 @@
 ﻿using BllEntities;
+using Client.ServerManager;
+using Client.ServerManager.Interface;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
@@ -19,16 +21,14 @@ namespace Client.Forms
         }
 
         List<BllUser> Users = new List<BllUser>();
-        MainForm parent;
         BllEvent Event;
-        IBusinessService server;
+        IServerInstance server;
 
-        public SendOnEventForm(MainForm parent, BllEvent Event, BllUser sender)
+        public SendOnEventForm(IServerInstance server, BllEvent Event, BllUser sender)
         {
             InitializeComponent();
-            this.parent = parent;
             this.Event = Event;
-            this.server = parent.server;
+            this.server = server;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -72,7 +72,8 @@ namespace Client.Forms
 
             try
             {
-                server.UpdateRecieversAndSendOnEvent(Event, newRecievers);
+                IEventCRUD eventCRUD = (EventCRUD)server;
+                eventCRUD.UpdateRecieversAndSendOnEvent(Event, newRecievers);
                 Close();
             }
             catch (Exception ex)
@@ -86,12 +87,6 @@ namespace Client.Forms
             PopulateRecieverTreeView();
         }
 
-        private void ConnectToServerUsingParent()
-        {
-            parent.ConnectToServer();
-            this.server = parent.server;
-        }
-
         private List<BllGroup> GetGroupsFromServer()
         {
             bool success = false;
@@ -100,12 +95,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    groups = server.GetAllGroups();
+                    IGroupGetter gg = (GroupGetter)server;
+                    groups = gg.GetAllGroups();
                     success = true;
                 }
                 catch
                 {
-                    ConnectToServerUsingParent();
+                    server.ReconnectToServer();
                     success = false;
                 }
             }
@@ -127,12 +123,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    users = server.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
+                    IUserGetter ug = (UserGetter)server;
+                    users = ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
                     success = true;
                 }
                 catch
                 {
-                    ConnectToServerUsingParent();
+                    server.ReconnectToServer();
                     success = false;
                 }
             }

@@ -1,5 +1,7 @@
 ﻿using BllEntities;
 using BllEntities.Interface;
+using Client.ServerManager;
+using Client.ServerManager.Interface;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
@@ -16,24 +18,22 @@ namespace Client.Forms
 {
     public partial class AddEventForm : ParentForm
     {
-        public IBusinessService server { private get; set; }
+        IServerInstance server;
         public BllEvent Event { get; private set; }
         List<BllAttribute> Attributes;
         List<BllUser> Users = new List<BllUser>();
         List<string> Filepaths = new List<string>();
         BllUser Sender;
-        MainForm parent;
         
         public AddEventForm()
         {
             InitializeComponent();
         }
 
-        public AddEventForm(MainForm parent, BllUser sender)
+        public AddEventForm(IServerInstance server, BllUser sender)
         {
             InitializeComponent();
-            this.parent = parent;
-            this.server = parent.server;
+            this.server = server;
             this.Sender = sender;
 
             PopulateEventTypeComboBox(sender.EventTypeLib);
@@ -66,12 +66,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    Attributes = server.GetAllAttributes();
+                    IAttributeGetter ag = (AttributeGetter)server;
+                    Attributes = ag.GetAllAttributes();
                     success = true;
                 }
                 catch
                 {
-                    ConnectToServerUsingParent();
+                    server.ReconnectToServer();
                     success = false;
                 }
             }
@@ -89,12 +90,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    groups = server.GetAllGroups();
+                    IGroupGetter gg = (GroupGetter)server;
+                    groups = gg.GetAllGroups();
                     success = true;
                 }
                 catch
                 {
-                    ConnectToServerUsingParent();
+                    server.ReconnectToServer();
                     success = false;
                 }
             }
@@ -108,12 +110,13 @@ namespace Client.Forms
                 {
                     try
                     {
-                        usersByGroup = server.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
+                        IUserGetter ug = (UserGetter)server;
+                        usersByGroup = ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
                         success = true;
                     }
                     catch
                     {
-                        ConnectToServerUsingParent();
+                        server.ReconnectToServer();
                         success = false;
                     }
                 }
@@ -126,12 +129,6 @@ namespace Client.Forms
                     }
                 }
             }
-        }
-
-        private void ConnectToServerUsingParent()
-        {
-            parent.ConnectToServer();
-            this.server = parent.server;
         }
 
         public void UncheckAllNodes(TreeNodeCollection nodes)
@@ -237,7 +234,8 @@ namespace Client.Forms
             Event.Sender = this.Sender;
             try
             {
-                Event = server.CreateAndSendOutEvent(Event);
+                IEventCRUD eventCRUD = (EventCRUD)server;
+                Event = eventCRUD.CreateAndSendOutEvent(Event);
                 Close();
             }
             catch (Exception ex)

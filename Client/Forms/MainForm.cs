@@ -1,5 +1,7 @@
 ﻿using BllEntities;
 using Client.Forms;
+using Client.ServerManager;
+using Client.ServerManager.Interface;
 using Globals;
 using Microsoft.Win32;
 using ServerInterface;
@@ -74,7 +76,7 @@ namespace Client
 
 
 
-        public ServerConnectionController server { get; private set; }
+        public IServerInstance server { get; private set; }
 
         BllUser User = null;
         List<BllEvent> EventSequence;
@@ -414,8 +416,6 @@ namespace Client
             SetAppControlsAccordingToOfflineServer();
             InitializeAppProperties();
             InitializeColumnSortOrder();
-            GetServerInstance();
-            User = CreateBlankUserAccordingToLoginAndPasswordFromConfig();
             try
             {
                 ConnectToServerAndIndicateServerStateOnControls();
@@ -431,22 +431,15 @@ namespace Client
         private void GetServerInstance() 
         {
             string ip = AppConfigManager.GetKeyValue(IP_KEY);
-            server = new ServerConnectionController(ip, this);
-        }
-
-        private void SetServerToAddEventForm()
-        {
-            if (addEventForm != null)
-            {
-                addEventForm.server = server;
-            }
+            server = new ServerInstance(ip, this);
         }
 
         private void ConnectToServerAndIndicateServerStateOnControls()
         {
             try
             {
-                ConnectToServer();
+                GetServerInstance();
+                Authorize();
                 SetUserFullnameOnLabel();
                 SetControlsAccordingToServerOnline();
             }
@@ -494,11 +487,13 @@ namespace Client
                 {
                     if (StatusDeleted == null)
                     {
-                        StatusDeleted = server.GetStatusDeleted();
+                        IStatusGetter sg = (StatusGetter)server;
+                        StatusDeleted = sg.GetStatusDELETED();
                     }
                     if (StatusClosed == null)
                     {
-                        StatusClosed = server.GetStatusClosed();
+                        IStatusGetter sg = (StatusGetter)server;
+                        StatusClosed = sg.GetStatusCLOSED();
                     }
                     success = true;
                 }
@@ -536,7 +531,10 @@ namespace Client
                 success = true;
                 try
                 {
-                    return server.GetEventsForUser(User);
+                    IEventCRUD eventCrud = (EventCRUD)server;
+                    {
+                        return eventCrud.GetEventsForUser(User);
+                    }
                 }
                 catch
                 {
@@ -788,17 +786,6 @@ namespace Client
             }
         }
 
-        private void SignInOnServer()
-        {
-            try
-            {
-                User = server.SignIn(User.Login, User.Password);
-            }
-            catch(Exception)
-            {
-                throw new ConnectionFailedException();
-            }
-        }
 
         private void SetUserFullnameOnLabel()
         {
@@ -817,7 +804,8 @@ namespace Client
                 {
                     SetLoginAndPasswordUsingSignInForm();
                 }
-                User = server.SignIn(User);
+                IAuthorizationManager am = (AuthorizationManager)server;
+                User = am.SignIn(User);
                 WriteLoginAndPasswordToConfig();                   
                 
             }
@@ -846,7 +834,7 @@ namespace Client
 
         private BllEvent GetNewEventUsingAddEventForm()
         {
-            addEventForm = new AddEventForm(this, User);
+            addEventForm = new AddEventForm(server, User);
             addEventForm.ShowDialog();
             return addEventForm.Event;
         }
@@ -1130,7 +1118,8 @@ namespace Client
                 {
                     try
                     {
-                        EventSequence[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventSequence[SelectedRowIndex], User);
+                        IEventCRUD crud = (EventCRUD)server;
+                        EventSequence[SelectedRowIndex] = crud.UpdateStatusAndSendOutEvent(EventSequence[SelectedRowIndex], User);
                         var newStatus = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities.Last();
                         AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
                         UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex);
@@ -1466,7 +1455,8 @@ namespace Client
                     MakeSelectedEventAdmited();
                 }
                 MarkRecieverInLib(currentEvent.RecieverLib);
-                currentEvent = server.UpdateAcceptedUsersAndSendOutEvent(currentEvent, User);
+                IEventCRUD crud = (EventCRUD)server;
+                currentEvent = crud.UpdateAcceptedUsersAndSendOutEvent(currentEvent, User);
                 FillUserChecklist(currentEvent.RecieverLib.SelectedEntities);
             }
         }
@@ -1898,7 +1888,7 @@ namespace Client
             PingServerAndIndicateHisStateOnControls();
             if (isServerOnline)
             {
-                SendOnEventForm sendOnEventForm = new SendOnEventForm(this, EventSequence[SelectedRowIndex], User);
+                SendOnEventForm sendOnEventForm = new SendOnEventForm(server, EventSequence[SelectedRowIndex], User);
                 sendOnEventForm.ShowDialog();
             }
         }
