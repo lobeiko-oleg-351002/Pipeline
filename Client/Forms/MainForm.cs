@@ -56,8 +56,7 @@ namespace Client
 
         const string LOGIN_TAG = "login";
         const string PASSWORD_TAG = "password";
-        const string DATE_FORMAT = "dd.MM.yyyy";
-        const string TIME_FORMAT = "HH:mm";
+        
         const string STATUS_NOT_CHANGED = "Статус не изменён";
         const string IP_KEY = "hostIP";
 
@@ -96,7 +95,7 @@ namespace Client
         List<int> IndeciesOfDeletedEvents = new List<int>();
         List<int> IndeciesOfClosedEvents = new List<int>();
         NotifyIcon notifyIcon = new NotifyIcon();
-        XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
+        
         AddEventForm addEventForm = null;
 
         int SelectedRowIndex;
@@ -934,7 +933,7 @@ namespace Client
                 DealWithTrayIcon();
                 PlaySignalAccordingToEventConfigValue();
             }));
-            CurrentSorting.Sort(); ;
+            CurrentSorting.Sort(); 
         }      
 
         private void SerializeEventsBackground()
@@ -1017,28 +1016,7 @@ namespace Client
             }
         }
 
-        private void SerializeEventsToCache()
-        {
-            try
-            {
-                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                if (!Directory.Exists(mydoc + Properties.Resources.DOWNLOADS_FOLDER))
-                {
-                    Directory.CreateDirectory(mydoc + Properties.Resources.DOWNLOADS_FOLDER);
-                }
 
-                using (FileStream stream = new FileStream(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Create))
-                {
-                    SetNotesForEvents();
-                    serializer.Serialize(stream, EventSequence);
-                    UnsetNotesForEvents();
-                }
-            }
-            catch (IOException)
-            {
-
-            }
-        }
 
         private List<BllEvent> DeserializeEventsFromCache()
         {

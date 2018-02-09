@@ -46,14 +46,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
-    <Compile Include="FileServiceClient.cs" />
-    <Compile Include="FlashWindow.cs" />
+    <Compile Include="Misc\SerializeManager.cs" />
+    <Compile Include="ServerManager\FileServiceClient.cs" />
+    <Compile Include="Misc\FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\AddEventForm.Designer.cs">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventClasses\DataGridManager.cs" />
+    <Compile Include="EventClasses\UiEvent.cs" />
+    <Compile Include="EventClasses\EventStates.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +82,7 @@
     <Compile Include="Forms\Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventClasses\UiEventManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Forms\SignInForm.cs">
@@ -100,7 +105,7 @@
     <Compile Include="ServerManager\AuthorizationManager.cs" />
     <Compile Include="ServerManager\EventCRUD.cs" />
     <Compile Include="ServerManager\StatusGetter.cs" />
-    <Compile Include="Sha1.cs" />
+    <Compile Include="Misc\Sha1.cs" />
     <Compile Include="CustomExceptions\UserIsNullException.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">
       <DependentUpon>AddEventForm.cs</DependentUpon>
@@ -165,5 +170,6 @@
   <ItemGroup>
     <None Include="Resources\ServerOfflineTray.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

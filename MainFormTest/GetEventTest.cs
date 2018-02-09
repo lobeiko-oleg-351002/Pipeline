@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,20 @@ namespace MainFormTest
     public class GetEventTest
     {
         [TestMethod]
-        public void GetEvent()
+        public void GetEventPositiveTest()
         {
+            string ExecutablePath = "E:\\Projects\\Visual Studio\\Pipeline\\MainFormTest\\bin\\Debug\\Client.exe";
+            MainForm mainForm = new MainForm(ExecutablePath);
+
             BllEvent testEvent = CreateTestEvent();
+            mainForm.GetEvent(testEvent);
+            //isTaskBarHighliths
+            //isTrayHighlights
+            //isDataContainersPopulatedProperly
+            //isProperRowSelected
+            //isListSortedProperly
+            //HasFilesDownloaded
+            //isRowBold
         }
 
         private BllEvent CreateTestEvent()
