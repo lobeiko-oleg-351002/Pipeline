@@ -1614,12 +1614,13 @@ namespace Client
 
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
         {
-            SelectedRowIndex = -1;
+            //SelectedRowIndex = -1;
             DisableSendOnEventButton();
             if (e.StateChanged != DataGridViewElementStates.Selected) return;
             if (dataGridView1.SelectedRows.Count == 0)
             {
                 ClearDataControls();
+                SelectedRowIndex = -1;
                 return;
             }
             SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
