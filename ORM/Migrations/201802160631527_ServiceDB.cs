@@ -3,7 +3,7 @@ namespace ORM.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class MigrateDB : DbMigration
+    public partial class ServiceDB : DbMigration
     {
         public override void Up()
         {

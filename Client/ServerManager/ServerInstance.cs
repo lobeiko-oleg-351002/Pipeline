@@ -9,9 +9,9 @@ using System.Text;
 
 namespace Client.ServerManager
 {
-    public class ServerInstance : IServerInstance
+    public class ServerInstance : IServerInstance 
     {
-        protected IBusinessService server;
+        public IBusinessService server { get; private set; }
 
         protected bool IsServerOnline;
 
@@ -22,17 +22,14 @@ namespace Client.ServerManager
         {
             this.ip = ip;
             this.clientCallBack = clientCallBack;
-            try
-            {
-                ConnectToServer(ip, clientCallBack);
-            }
-            catch (ConnectionFailedException ex)
-            {
-                throw ex;
-            }
         }
 
-        public void ConnectToServer(string ip, IClientCallBack clientCallBack)
+        public ServerInstance(IBusinessService server)
+        {
+            this.server = server;
+        }
+
+        public void ConnectToServer()
         {
             server = GetServerInstanceUsingIp(ip, clientCallBack);
             try
@@ -57,7 +54,7 @@ namespace Client.ServerManager
             return ServiceChannelMakerSingleton.Instance.GetServerMethods(clientCallBack, ip);
         }
 
-        public bool IsThereConnection()
+        public bool IsConnected()
         {
             return IsServerOnline;
         }
@@ -72,11 +69,6 @@ namespace Client.ServerManager
             {
                 throw new ConnectionFailedException();
             }
-        }
-
-        public void ReconnectToServer()
-        {
-            ConnectToServer(ip, clientCallBack);
         }
     }
 }

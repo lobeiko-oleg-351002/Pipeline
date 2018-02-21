@@ -62,9 +62,9 @@
     <Compile Include="Migrations\201801171255359_InitialCreate.Designer.cs">
       <DependentUpon>201801171255359_InitialCreate.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802060618598_MigrateDB.cs" />
-    <Compile Include="Migrations\201802060618598_MigrateDB.Designer.cs">
-      <DependentUpon>201802060618598_MigrateDB.cs</DependentUpon>
+    <Compile Include="Migrations\201802160631527_ServiceDB.cs" />
+    <Compile Include="Migrations\201802160631527_ServiceDB.Designer.cs">
+      <DependentUpon>201802160631527_ServiceDB.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -86,8 +86,8 @@
     <EmbeddedResource Include="Migrations\201801171255359_InitialCreate.resx">
       <DependentUpon>201801171255359_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802060618598_MigrateDB.resx">
-      <DependentUpon>201802060618598_MigrateDB.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802160631527_ServiceDB.resx">
+      <DependentUpon>201802160631527_ServiceDB.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

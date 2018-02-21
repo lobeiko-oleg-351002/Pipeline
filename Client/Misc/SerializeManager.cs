@@ -1,4 +1,5 @@
 ﻿using Client.EventClasses;
+using Client.EventClasses.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,7 +60,7 @@ namespace Client.Misc
             }
             catch (IOException ex)
             {
-                throw ex;
+                return new List<UiEvent>();
             }
         }
 

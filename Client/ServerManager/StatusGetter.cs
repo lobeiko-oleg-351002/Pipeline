@@ -10,7 +10,7 @@ namespace Client.ServerManager
 {
     public class StatusGetter : ServerInstance, IStatusGetter
     {
-        public StatusGetter(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public StatusGetter(IBusinessService server) : base(server)
         {
         }
 

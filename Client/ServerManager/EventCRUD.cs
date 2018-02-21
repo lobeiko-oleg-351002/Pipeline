@@ -10,7 +10,7 @@ namespace Client.ServerManager
 {
     public class EventCRUD : ServerInstance, IEventCRUD
     {
-        public EventCRUD(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public EventCRUD(IBusinessService server) : base(server)
         {
         }
 

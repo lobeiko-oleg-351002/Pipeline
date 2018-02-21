@@ -10,7 +10,7 @@ namespace Client.ServerManager
 {
     public class AttributeGetter : ServerInstance, IAttributeGetter
     {
-        public AttributeGetter(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public AttributeGetter(IBusinessService server) : base(server)
         {
         }
 

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Client.EventClasses
+namespace Client.EventClasses.Events
 {
     public enum EventStates
     {
-        Common,
-        New,
-        Deleted,
-        Closed
+        ClosedEvent,
+        DeletedEvent,
+        NewEvent,
+        RegularEvent
     }
 }

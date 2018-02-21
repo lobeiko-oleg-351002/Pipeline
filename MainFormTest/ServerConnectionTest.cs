@@ -17,8 +17,9 @@ namespace MainFormTest
         public void ConnectToServer()
         {
             IServerInstance server = new ServerInstance(serverIp, this);
+            server.ConnectToServer();
             server.PingServer();
-            Assert.IsTrue(server.IsThereConnection());
+            Assert.IsTrue(server.IsConnected());
         }
 
         [TestMethod]

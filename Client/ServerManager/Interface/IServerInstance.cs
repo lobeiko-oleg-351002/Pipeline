@@ -8,9 +8,8 @@ namespace Client.ServerManager.Interface
 {
     public interface IServerInstance
     {
-        void ConnectToServer(string ip, IClientCallBack clientCallBack);
-        void ReconnectToServer();
+        void ConnectToServer();
         void PingServer();
-        bool IsThereConnection();
+        bool IsConnected();
     }
 }

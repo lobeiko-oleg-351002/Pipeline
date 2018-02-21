@@ -10,7 +10,7 @@ namespace Client.ServerManager
 {
     public class UserGetter : ServerInstance, IUserGetter
     {
-        public UserGetter(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public UserGetter(IBusinessService server) : base(server)
         {
         }
 

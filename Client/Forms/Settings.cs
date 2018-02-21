@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Misc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -36,13 +37,13 @@ namespace Client.Forms
             SetCheckListItem(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
             SetCheckListItem(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
 
-            checkBox1.Checked = MainForm.AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
-            numericUpDown1.Value = MainForm.AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
+            checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
+            numericUpDown1.Value = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
         }
 
         private void SetCheckListItem(string tag, int i)
         {
-             checkedListBox1.SetItemChecked(i, MainForm.AppConfigManager.GetBoolKeyValue(tag)); 
+             checkedListBox1.SetItemChecked(i, AppConfigManager.GetBoolKeyValue(tag)); 
             
         }
 
@@ -55,14 +56,14 @@ namespace Client.Forms
             SetKeyValue(Properties.Resources.TAG_STARTUP_TRAY, 4);
             SetKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
             SetKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
-            MainForm.AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, hideClosedEvents.ToString());
-            MainForm.AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE, numericUpDown1.Value.ToString());
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, hideClosedEvents.ToString());
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE, numericUpDown1.Value.ToString());
             Close();
         }
 
         private void SetKeyValue(string tag, int i)
         {
-            MainForm.AppConfigManager.SetKeyValue(tag, checkedListBox1.GetItemChecked(i).ToString());
+            AppConfigManager.SetKeyValue(tag, checkedListBox1.GetItemChecked(i).ToString());
         }
 
         private void button2_Click(object sender, EventArgs e)

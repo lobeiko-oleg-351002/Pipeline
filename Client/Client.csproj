@@ -45,8 +45,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomExceptions\NoItemsInCollectionException.cs" />
+    <Compile Include="EventClasses\EventHelper.cs" />
+    <Compile Include="EventClasses\Events\ClosedEvent.cs" />
+    <Compile Include="EventClasses\Events\DeletedEvent.cs" />
+    <Compile Include="EventClasses\Events\EventStates.cs" />
+    <Compile Include="EventClasses\Events\NewEvent.cs" />
+    <Compile Include="EventClasses\Events\RegularEvent.cs" />
+    <Compile Include="EventClasses\StatusesForOwner.cs" />
+    <Compile Include="Misc\FileDownloader.cs" />
+    <Compile Include="ServerManager\ClientLauncher.cs" />
     <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
+    <Compile Include="EventClasses\Authorization.cs" />
+    <Compile Include="EventClasses\RowStyleManager.cs" />
+    <Compile Include="EventClasses\Sorting\SortableColumn.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByAttribute.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByDate.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByName.cs" />
+    <Compile Include="EventClasses\Sorting\SortingBySender.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByStatus.cs" />
+    <Compile Include="Misc\AppConfigManager.cs" />
     <Compile Include="Misc\SerializeManager.cs" />
+    <Compile Include="Misc\Signal.cs" />
+    <Compile Include="Misc\Indication.cs" />
+    <Compile Include="Misc\TurnInOutController.cs" />
     <Compile Include="ServerManager\FileServiceClient.cs" />
     <Compile Include="Misc\FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">
@@ -56,8 +78,7 @@
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </Compile>
     <Compile Include="EventClasses\DataGridManager.cs" />
-    <Compile Include="EventClasses\UiEvent.cs" />
-    <Compile Include="EventClasses\EventStates.cs" />
+    <Compile Include="EventClasses\Events\UiEvent.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

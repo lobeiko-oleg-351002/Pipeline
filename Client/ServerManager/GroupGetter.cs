@@ -10,7 +10,7 @@ namespace Client.ServerManager
 {
     public class GroupGetter : ServerInstance, IGroupGetter
     {
-        public GroupGetter(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public GroupGetter(IBusinessService server) : base(server)
         {
         }
 

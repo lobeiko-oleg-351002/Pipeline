@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Client.Misc;
 using Client.ServerManager.Interface;
 using ServerInterface;
 using ServiceChannelManager;
@@ -11,7 +12,7 @@ namespace Client.ServerManager
 {
     public class AuthorizationManager : ServerInstance, IAuthorizationManager
     {
-        public AuthorizationManager(string ip, IClientCallBack clientCallBack) : base(ip, clientCallBack)
+        public AuthorizationManager(IBusinessService server) : base(server)
         {
         }
 
@@ -19,7 +20,7 @@ namespace Client.ServerManager
         {           
             try
             {
-                ConnectToServer(ip, clientCallBack);
+                ConnectToServer();
                 return SignIn(user);
             }
             catch (ConnectionFailedException ex)
@@ -43,7 +44,11 @@ namespace Client.ServerManager
                 }
                 return User;
             }
-            catch
+            catch(UserIsNullException ex)
+            {
+                throw ex;
+            }
+            catch(Exception ex)
             {
                 throw new ConnectionFailedException();
             }

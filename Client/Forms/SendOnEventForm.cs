@@ -22,13 +22,13 @@ namespace Client.Forms
 
         List<BllUser> Users = new List<BllUser>();
         BllEvent Event;
-        IServerInstance server;
+        ServerInstance serverInstance;
 
-        public SendOnEventForm(IServerInstance server, BllEvent Event, BllUser sender)
+        public SendOnEventForm(ServerInstance server, BllEvent Event, BllUser sender)
         {
             InitializeComponent();
             this.Event = Event;
-            this.server = server;
+            this.serverInstance = server;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -72,7 +72,7 @@ namespace Client.Forms
 
             try
             {
-                IEventCRUD eventCRUD = (EventCRUD)server;
+                IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
                 eventCRUD.UpdateRecieversAndSendOnEvent(Event, newRecievers);
                 Close();
             }
@@ -95,13 +95,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    IGroupGetter gg = (GroupGetter)server;
+                    IGroupGetter gg = new GroupGetter(serverInstance.server);
                     groups = gg.GetAllGroups();
                     success = true;
                 }
                 catch
                 {
-                    server.ReconnectToServer();
+                    serverInstance.ConnectToServer();
                     success = false;
                 }
             }
@@ -123,13 +123,13 @@ namespace Client.Forms
             {
                 try
                 {
-                    IUserGetter ug = (UserGetter)server;
+                    IUserGetter ug = new UserGetter(serverInstance.server);
                     users = ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
                     success = true;
                 }
                 catch
                 {
-                    server.ReconnectToServer();
+                    serverInstance.ConnectToServer();
                     success = false;
                 }
             }

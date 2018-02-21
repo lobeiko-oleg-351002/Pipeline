@@ -19,7 +19,7 @@ namespace MainFormTest
             MainForm mainForm = new MainForm(ExecutablePath);
 
             BllEvent testEvent = CreateTestEvent();
-            mainForm.GetEvent(testEvent);
+           // mainForm.GetEvent(testEvent);
             //isTaskBarHighliths
             //isTrayHighlights
             //isDataContainersPopulatedProperly
@@ -38,7 +38,6 @@ namespace MainFormTest
                 Date = DateTime.Now,
                 Description = "test",
                 FilepathLib = CreateFilepathLib(),
-                HasMissedStatus = false,
                 Name = "TestEvent1",
                 RecieverLib = CreateUserLib(),
                 StatusLib = CreateStatusLib(),
