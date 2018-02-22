@@ -1,5 +1,10 @@
 ﻿using BllEntities;
+using Client.EventClasses;
+using Client.EventClasses.Events;
 using Client.Forms;
+using Client.Misc;
+using Client.ServerManager;
+using Client.ServerManager.Interface;
 using Globals;
 using Microsoft.Win32;
 using ServerInterface;
@@ -22,162 +27,56 @@ using System.Xml.Serialization;
 
 namespace Client
 {
-    public partial class MainForm : ParentForm, IClientCallBack
-    {
+    public partial class MainForm : ParentForm
+    {        
+        const string STATUS_NOT_CHANGED = "Статус не изменён";
+        const string DATE_FORMAT = "dd.MM.yyyy";
+        const string TIME_FORMAT = "HH:mm";
+
+        AddEventForm addEventForm = null;
+        UiEventManager eventManager = null;
+        public Indication indication = null;
+        ClientLauncher client = null;
+        UiEvent SelectedEvent = null;
+        List<BllStatus> AvailableStatusesForSelectedEvent = new List<BllStatus>();
+
+        int SelectedRowIndex;
+        bool noteTextBoxChangesProgramatically = false;
+
+        //for tests
+        public MainForm(string pathToClient)
+        {
+            InitializeComponent();
+            AppConfigManager.SetExecutablePath(pathToClient);
+        }
+
         public MainForm()
         {
             InitializeComponent();
+            AppConfigManager.SetExecutablePath(Application.ExecutablePath);
         }
 
-        private class SortableColumn
+        private void Form1_Load(object sender, EventArgs e)
         {
-            public int Number { get; private set; }
-            public int Direction { get; set; }
-            public Func<bool> Sort { get; private set; }
-
-            public SortableColumn(int Number, int Direction, Func<bool> Sort)
+            eventManager = new UiEventManager(dataGridView1, this);
+            indication = new Indication(this);
+            InitializeAppProperties();
+            try
             {
-                this.Number = Number;
-                this.Direction = Direction;
-                this.Sort = Sort;
+                client = new ClientLauncher(eventManager, this);
+                client.Launch();
+                eventManager.client = client;
+                StatusesForOwner.Init(client.GetServerInstance());                
+                eventManager.GetEventList();
+                eventManager.HideClosedEventsAccordingToConfigValue();
+            }
+            catch (UserIsNullException) //user has not logged in
+            {
+                ExitApp();
             }
         }
 
-        const string LOGIN_TAG = "login";
-        const string PASSWORD_TAG = "password";
-        const string DATE_FORMAT = "dd.MM.yyyy";
-        const string TIME_FORMAT = "HH:mm";
-        const string STATUS_NOT_CHANGED = "Статус не изменён";
-        const string IP_KEY = "hostIP";
-
-        const int SENDER_COL_NUM = 0;
-        const int NAME_COL_NUM = 1;
-        const int DATE_COL_NUM = 2;
-        const int TIME_COL_NUM = 3;
-        const int STATUS_COL_NUM = 4;
-        const int ATTRIBUTE_COL_NUM = 5;
-        const int FILE_COL_NUM = 6;
-        const int DESCRIPTION_COL_NUM = 7;
-        const int NOTE_COL_NUM = 8;
-        const int DIRECTION_MULTIPLIER = -1;
-
-        const int PING_SLEEPTIME_MS = 10000;
-
-
-
-        public IBusinessService server { get; private set; }
-
-        BllUser User = null;
-        List<BllEvent> EventSequence;
-        List<BllStatus> AvailableStatusesForSelectedEvent = new List<BllStatus>();
-        BllStatus StatusDeleted = null;
-        BllStatus StatusClosed = null;
-        SortableColumn CurrentSorting;
-
-        SortableColumn SenderColumn;
-        SortableColumn NameColumnSorting;
-        SortableColumn DateColumn;
-        SortableColumn StatusColumn;
-        SortableColumn AttributeColumn;
-
-        List<int> IndeciesOfNewEvents = new List<int>();
-        List<int> IndeciesOfNewStatuses = new List<int>();
-        List<int> IndeciesOfDeletedEvents = new List<int>();
-        List<int> IndeciesOfClosedEvents = new List<int>();
-        NotifyIcon notifyIcon = new NotifyIcon();
-        XmlSerializer serializer = new XmlSerializer(typeof(List<BllEvent>));
-        AddEventForm addEventForm = null;
-
-        int SelectedRowIndex;
-        string FormText = Properties.Resources.CLIENT_NAME;
-        
-        bool isServerOnline;
-        bool isAppClosed = false;
-
-        private void RunMethodBackground(Action method)
-        {
-            Invoke(new Action(() =>
-            {
-                method();
-            }));
-        }
-        
-        public static class AppConfigManager
-        {
-            public static string GetKeyValue(string tag)
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                if (config.AppSettings.Settings[tag] != null)
-                {
-                    return config.AppSettings.Settings[tag].Value;
-                }
-                return null;
-            }
-
-            public static void SetKeyValue(string tag, string value)
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                if (config.AppSettings.Settings[tag] != null)
-                {
-                    config.AppSettings.Settings[tag].Value = value;
-                }
-                else
-                {
-                    config.AppSettings.Settings.Add(tag, value);
-                }
-                config.Save(ConfigurationSaveMode.Minimal);
-            }
-
-            public static bool GetBoolKeyValue(string tag)
-            {                
-                var value = GetKeyValue(tag);
-                if (value != null)
-                {
-                    return bool.Parse(value);
-                }
-                else
-                {
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                    config.AppSettings.Settings.Add(tag, bool.FalseString);
-                    return false;
-                }
-            }
-
-            public static int GetIntKeyValue(string tag)
-            {
-                var value = GetKeyValue(tag);
-                if (value != null)
-                {
-                    return int.Parse(value);
-                }
-                else
-                {
-                    Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                    config.AppSettings.Settings.Add(tag, "0");
-                    return 0;
-                }
-            }
-
-
-            public static void ClearTagValues(string tag)
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                if (config.AppSettings.Settings[tag] != null)
-                {
-                    config.AppSettings.Settings[tag].Value = "";
-                    config.Save(ConfigurationSaveMode.Minimal);
-                }
-            }
-
-            public static void AddKeyValue(string tag, string value)
-            {
-                Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-                config.AppSettings.Settings.Add(tag, value);
-                config.Save(ConfigurationSaveMode.Minimal);
-            }
-        }
-
-        private void SetControlsAccordingToServerOffline()
+        public void SetControlsAccordingToServerOffline()
         {
             Invoke(new Action(() =>
             {
@@ -185,16 +84,11 @@ namespace Client
                 label4.ForeColor = Color.Red;
                 создатьСобытиеToolStripMenuItem.Enabled = false;
                 button1.Enabled = false;
-                DealWithTrayIcon();
+                indication.SetTrayServerOfflineIcon();
             }));
         }
 
-        private bool AreUserStatusesSet()
-        {
-            return comboBox1.Items.Count == 1;
-        }
-
-        private void SetControlsAccordingToServerOnline()
+        public void SetControlsAccordingToServerOnline()
         {
             Invoke(new Action(() =>
             {
@@ -205,10 +99,20 @@ namespace Client
                 {
                     button1.Enabled = true;
                 }
-                DealWithTrayIcon();
+                indication.DealWithTrayIcon();
                 InitStatusesForSelectedEvent();
-            }));
-            
+                SetUserFullnameOnLabel();
+            }));           
+        }
+
+        public BllUser GetCurrentUser()
+        {
+            return client.GetUser();
+        }
+
+        private bool AreUserStatusesSet()
+        {
+            return comboBox1.Items.Count == 1;
         }
 
         private void PopulateTextBoxesUsingEvent(BllEvent Event)
@@ -233,38 +137,37 @@ namespace Client
             richTextBox1.Text = description;
         }
 
-        private void SetEventNoteUsingCellValue()
+        private void SetEventNoteUsingCellValue(string note)
         {
-            if (dataGridView1.RowCount > 0)
-            {
-                if (dataGridView1.Rows[SelectedRowIndex].Cells[NOTE_COL_NUM].Value != null)
-                {
-                    richTextBox2.Text = dataGridView1.Rows[SelectedRowIndex].Cells[NOTE_COL_NUM].Value.ToString();
-                }
-            }
+            richTextBox2.Text = note;
             richTextBox2.Enabled = true;
         }
 
-        private void AddStatusesForOwnerAccordingToOwner(BllUser sender)
+        private void AddStatusesForSenderAccordingToSender(BllUser sender)
         {
-            if (StatusDeleted != null)
+            var statusesForOwner = StatusesForOwner.GetStatusesForOwner();
+            foreach(var status in statusesForOwner)
             {
-                comboBox1.Items.Remove(StatusDeleted.Name);
-                comboBox1.Items.Remove(StatusClosed.Name);
-                AvailableStatusesForSelectedEvent.Remove(StatusDeleted);
-                AvailableStatusesForSelectedEvent.Remove(StatusClosed);
-
-                if (AreUsersEqual(User, sender))
+                comboBox1.Items.Remove(status.Name);
+                AvailableStatusesForSelectedEvent.Remove(status);
+                if (AreUsersEqual(client.GetUser(), sender))
                 {
-                    comboBox1.Items.Add(StatusDeleted.Name);
-                    comboBox1.Items.Add(StatusClosed.Name);
-                    AvailableStatusesForSelectedEvent.Add(StatusDeleted);
-                    AvailableStatusesForSelectedEvent.Add(StatusClosed);
-                }               
+                    comboBox1.Items.Add(status.Name);
+                    AvailableStatusesForSelectedEvent.Add(status);
+                }
             }
         }
 
-        private void SelectBlankStatus()
+        private bool AreUsersEqual(BllUser user1, BllUser user2)
+        {
+            if (user1.Login == user2.Login)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void SelectBlankStatus()
         {
             comboBox1.SelectedIndex = 0;
             comboBox1.Enabled = true;
@@ -273,17 +176,16 @@ namespace Client
 
         private void SetSelectedEventToControls()
         {
-            BllEvent Event = EventSequence[SelectedRowIndex];
-            PopulateTextBoxesUsingEvent(Event);
-            PopulateStatusDataGridUsingStatusLib(Event.StatusLib);
-            PopulateFileListBoxUsingFilepathLib(Event.FilepathLib);
-            SetEventDescription(Event.Description);
-            SetEventNoteUsingCellValue();
+            PopulateTextBoxesUsingEvent(SelectedEvent.EventData);
+            PopulateStatusDataGridUsingStatusLib(SelectedEvent.EventData.StatusLib);
+            PopulateFileListBoxUsingFilepathLib(SelectedEvent.EventData.FilepathLib);
+            SetEventDescription(SelectedEvent.EventData.Description);
+            SetEventNoteUsingCellValue(SelectedEvent.Note);
             SelectBlankStatus();
-            AddStatusesForOwnerAccordingToOwner(Event.Sender);         
+            AddStatusesForSenderAccordingToSender(SelectedEvent.EventData.Sender);         
         }
 
-        private void AddStatusToDataGrid(string name, DateTime date)
+        public void AddStatusToDataGrid(string name, DateTime date)
         {
             DataGridViewRow row = new DataGridViewRow();
             row.CreateCells(dataGridView2);
@@ -291,11 +193,6 @@ namespace Client
             row.Cells[1].Value = date;
             dataGridView2.Rows.Add(row);
         } 
-
-        private bool HasUserLoginAndPassword()
-        {
-            return User.Login != "";
-        }
 
         private void AddAppShortcutToStartup()
         {
@@ -308,26 +205,6 @@ namespace Client
                 key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + currentLocation + "\\" + launcher + "\"");
                // }
             }
-        }
-
-        private void InitTrayIcon()
-        {
-            notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
-            notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
-            notifyIcon.BalloonTipTitle = Properties.Resources.CLIENT_NAME; ;
-            notifyIcon.Icon = this.Icon;
-            notifyIcon.Text = Properties.Resources.CLIENT_NAME; ;
-            notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
-        }
-
-        private void InitializeAppValues()
-        {
-            EventSequence = new List<BllEvent>();
-        }
-
-        private void AddVersionToFormName()
-        {
-            FormText += " " + AppConfigManager.GetKeyValue(Globals.Globals.TAG_VERSION);
         }
 
         private void AddBlankStatusToComboBox()
@@ -350,12 +227,11 @@ namespace Client
 
         private void InitializeAppProperties()
         {
-            AddVersionToFormName();
             AddAppShortcutToStartup();
-            InitTrayIcon();
             SetOpenFileLocationCheckBoxAccordingToConfigValue();
             AddBlankStatusToComboBox();
             TurnAppStartupInTrayAccordingToConfigValue();
+            SetControlsAccordingToServerOffline();
         }
 
         private void SetAppControlsAccordingToOfflineServer()
@@ -363,18 +239,7 @@ namespace Client
             SetControlsAccordingToServerOffline();
         }
 
-        private void StartPingingServerBackground()
-        {
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    Thread.CurrentThread.IsBackground = true;
-                    PingServerAndIndicateHisStateOnControls();
-                    Thread.Sleep(PING_SLEEPTIME_MS);
-                }
-            }).Start();
-        }
+
 
         private void SetDefaultSelectedRow()
         {
@@ -387,126 +252,15 @@ namespace Client
             }
         }
 
-        private void InitializeColumnSortOrder()
-        {
-            SenderColumn = new SortableColumn(SENDER_COL_NUM, DIRECTION_MULTIPLIER, OrderBySender);
-            NameColumnSorting = new SortableColumn(NAME_COL_NUM, DIRECTION_MULTIPLIER, OrderByName);
-            DateColumn = new SortableColumn(DATE_COL_NUM, DIRECTION_MULTIPLIER, OrderByDate);
-            StatusColumn = new SortableColumn(STATUS_COL_NUM, DIRECTION_MULTIPLIER, OrderByStatus);
-            AttributeColumn = new SortableColumn(ATTRIBUTE_COL_NUM, DIRECTION_MULTIPLIER, OrderByAttributes);
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            InitializeAppValues();
-            SetAppControlsAccordingToOfflineServer();
-            InitializeAppProperties();
-            InitializeColumnSortOrder();
-            try
-            {
-                ConnectToServer();
-                StartPingingServerBackground();
-                GetEventList();
-            }
-            catch (UserIsNullException) //user has not logged in
-            {
-                ExitApp();
-            }           
-        }
-
-        private void GetServerInstance()
-        {
-            string ip = AppConfigManager.GetKeyValue(IP_KEY);
-            server = ServiceChannelManagerSingleton.Instance.GetServerMethods(this, ip);
-        }
-
-        private void SetServerToAddEventForm()
-        {
-            if (addEventForm != null)
-            {
-                addEventForm.server = server;
-            }
-        }
-
-        public void ConnectToServer() 
-        {
-            GetServerInstance();
-            SetServerToAddEventForm();
-
-            try
-            {
-                Authorize();
-                isServerOnline = true;
-                SetControlsAccordingToServerOnline();                
-            }
-            catch(ConnectionFailedException ex)
-            {
-                isServerOnline = false;
-                SetControlsAccordingToServerOffline();               
-            }
-            catch(UserIsNullException ex)
-            {
-                throw ex;
-            }           
-        }
-
-        private void PingServerAndIndicateHisStateOnControls()
-        {
-            bool previousServerState = isServerOnline;
-            if (isServerOnline == false)
-            {
-                ConnectToServer();
-            }
-            try
-            {
-                server.PingServer();
-            }
-            catch(Exception)
-            {
-                if (previousServerState == true)
-                {
-                    SetControlsAccordingToServerOffline();
-                    isServerOnline = false;
-                }
-            }
-        }
-
-        private void GetStatusesForOwnerFromServer()
-        {
-            bool success = false;
-            while (!success)
-            {
-                try
-                {
-                    if (StatusDeleted == null)
-                    {
-                        StatusDeleted = server.GetStatusDeleted();
-                    }
-                    if (StatusClosed == null)
-                    {
-                        StatusClosed = server.GetStatusClosed();
-                    }
-                    success = true;
-                }
-                catch
-                {
-                    PingServerAndIndicateHisStateOnControls();
-                    success = false;
-                }
-            }
-
-        }
-
         private void InitStatusesForSelectedEvent()
         {
-            if (User.StatusLib != null)
+            if (client.GetUser().StatusLib != null)
             {
                 AvailableStatusesForSelectedEvent.Clear();
                 comboBox1.Items.Clear();
                 AddBlankStatusToComboBox();
-                GetStatusesForOwnerFromServer();
                 
-                foreach (var item in User.StatusLib.SelectedEntities)
+                foreach (var item in client.GetUser().StatusLib.SelectedEntities)
                 {
                     AvailableStatusesForSelectedEvent.Add(item.Entity);
                     comboBox1.Items.Add(item.Entity.Name);
@@ -514,317 +268,23 @@ namespace Client
             }
         }
 
-        private List<BllEvent> GetEventsFromServerForCurrentUser()
-        {
-            bool success = false;
-            while (!success)
-            {
-                success = true;
-                try
-                {
-                    return server.GetEventsForUser(User);
-                }
-                catch
-                {
-                    success = false;
-                    PingServerAndIndicateHisStateOnControls();
-                }
-            }
-            return null;
-        }
-
-        private bool HasEventListItems(List<BllEvent> list)
-        {
-            return list != null;
-        }
-
-        private bool IsEventAccepted(BllEvent Event)
-        {
-            foreach(var item in Event.RecieverLib.SelectedEntities)
-            {
-                if (AreUsersEqual(item.Entity, User) && item.IsEventAccepted)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void UpdateEventUsingCachedEvent(BllEvent Event, BllEvent cachedEvent)
-        {
-            Event.Note = cachedEvent.Note;
-            Event.HasMissedStatus = cachedEvent.HasMissedStatus;
-        }
-
-        private void AddLocalCachedEventsAndUpdateEventsFromServerUsingCache(List<BllEvent> serverEvents, List<BllEvent> cachedEvents)
-        {
-            foreach (var cachedItem in cachedEvents)
-            {
-                bool isCachedItemMatchsInListFromServer = false;
-                foreach (var item in serverEvents)
-                {
-                    if (item.Id == cachedItem.Id)
-                    {
-                        isCachedItemMatchsInListFromServer = true;
-                        UpdateEventUsingCachedEvent(item, cachedItem);
-                        if (IsTargetStatusObsolete(item, cachedItem))
-                        {
-                            item.HasMissedStatus = true;
-                        }
-                        break;
-                    }
-                }
-                if (isCachedItemMatchsInListFromServer == false)
-                {
-                    EventSequence.Add(cachedItem);
-                    AddEventToDataGrid(cachedItem);
-                }
-            }
-        }
-
-        private void DownloadEventFilesUsingFilepathLib(BllFilepathLib lib)
-        {
-            foreach (var name in lib.Entities)
-            {
-                new Thread(delegate ()
-                {
-                    DownloadFile(name.Path, lib.FolderName);
-                }).Start();
-            }
-        }
-
-        private void HideClosedEventsAccordingConfigValue()
-        {
-            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
-            {
-                HideClosedEvents();
-            }
-        }
-
-        private void AddEventsAndDownloadTheirFiles(List<BllEvent> events)
-        {
-            foreach (var item in events)
-            {
-                EventSequence.Add(item);
-                AddEventToDataGrid(item);
-                DownloadEventFilesUsingFilepathLib(item.FilepathLib);
-            }
-        }
-
-        private void GetEventList()
-        {
-            if (isServerOnline == false)
-            {
-                EventSequence = DeserializeEventsFromCache();
-                RefreshDataGrid();
-            }
-            else
-            {
-                List<BllEvent> eventsFromServer = GetEventsFromServerForCurrentUser();
-                List<BllEvent> cachedEvents = DeserializeEventsFromCache();
-                if (HasEventListItems(cachedEvents))
-                {
-                    AddLocalCachedEventsAndUpdateEventsFromServerUsingCache(eventsFromServer, cachedEvents);
-                }
-                AddEventsAndDownloadTheirFiles(eventsFromServer);
-                IndicateNewEventsOnTaskbar();
-                SerializeEventsToCache();
-            }
-            HideClosedEventsAccordingConfigValue();
-            SetSortingFromConfigAndSort();
-            SetDefaultSelectedRow();
-        }
-
-        private void SetSortingFromConfigAndSort()
-        {
-            int sortNum = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_NUM);
-            int sortDir = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_DIR);
-            SetCurrentSortingAndSort(sortNum, sortDir);        
-        }
-
-        private void SetCurrentSortingAndSort(int sortNum, int sortDir)
-        {
-            switch (sortNum)
-            {
-                case SENDER_COL_NUM:
-                    CurrentSorting = SenderColumn;
-                    break;
-                case NAME_COL_NUM:
-                    CurrentSorting = NameColumnSorting;
-                    break;
-                case DATE_COL_NUM:
-                    CurrentSorting = DateColumn;
-                    break;
-                case STATUS_COL_NUM:
-                    CurrentSorting = StatusColumn;
-                    break;
-                case ATTRIBUTE_COL_NUM:
-                    CurrentSorting = AttributeColumn;
-                    break;
-            }
-            CurrentSorting.Direction = sortDir;
-            CurrentSorting.Sort();
-        }
-
-       
-
-        private void AddEventToDataGrid(BllEvent Event)
-        {
-            DataGridViewRow row = new DataGridViewRow();
-            row.CreateCells(dataGridView1);
-            row.Cells[SENDER_COL_NUM].Value = Event.Sender.Fullname;
-            row.Cells[NAME_COL_NUM].Value = Event.Name;
-            row.Cells[DATE_COL_NUM].Value = Event.Date.ToString(DATE_FORMAT);
-            row.Cells[TIME_COL_NUM].Value = Event.Date.ToString(TIME_FORMAT);
-            if (Event.StatusLib.SelectedEntities.Count > 0)
-            {
-                var status = Event.StatusLib.SelectedEntities.Last();
-                row.Cells[STATUS_COL_NUM].Value = status.Entity.Name + " " + status.Date;
-            }
-           
-            foreach (var attr in Event.AttributeLib.SelectedEntities)
-            {
-                row.Cells[ATTRIBUTE_COL_NUM].Value += attr.Entity.Name + "; ";
-            }
-
-            var cell6 = (DataGridViewButtonCell)row.Cells[FILE_COL_NUM];
-            if (Event.FilepathLib.Entities.Count == 0)
-            {
-                cell6.Value = "-";
-                cell6.ReadOnly = true;
-            }
-            else
-            {
-                cell6.Value += " " + Event.FilepathLib.Entities.Count + " ф.";
-            }
-
-            row.Cells[DESCRIPTION_COL_NUM].Value = Event.Description;
-
-            if (Event.Note != "")
-            {
-                row.Cells[NOTE_COL_NUM].Value = Event.Note;
-            }
-
-            dataGridView1.Rows.Add(row);
-
-            int addedRowNum = dataGridView1.Rows.Count - 1;
-            if (!IsEventAccepted(Event))
-            {
-                HighlightRow(addedRowNum);
-                IndeciesOfNewEvents.Add(addedRowNum);
-            }
-
-            var selectedEntities = Event.StatusLib.SelectedEntities;
-            if (selectedEntities.Count > 0)
-            {
-                if (selectedEntities.Last().Entity.Name == Globals.Globals.STATUS_CLOSED)
-                {
-                    IndeciesOfClosedEvents.Add(addedRowNum);
-                    MarkEventInDataGridAsClosed(addedRowNum);
-                }
-                if (selectedEntities.Last().Entity.Name == Globals.Globals.STATUS_DELETED)
-                {
-                    IndeciesOfDeletedEvents.Add(addedRowNum);
-                    MarkEventInDataGridAsDeleted(addedRowNum);
-                }
-                if (Event.HasMissedStatus)
-                {
-                    IndeciesOfNewStatuses.Add(addedRowNum);
-                    MakeBoldFontToStatusInDataGrid(addedRowNum);
-                }
-            }
-            
-        }
-        
-        private BllUser CreateBlankUserAccordingToLoginAndPasswordFromConfig()
-        {
-            string login = AppConfigManager.GetKeyValue(LOGIN_TAG);
-            string password = AppConfigManager.GetKeyValue(PASSWORD_TAG);
-            if ((login != null) && (password != null))
-            {
-                return new BllUser
-                {
-                    Login = login,
-                    Password = password
-                };
-            }
-            return new BllUser
-            {
-                Login = "",
-                Password = ""
-            };
-        }
-
-        private void SetUserUsingSignInForm()
-        {
-            SignInForm signInForm = new SignInForm(server);
-            signInForm.ShowDialog();
-            User = signInForm.User;
-        }
-
-        private void SignInOnServer()
-        {
-            try
-            {
-                User = server.SignIn(User.Login, User.Password);
-            }
-            catch(Exception)
-            {
-                throw new ConnectionFailedException();
-            }
-        }
-
         private void SetUserFullnameOnLabel()
         {
             Invoke(new Action(() =>
             {
-                label9.Text = User.Fullname;
+                label9.Text = client.GetUser().Fullname;
             }));
-        }
+        }    
 
-        private void Authorize()
+        public void ExitApp()
         {
-            User = CreateBlankUserAccordingToLoginAndPasswordFromConfig();
-            try
-            {
-                if (HasUserLoginAndPassword())
-                {
-                    SignInOnServer();
-                    SetUserFullnameOnLabel();
-                }
-                else
-                {
-                    SetUserUsingSignInForm();
-                    WriteLoginAndPasswordToConfig();
-                    SetUserFullnameOnLabel();
-                }
-            }
-            catch(ConnectionFailedException ex)
-            {
-                throw ex;
-            }
-            catch(UserIsNullException ex)
-            {
-                throw ex;
-            }
-        }
-
-        private void WriteLoginAndPasswordToConfig()
-        {
-            AppConfigManager.SetKeyValue(LOGIN_TAG, User.Login);
-            AppConfigManager.SetKeyValue(PASSWORD_TAG, User.Password);
-        }
-
-        private void ExitApp()
-        {
-            isAppClosed = true;
             Application.Exit();
             Close();
         }
 
         private BllEvent GetNewEventUsingAddEventForm()
         {
-            addEventForm = new AddEventForm(this, User);
+            addEventForm = new AddEventForm(client.GetServerInstance(), client.GetUser());
             addEventForm.ShowDialog();
             return addEventForm.Event;
         }
@@ -836,15 +296,13 @@ namespace Client
 
         private void создатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PingServerAndIndicateHisStateOnControls();
-            if (isServerOnline)
+            client.PingServerAndIndicateHisStateOnControls();
+            if (client.isServerOnline)
             {
-                if (GetNewEventUsingAddEventForm() != null)
-                {                 
-                    EventSequence.Add(addEventForm.Event);
-                    AddEventToDataGrid(addEventForm.Event);
-                    CurrentSorting.Sort(); 
-                    SerializeEventsToCache();
+                var createdEvent = GetNewEventUsingAddEventForm();
+                if (createdEvent != null)
+                {
+                    eventManager.AddNewEventAndSerialize(createdEvent);
                     if (IsAnyRowSelected() == false)
                     {
                         dataGridView1.ClearSelection();
@@ -853,88 +311,6 @@ namespace Client
                 addEventForm = null;
             }
         }
-        private void HighlightRow(int i)
-        {
-            DataGridViewCellStyle style = new DataGridViewCellStyle();
-            style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
-            foreach (DataGridViewCell cell in dataGridView1.Rows[i].Cells)
-            {
-                cell.Style.Font = style.Font;
-            }
-
-        }
-
-        private void MakeCommonRowBackground(int i)
-        {
-            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Black;
-            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.White;
-        }
-
-        private void RowCommonFont(int i)
-        {
-            DataGridViewCellStyle style = new DataGridViewCellStyle();
-            style.Font = new Font(dataGridView1.Font, FontStyle.Regular);
-            foreach (DataGridViewCell cell in dataGridView1.Rows[i].Cells)
-            {
-                cell.Style.Font = style.Font;
-            }
-        }
-
-        private void TurnOutWithEventFormIfHidden()
-        {
-            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_EVENT) && notifyIcon.Visible)
-            {
-                TurnOutForm();
-            }
-        }
-
-        private void TurnOutWithStatusFormIfHidden()
-        {
-            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TURNOUT_STATUS) && notifyIcon.Visible)
-            {
-                TurnOutForm();
-            }
-        }
-
-        private void PlaySignalAccordingToEventConfigValue()
-        {
-            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_EVENT))
-            {
-                SystemSounds.Beep.Play();
-            }
-        }
-
-        private void PlaySignalAccordingToStatusConfigValue()
-        {
-            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_SOUND_STATUS))
-            {
-                SystemSounds.Beep.Play();
-            }
-        }
-
-        public void GetEvent(BllEvent Event)
-        {
-            EventSequence.Add(Event);
-            Invoke(new Action(() =>
-            {
-                AddEventToDataGrid(Event);
-                SerializeEventsBackground();
-                IndicateNewEventsOnTaskbar();
-                TurnOutWithEventFormIfHidden();
-                DealWithTrayIcon();
-                PlaySignalAccordingToEventConfigValue();
-            }));
-            CurrentSorting.Sort(); ;
-        }      
-
-        private void SerializeEventsBackground()
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                SerializeEventsToCache();
-            }).Start();
-        }
 
         private void DownloadAndLaunchFiles(BllFilepathLib lib)
         {
@@ -942,7 +318,7 @@ namespace Client
             {
                 try
                 {
-                    Process.Start(DownloadFile(name.Path, lib.FolderName));
+                    Process.Start(FileDownloader.DownloadFile(name.Path, lib.FolderName));
                 }
                 catch
                 {
@@ -957,108 +333,10 @@ namespace Client
             
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
             {
-                var lib = EventSequence[e.RowIndex].FilepathLib;
+                var lib = SelectedEvent.EventData.FilepathLib;
                 DownloadAndLaunchFiles(lib);
             }
         }
-
-        private string DownloadFile(string name, string folderName)
-        {
-            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Properties.Resources.DOWNLOADS_FOLDER;
-            string eventFolderPath = Path.Combine(downloadsPath, folderName);
-            string filePath = Path.Combine(downloadsPath, folderName, name);
-            if (!Directory.Exists(eventFolderPath))
-            {
-                Directory.CreateDirectory(eventFolderPath);
-            }
-            if (!File.Exists(filePath))
-            {
-                using (FileStream output = new FileStream(filePath, FileMode.Create))
-                {
-                    Stream downloadStream;
-                    using (FileServiceClient client = new FileServiceClient())
-                    {
-                        downloadStream = client.GetFile(Path.Combine(folderName, name));
-                    }
-                    downloadStream.CopyTo(output);
-                }
-            }
-            return filePath;
-        }
-
-        public void Ping()
-        {
-            
-        }
-
-        private void SetNotesForEvents()
-        {
-            for (int i = 0; i < dataGridView1.RowCount; i++)
-            {
-                EventSequence[i].Note = (string)dataGridView1.Rows[i].Cells[NOTE_COL_NUM].Value;
-            }
-        }
-
-        private void UnsetNotesForEvents()
-        {
-            for (int i = 0; i < dataGridView1.RowCount; i++)
-            {
-                EventSequence[i].Note = "";
-            }
-        }
-
-        private void SerializeEventsToCache()
-        {
-            try
-            {
-                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                if (!Directory.Exists(mydoc + Properties.Resources.DOWNLOADS_FOLDER))
-                {
-                    Directory.CreateDirectory(mydoc + Properties.Resources.DOWNLOADS_FOLDER);
-                }
-
-                using (FileStream stream = new FileStream(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Create))
-                {
-                    SetNotesForEvents();
-                    serializer.Serialize(stream, EventSequence);
-                    UnsetNotesForEvents();
-                }
-            }
-            catch (IOException)
-            {
-
-            }
-        }
-
-        private List<BllEvent> DeserializeEventsFromCache()
-        {
-            try
-            {
-                string mydoc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                using (Stream stream = File.Open(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Open))
-                {
-                    return (List<BllEvent>)serializer.Deserialize(stream);
-                }
-            }
-            catch (IOException)
-            {
-            }
-            return null;
-
-        }
-
-        
-        private void IndicateNewEventsOnTaskbar()
-        {
-            int n = IndeciesOfNewEvents.Count;
-            Text = FormText;
-            if (n > 0 )
-            {
-                Text += " (" + n + ")";
-            }
-            DealWithFlashing();
-        }
-
 
         private void EnableStatusControls()
         {
@@ -1072,55 +350,13 @@ namespace Client
             button1.Enabled = false;
         }
 
-        private bool IsCurrentStatusForOwner()
-        {
-            var statuses = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities;
-            if (statuses.Count > 0)
-            {
-                string statusName = statuses.Last().Entity.Name;
-                if ((statusName == Globals.Globals.STATUS_CLOSED) || (statusName == Globals.Globals.STATUS_DELETED))
-                {
-                    return true;
-                }
-            }          
-            return false;
-        }
-
-        private void AddSelectedStatusToEvent()
-        {
-            var statuses = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities;
-            statuses.Add(new BllSelectedStatus { Entity = AvailableStatusesForSelectedEvent[comboBox1.SelectedIndex - 1] });
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
-            PingServerAndIndicateHisStateOnControls();
+            client.PingServerAndIndicateHisStateOnControls();
             
-            if (isServerOnline && IsAnyRowSelected())
+            if (client.isServerOnline && IsAnyRowSelected())
             {
-                if(IsCurrentStatusForOwner())
-                {
-                    DeleteFromIndexLists(SelectedRowIndex);
-                }
-                AddSelectedStatusToEvent();
-                bool success = false;
-                while (!success)
-                {
-                    try
-                    {
-                        EventSequence[SelectedRowIndex] = server.UpdateStatusAndSendOutEvent(EventSequence[SelectedRowIndex], User);
-                        var newStatus = EventSequence[SelectedRowIndex].StatusLib.SelectedEntities.Last();
-                        AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
-                        UpdateEventStatusInDataGrid(newStatus, SelectedRowIndex);
-                        SelectBlankStatus();
-                        SerializeEventsBackground();
-                        success = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        PingServerAndIndicateHisStateOnControls();
-                    }
-                }
+                eventManager.AddStatusToSelectedEvent(AvailableStatusesForSelectedEvent[comboBox1.SelectedIndex - 1]);
             }
         }
 
@@ -1132,7 +368,7 @@ namespace Client
             }
             else
             {
-                if (isServerOnline)
+                if (client.isServerOnline)
                 {
                     button1.Enabled = true;
                 }
@@ -1140,43 +376,7 @@ namespace Client
 
         }
 
-        private int FindUpdatedEventInEventSequenceById(int eventId) 
-        {
-            for (int i = 0; i < EventSequence.Count; i++)
-            {
-                if (EventSequence[i].Id == eventId)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-
-
-        private bool IsTargetStatusObsolete(BllEvent source, BllEvent target)
-        {
-            if (source.StatusLib.SelectedEntities.Count > 0)
-            {
-                var selectedStatuses = target.StatusLib.SelectedEntities;
-                var newstatus = source.StatusLib.SelectedEntities.Last();
-                if (selectedStatuses.Count > 0)
-                {
-                    var oldstatus = selectedStatuses.Last();
-                    if (newstatus.Date != oldstatus.Date)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void UpdateSelectedEvent(BllEvent source, int rowNum)
+        public void UpdateSelectedEvent(BllEvent source, int rowNum)  //confirmed
         {
             if (dataGridView1.SelectedRows.Count > 0)
             {
@@ -1188,62 +388,6 @@ namespace Client
                         FillUserChecklist(source.RecieverLib.SelectedEntities);
                         HandleStatusChanging();
                     }));
-                }
-            }
-
-        }
-
-        public void UpdateEvent(BllEvent Event)
-        {
-            int i = FindUpdatedEventInEventSequenceById(Event.Id);
-            if (i >= 0)
-            {
-                if (IsTargetStatusObsolete(Event, EventSequence[i]))
-                {
-                    var newStatus = Event.StatusLib.SelectedEntities.Last();
-                    UpdateEventStatusInDataGrid(newStatus, i);
-                    MakeBoldFontToStatusInDataGrid(i);
-                    IndeciesOfNewStatuses.Add(i);
-                    Event.HasMissedStatus = false;
-                    DealWithFlashing();
-                    DealWithTrayIcon();
-                    TurnOutWithStatusFormIfHidden();
-                    PlaySignalAccordingToStatusConfigValue();
-                }
-                else
-                {
-                    Event.HasMissedStatus = true;
-                }
-                EventSequence[i] = Event;
-                UpdateSelectedEvent(Event, i);
-                SerializeEventsBackground();
-            }
-        }
-
-        private void MarkEventInDataGridAsClosed(int i)
-        {
-            IndeciesOfClosedEvents.Add(i);
-            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Gray;
-            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.LightGray;
-            if (dataGridView1.SelectedRows.Count > 0)
-            {
-                if (SelectedRowIndex == i)
-                {
-                    EnableDeleteEventButton();
-                }
-            }
-        }
-
-        private void MarkEventInDataGridAsDeleted(int i)
-        {
-            IndeciesOfDeletedEvents.Add(i);
-            dataGridView1.Rows[i].DefaultCellStyle.ForeColor = Color.Red;
-            dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.DarkRed;
-            if (dataGridView1.SelectedRows.Count > 0)
-            {
-                if (SelectedRowIndex == i)
-                {
-                    EnableDeleteEventButton();
                 }
             }
         }
@@ -1268,42 +412,13 @@ namespace Client
             удалитьСобытиеToolStripMenuItem.Enabled = false;
         }
 
-        private void PopulateStatusDataGridUsingStatusLib(BllStatusLib lib)
+        private void PopulateStatusDataGridUsingStatusLib(BllStatusLib lib) //confirmed
         {
             dataGridView2.Rows.Clear();
             foreach(var item in lib.SelectedEntities)
             {
                 AddStatusToDataGrid(item.Entity.Name, item.Date);
             }
-        }
-
-        private void MakeBoldFontToStatusInDataGrid(int row)
-        {
-            var cell = dataGridView1.Rows[row].Cells[STATUS_COL_NUM];
-            cell.Style.Font = new Font(dataGridView1.Font, FontStyle.Bold);
-        }
-
-        private void UpdateEventStatusInDataGrid(BllSelectedStatus status, int index)
-        {
-            var cell = dataGridView1.Rows[index].Cells[STATUS_COL_NUM];
-            cell.Value = status.Entity.Name + " " + status.Date;
-            if (status.Entity.Name == Globals.Globals.STATUS_CLOSED)
-            {
-                MarkEventInDataGridAsClosed(index);
-            }
-            else
-            {
-                if (status.Entity.Name == Globals.Globals.STATUS_DELETED)
-                {
-                    MarkEventInDataGridAsDeleted(index);
-                }
-                else
-                {
-                    MakeCommonRowBackground(index);
-                }
-            }
-
-
         }
 
         private void comboBox1_TextChanged(object sender, EventArgs e)
@@ -1314,82 +429,12 @@ namespace Client
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
 
-        }
-
-        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            TurnOutForm();
-        }
-
-        private void SetTrayNewEventIcon()
-        {
-            notifyIcon.Icon = new Icon(Properties.Resources.NewEventTray, new Size(32, 32));
-        }
-
-        private void SetTrayServerOfflineIcon()
-        {
-            notifyIcon.Icon = new Icon(Properties.Resources.ServerOfflineTray, new Size(32, 32));
-        }
-
-        private void SetTrayCommontIcon()
-        {
-            notifyIcon.Icon = this.Icon;
-        }
-
-        private void DealWithTrayIcon()
-        {
-            if (!isServerOnline)
-            {
-                SetTrayServerOfflineIcon();
-            }
-            else
-            {
-                if ((IndeciesOfNewEvents.Count != 0) || ((IndeciesOfNewStatuses.Count != 0) && AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS)))
-                {
-                    SetTrayNewEventIcon();
-                }
-                else
-                {
-                    SetTrayCommontIcon();
-                }
-            }
-        }
-
-        private void TurnInForm()
-        {
-            notifyIcon.Visible = true;
-            // notifyIcon.ShowBalloonTip(3000);
-            DealWithTrayIcon();
-            this.ShowInTaskbar = false;
-            this.Hide();
-        }
-
-        private void TurnOutForm()
-        {
-            this.Show();
-            this.ShowInTaskbar = true;
-            notifyIcon.Visible = false;
-            DealWithFlashing();
-        }
-            
+        }            
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!isAppClosed)
-            {
-                TurnInForm();
-                e.Cancel = true;
-            }
-        }
-
-        private void OnApplicationExit(object sender, EventArgs e)
-        {
-            try
-            {
-                SerializeEventsToCache();
-                notifyIcon.Visible = false;
-            }
-            catch { }
+            e.Cancel = true;
+            indication.HideForm();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -1404,48 +449,28 @@ namespace Client
             }
         }
 
-        private void MakeSelectedEventAdmited()
+        private void button2_Click(object sender, EventArgs e)
         {
-            IndeciesOfNewEvents.Remove(SelectedRowIndex);
-            RowCommonFont(SelectedRowIndex);
-            IndicateNewEventsOnTaskbar();
-            SerializeEventsBackground();
-        }
-
-        private bool AreUsersEqual(BllUser user1, BllUser user2)
-        {
-            if (user1.Login == user2.Login)
+            if (checkBox1.Checked)
             {
-                return true;
+                ShowChecklist();
+                MarkRecieverInLib(SelectedEvent.EventData.RecieverLib);
+                eventManager.AdmitEventAsAcquainted();
+                SelectedEvent = eventManager.GetSelectedEvent(SelectedRowIndex);
+                FillUserChecklist(SelectedEvent.EventData.RecieverLib.SelectedEntities);
+                EnableStatusControls();
             }
-            return false;
         }
 
         private void MarkRecieverInLib(BllUserLib RecieverLib)
         {
             foreach (var item in RecieverLib.SelectedEntities)
             {
-                if (AreUsersEqual(item.Entity, User))
+                if (AreUsersEqual(item.Entity, client.GetUser()))
                 {
                     item.IsEventAccepted = true;
                     break;
                 }
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            var currentEvent = EventSequence[SelectedRowIndex];
-            if (checkBox1.Checked)
-            {
-                ShowChecklist();
-                if (IndeciesOfNewEvents.Contains(SelectedRowIndex))
-                {
-                    MakeSelectedEventAdmited();
-                }
-                MarkRecieverInLib(currentEvent.RecieverLib);
-                currentEvent = server.UpdateAcceptedUsersAndSendOutEvent(currentEvent, User);
-                FillUserChecklist(currentEvent.RecieverLib.SelectedEntities);
             }
         }
 
@@ -1474,7 +499,7 @@ namespace Client
             groupBox1.Visible = true;
         }
 
-        private void ShowCheckbox()
+        private void ShowAcquaintedCheckbox()
         {
             groupBox4.Visible = true;
             groupBox1.Visible = false;
@@ -1486,7 +511,7 @@ namespace Client
             groupBox1.Visible = false;
         }
 
-        private void AddUserToChecklist(BllUser user, bool isAccepted)
+        private void AddUserToChecklist(BllUser user, bool isAccepted) //confirmed
         {
             listView1.Items.Add(user.Fullname);
             var addedItem = listView1.Items[listView1.Items.Count - 1];
@@ -1500,7 +525,7 @@ namespace Client
             }
         }
 
-        private void AddUnacquaintedUsersToCheckList(List<BllSelectedUser> users)
+        private void AddUnacquaintedUsersToCheckList(List<BllSelectedUser> users) //confirmed
         {
             foreach (var item in users)
             {
@@ -1511,7 +536,7 @@ namespace Client
             }
         }
 
-        private void AddAcquaintedUsersToCheckListAndSetTheirCount(List<BllSelectedUser> users)
+        private void AddAcquaintedUsersToCheckListAndSetTheirCount(List<BllSelectedUser> users) //confirmed
         {
             int acceptedEvents = 0;
             foreach (var item in users)
@@ -1525,7 +550,7 @@ namespace Client
             groupBox1.Text = "Ознакомились " + acceptedEvents + " из " + users.Count;
         }
 
-        private void FillUserChecklist(List<BllSelectedUser> users)
+        private void FillUserChecklist(List<BllSelectedUser> users) //confirmed
         {
             listView1.Items.Clear();
             AddUnacquaintedUsersToCheckList(users);
@@ -1541,17 +566,30 @@ namespace Client
         {
             if (listBox2.SelectedIndex >= 0)
             {
+<<<<<<< HEAD
                 string filename = EventSequence[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path;
                 string foldername = EventSequence[SelectedRowIndex].FilepathLib.FolderName;
+=======
+                string filename = SelectedEvent.EventData.FilepathLib.Entities[listBox2.SelectedIndex].Path;
+                string foldername = SelectedEvent.EventData.FilepathLib.FolderName;
+>>>>>>> dev
                 try
                 {
                     if (checkBox2.Checked == false)
                     {
+<<<<<<< HEAD
                         Process.Start(DownloadFile(filename, foldername));
                     }
                     else
                     {
                         string path = DownloadFile(filename, foldername);
+=======
+                        Process.Start(FileDownloader.DownloadFile(filename, foldername));
+                    }
+                    else
+                    {
+                        string path = FileDownloader.DownloadFile(filename, foldername);
+>>>>>>> dev
                         Process.Start("explorer.exe", "/select, \"" + path + "\"");
                     }
 
@@ -1560,6 +598,7 @@ namespace Client
                 {
                     MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
+<<<<<<< HEAD
             }
         }
 
@@ -1577,6 +616,8 @@ namespace Client
             if (IndeciesOfNewEvents.Contains(i))
             {
                 IndeciesOfNewEvents.Remove(i);
+=======
+>>>>>>> dev
             }
         }
 
@@ -1584,15 +625,7 @@ namespace Client
         {
             if (SelectedRowIndex >= 0)
             {
-                DeleteFromIndexLists(SelectedRowIndex);
-                DealWithTrayIcon();
-                RecalculateIndexList(IndeciesOfDeletedEvents, SelectedRowIndex);
-                RecalculateIndexList(IndeciesOfClosedEvents, SelectedRowIndex);
-                RecalculateIndexList(IndeciesOfNewEvents, SelectedRowIndex);
-                EventSequence.RemoveAt(SelectedRowIndex);
-                dataGridView1.Rows.RemoveAt(SelectedRowIndex);
-                dataGridView1.ClearSelection();
-                SerializeEventsBackground();
+                eventManager.RemoveEvent(SelectedRowIndex);
                 if (dataGridView1.DisplayedRowCount(true) == 0)
                 {
                     DisableDeleteEventButton();
@@ -1601,20 +634,12 @@ namespace Client
             }
         }
 
-        private void RecalculateIndexList(List<int> list, int selectedRowIndex)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i] > selectedRowIndex)
-                {
-                    list[i]--;
-                }
-            }
-        }
-
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
         {
+<<<<<<< HEAD
             //SelectedRowIndex = -1;
+=======
+>>>>>>> dev
             DisableSendOnEventButton();
             if (e.StateChanged != DataGridViewElementStates.Selected) return;
             if (dataGridView1.SelectedRows.Count == 0)
@@ -1625,9 +650,10 @@ namespace Client
             }
             SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
             EnableSendOnEventButton();
-
+            SelectedEvent = eventManager.GetSelectedEvent(SelectedRowIndex);
             checkBox1.Checked = false;
-            if (IndeciesOfClosedEvents.Contains(SelectedRowIndex) || IndeciesOfDeletedEvents.Contains(SelectedRowIndex))
+
+            if (SelectedEvent.EventState == EventStates.DeletedEvent || SelectedEvent.EventState == EventStates.ClosedEvent)
             {
                 EnableDeleteEventButton();
             }
@@ -1635,71 +661,48 @@ namespace Client
             {
                 DisableDeleteEventButton();
             }
-
-            if (IndeciesOfNewStatuses.Contains(SelectedRowIndex))
-            {
-                RemoveNewStatusIndex(SelectedRowIndex);
-            }
           
             SetSelectedEventToControls();
-            var recievers = EventSequence[SelectedRowIndex].RecieverLib.SelectedEntities;
-            if ((IsUserInChecklistByLogin(User, recievers)) || (User.Login == EventSequence[SelectedRowIndex].Sender.Login))
+
+            PopulateRecievers();
+            HandleStatusChanging();
+        }
+
+        private void PopulateRecievers()
+        {
+            var recievers = SelectedEvent.EventData.RecieverLib.SelectedEntities;
+            var User = client.GetUser();
+            if ((IsUserInChecklistByLogin(User, recievers)) || (User.Login == SelectedEvent.EventData.Sender.Login))
             {
                 ShowChecklist();
                 FillUserChecklist(recievers);
             }
             else
             {
-                if (isServerOnline)
+                if (client.isServerOnline)
                 {
-                    ShowCheckbox();
-                }
-            }
-
-            HandleStatusChanging();
-        }
-
-        private void DealWithFlashing()
-        {
-            if (IndeciesOfNewStatuses.Count == 0 && IndeciesOfNewStatuses.Count == 0)
-            {
-                FlashWindow.Stop(this);
-            }
-            else
-            {
-                if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS))
-                {
-                    FlashWindow.Start(this);
+                    ShowAcquaintedCheckbox();
                 }
             }
         }
 
-        private void RemoveNewStatusIndex(int selectedRowIndex)
-        {
-            IndeciesOfNewStatuses.Remove(selectedRowIndex);
-            RowCommonFont(selectedRowIndex);
-            EventSequence[selectedRowIndex].HasMissedStatus = false;
-            DealWithFlashing();
-            DealWithTrayIcon();
-            SerializeEventsBackground();
-        }
 
-        private void HandleStatusChanging()
+        private void HandleStatusChanging()  //fix
         {
-            if (EventSequence[SelectedRowIndex].StatusLib.SelectedEntities.Count > 0)
+            if (SelectedEvent.EventData.StatusLib.SelectedEntities.Count > 0)
             {
-                if (IsCurrentStatusForOwner())
+                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(SelectedEvent.EventData)))
                 {
-                    if (User.Login == EventSequence[SelectedRowIndex].Sender.Login)
-                    {
-                        EnableStatusControls();
-                    }
-                    else
+                    if (client.GetUser().Login != SelectedEvent.EventData.Sender.Login)
                     {
                         DisableStatusControls();
                         HideChecklistAndCheckbox();
                     }
                 }
+            }
+            if (!EventHelper.IsEventAcceptedByUser(SelectedEvent.EventData, client.GetUser()))
+            {
+                DisableStatusControls();
             }
         }
 
@@ -1718,9 +721,16 @@ namespace Client
             checkBox1.Checked = false;
             HideChecklistAndCheckbox();
             удалитьСобытиеToolStripMenuItem.Enabled = false;
-            richTextBox2.Text = "";
+            ClearNoteTextBox();
             richTextBox2.Enabled = false;
             dataGridView1.ClearSelection();
+        }
+
+        private void ClearNoteTextBox()
+        {
+            noteTextBoxChangesProgramatically = true;
+            richTextBox2.Text = "";
+            noteTextBoxChangesProgramatically = false;
         }
 
         private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1733,42 +743,18 @@ namespace Client
             {
                 if (prevHideClosed)
                 {
-                    foreach(var i in IndeciesOfClosedEvents)
-                    {
-                        dataGridView1.Rows[i].Visible = true;
-                    }
+                    eventManager.ShowClosedEvents();
                 }
                 else
                 {
-                    HideClosedEvents();
+                    eventManager.HideClosedEventsAccordingToConfigValue();
                 }
             }
             else
             {
                 if (prevHideClosed && (prevHideAllowance != AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE)))
                 {
-                    HideClosedEvents();
-                }
-            }
-        }
-
-        private void HideClosedEvents()
-        {
-            int days = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
-            DateTime now = DateTime.Now;
-            for (int i = 0; i < EventSequence.Count; i++)
-            {
-                if (IndeciesOfClosedEvents.Contains(i))
-                {
-                    var currentStatusDate = EventSequence[i].StatusLib.SelectedEntities.Last().Date;
-                    if (currentStatusDate.AddDays(days).CompareTo(now) < 0)
-                    {
-                        dataGridView1.Rows[i].Visible = false;
-                    }
-                }
-                else
-                {
-                    dataGridView1.Rows[i].Visible = true;
+                    eventManager.HideClosedEventsAccordingToConfigValue();
                 }
             }
         }
@@ -1778,111 +764,31 @@ namespace Client
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_OPEN_FILE_LOCATION, checkBox2.Checked.ToString());
         }
 
-        private int GetNewSortDirectionUsingSortNumbers(int previousSortNum, int newSortNum)
-        {
-            int newDir = CurrentSorting.Direction;
-            if (previousSortNum == newSortNum)
-            {
-                newDir *= DIRECTION_MULTIPLIER;
-            }
-            return newDir;
-        }
-
         private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            int newDir = GetNewSortDirectionUsingSortNumbers(CurrentSorting.Number, e.ColumnIndex);
-            SetCurrentSortingAndSort(e.ColumnIndex, newDir);
-        }
-
-        private bool OrderBySender()
-        {
-            SetNotesForEvents();
-            EventSequence.Sort((x, y) => CurrentSorting.Direction * string.Compare(x.Sender.Fullname, y.Sender.Fullname));
-            RefreshDataGrid();
-            UnsetNotesForEvents();
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, SENDER_COL_NUM.ToString());
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, CurrentSorting.Direction.ToString());
-            return true;
-        }
-
-        private bool OrderByName()
-        {
-            SetNotesForEvents();
-            EventSequence.Sort((x, y) => CurrentSorting.Direction * string.Compare(x.Name, y.Name));
-            RefreshDataGrid();
-            UnsetNotesForEvents();
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, NAME_COL_NUM.ToString());
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, CurrentSorting.Direction.ToString());
-            return true;
-        }
-
-        private bool OrderByDate()
-        {
-            SetNotesForEvents();
-            EventSequence.Sort((x, y) => CurrentSorting.Direction * DateTime.Compare(x.Date, y.Date));
-            RefreshDataGrid();
-            UnsetNotesForEvents();
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, DATE_COL_NUM.ToString());
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, CurrentSorting.Direction.ToString());
-            return true;
-        }
-
-        private bool OrderByStatus()
-        {
-            SetNotesForEvents();
-            EventSequence.Sort((x, y) => CurrentSorting.Direction * string.Compare(x.StatusLib.SelectedEntities.Count != 0 ? x.StatusLib.SelectedEntities.Last().Entity.Name : "",
-                                                                                   y.StatusLib.SelectedEntities.Count != 0 ? y.StatusLib.SelectedEntities.Last().Entity.Name : ""));
-            RefreshDataGrid();
-            UnsetNotesForEvents();
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, STATUS_COL_NUM.ToString());
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, CurrentSorting.Direction.ToString());
-            return true;
-        }
-
-        private bool OrderByAttributes()
-        {
-            SetNotesForEvents();
-            EventSequence.Sort((x, y) => CurrentSorting.Direction * (x.AttributeLib.SelectedEntities.Count - y.AttributeLib.SelectedEntities.Count));
-            RefreshDataGrid();
-            UnsetNotesForEvents();
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_NUM, ATTRIBUTE_COL_NUM.ToString());
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, CurrentSorting.Direction.ToString());
-            return true;
-        }
-
-        private void RefreshDataGrid()
-        {           
-            dataGridView1.Rows.Clear();
-            IndeciesOfClosedEvents.Clear();
-            IndeciesOfDeletedEvents.Clear();
-            IndeciesOfNewEvents.Clear();
-            foreach(var item in EventSequence)
-            {
-                AddEventToDataGrid(item);
-            }
-            HideClosedEventsAccordingConfigValue();
-        }
-
-        private void richTextBox2_TextChanged(object sender, EventArgs e)
-        {
-            if (SelectedRowIndex >= 0)
-            {
-                dataGridView1.Rows[SelectedRowIndex].Cells[NOTE_COL_NUM].Value = richTextBox2.Text;
-            }
+            eventManager.SortEventsUsingHeader(dataGridView1.Columns[e.ColumnIndex].HeaderText);
         }
 
         private void richTextBox2_Leave(object sender, EventArgs e)
         {
-            SerializeEventsBackground();
+            eventManager.SerializeEvents();
         }
 
         private void переслатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PingServerAndIndicateHisStateOnControls();
-            if (isServerOnline)
+            client.PingServerAndIndicateHisStateOnControls();
+            if (client.isServerOnline)
             {
-                SendOnEventForm sendOnEventForm = new SendOnEventForm(this, EventSequence[SelectedRowIndex], User);
+                SendOnEventForm sendOnEventForm = new SendOnEventForm(client.GetServerInstance(), SelectedEvent.EventData, client.GetUser());
                 sendOnEventForm.ShowDialog();
+            }
+        }
+
+        private void richTextBox2_TextChanged(object sender, EventArgs e)
+        {
+            if (SelectedRowIndex >= 0 && !noteTextBoxChangesProgramatically)
+            {
+                eventManager.SetEventNote(richTextBox2.Text);
             }
         }
     }

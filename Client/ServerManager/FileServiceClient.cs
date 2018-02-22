@@ -6,7 +6,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 
-namespace Client
+namespace Client.ServerManager
 {
     public class FileServiceClient : ClientBase<IFileService>, IFileService, IDisposable
     {

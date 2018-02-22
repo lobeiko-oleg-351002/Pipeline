@@ -166,8 +166,8 @@
   <data name="TAG_SORT_DIR" xml:space="preserve">
     <value>SORT_DIR</value>
   </data>
-  <data name="TAG_SORT_NUM" xml:space="preserve">
-    <value>SORT_NUM</value>
+  <data name="TAG_SORT_NAME" xml:space="preserve">
+    <value>SORT_NAME</value>
   </data>
   <data name="TAG_SOUND_EVENT" xml:space="preserve">
     <value>SOUND_EVENT</value>

@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Client.Misc;
 using ServerInterface;
 using System;
 using System.Collections.Generic;
@@ -16,18 +17,10 @@ namespace Client
     {
         public SignInForm()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
-        IBusinessService server;
         public BllUser User;
-
-        public SignInForm(IBusinessService server)
-        {
-            InitializeComponent();
-            this.server = server;
-            User = new BllUser { Login = "" };
-        }
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -37,27 +30,22 @@ namespace Client
 
         private void button1_Click(object sender, EventArgs e)
         {
-            try
+            User = new BllUser();
+            if ((textBox1.Text == "") || (textBox2.Text == ""))
             {
-                User = server.SignIn(textBox1.Text, Sha1.Encrypt(textBox2.Text));
-                if (User == null)
-                {
-                    MessageBox.Show(Properties.Resources.ResourceManager.GetString("USER_NOT_FOUND"));
-                }
-                else
-                {
-                    Close();
-                }
+                MessageBox.Show("Введите логин и пароль");
             }
-            catch(Exception)
+            else
             {
-                MessageBox.Show(Properties.Resources.SERVER_NOT_FOUND);
+                User.Login = textBox1.Text;
+                User.Password = Sha1.Encrypt(textBox2.Text);
                 Close();
-                throw new UserIsNullException();
             }
-
         }
 
-
+        public void ShowInvalidLoginMessage()
+        {
+            MessageBox.Show("Неверный логин/пароль");
+        }
     }
 }

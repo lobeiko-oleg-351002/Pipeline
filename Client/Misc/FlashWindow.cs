@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Client
+namespace Client.Misc
 {
     public static class FlashWindow
     {
@@ -119,10 +119,17 @@ namespace Client
         /// <returns></returns>
         public static bool Start(System.Windows.Forms.Form form)
         {
-            if (Win2000OrLater)
+            try
             {
-                FLASHWINFO fi = Create_FLASHWINFO(form.Handle, FLASHW_ALL, uint.MaxValue, 0);
-                return FlashWindowEx(ref fi);
+                if (Win2000OrLater)
+                {
+                    FLASHWINFO fi = Create_FLASHWINFO(form.Handle, FLASHW_ALL, uint.MaxValue, 0);
+                    return FlashWindowEx(ref fi);
+                }
+            }
+            catch
+            {
+
             }
             return false;
         }

@@ -216,11 +216,11 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SORT_NUM.
+        ///   Looks up a localized string similar to SORT_NAME.
         /// </summary>
-        internal static string TAG_SORT_NUM {
+        internal static string TAG_SORT_NAME {
             get {
-                return ResourceManager.GetString("TAG_SORT_NUM", resourceCulture);
+                return ResourceManager.GetString("TAG_SORT_NAME", resourceCulture);
             }
         }
         

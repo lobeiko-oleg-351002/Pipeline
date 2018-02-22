@@ -45,15 +45,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConnectionFailedException.cs" />
-    <Compile Include="FileServiceClient.cs" />
-    <Compile Include="FlashWindow.cs" />
+    <Compile Include="CustomExceptions\NoItemsInCollectionException.cs" />
+    <Compile Include="EventClasses\EventHelper.cs" />
+    <Compile Include="EventClasses\Events\ClosedEvent.cs" />
+    <Compile Include="EventClasses\Events\DeletedEvent.cs" />
+    <Compile Include="EventClasses\Events\EventStates.cs" />
+    <Compile Include="EventClasses\Events\NewEvent.cs" />
+    <Compile Include="EventClasses\Events\RegularEvent.cs" />
+    <Compile Include="EventClasses\StatusesForOwner.cs" />
+    <Compile Include="Misc\FileDownloader.cs" />
+    <Compile Include="ServerManager\ClientLauncher.cs" />
+    <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
+    <Compile Include="EventClasses\Authorization.cs" />
+    <Compile Include="EventClasses\RowStyleManager.cs" />
+    <Compile Include="EventClasses\Sorting\SortableColumn.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByAttribute.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByDate.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByName.cs" />
+    <Compile Include="EventClasses\Sorting\SortingBySender.cs" />
+    <Compile Include="EventClasses\Sorting\SortingByStatus.cs" />
+    <Compile Include="Misc\AppConfigManager.cs" />
+    <Compile Include="Misc\SerializeManager.cs" />
+    <Compile Include="Misc\Signal.cs" />
+    <Compile Include="Misc\Indication.cs" />
+    <Compile Include="Misc\TurnInOutController.cs" />
+    <Compile Include="ServerManager\FileServiceClient.cs" />
+    <Compile Include="Misc\FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\AddEventForm.Designer.cs">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventClasses\DataGridManager.cs" />
+    <Compile Include="EventClasses\Events\UiEvent.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +103,7 @@
     <Compile Include="Forms\Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventClasses\UiEventManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Forms\SignInForm.cs">
@@ -86,8 +112,22 @@
     <Compile Include="Forms\SignInForm.Designer.cs">
       <DependentUpon>SignInForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Sha1.cs" />
-    <Compile Include="UserIsNullException.cs" />
+    <Compile Include="ServerManager\AttributeGetter.cs" />
+    <Compile Include="ServerManager\GroupGetter.cs" />
+    <Compile Include="ServerManager\Interface\IAttributeGetter.cs" />
+    <Compile Include="ServerManager\Interface\IAuthorizationManager.cs" />
+    <Compile Include="ServerManager\Interface\IGroupGetter.cs" />
+    <Compile Include="ServerManager\Interface\IEventCRUD.cs" />
+    <Compile Include="ServerManager\Interface\IServerInstance.cs" />
+    <Compile Include="ServerManager\Interface\IStatusGetter.cs" />
+    <Compile Include="ServerManager\Interface\IUserGetter.cs" />
+    <Compile Include="ServerManager\UserGetter.cs" />
+    <Compile Include="ServerManager\ServerInstance.cs" />
+    <Compile Include="ServerManager\AuthorizationManager.cs" />
+    <Compile Include="ServerManager\EventCRUD.cs" />
+    <Compile Include="ServerManager\StatusGetter.cs" />
+    <Compile Include="Misc\Sha1.cs" />
+    <Compile Include="CustomExceptions\UserIsNullException.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -151,5 +191,6 @@
   <ItemGroup>
     <None Include="Resources\ServerOfflineTray.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

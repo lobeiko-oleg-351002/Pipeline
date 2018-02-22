@@ -43,12 +43,15 @@ namespace Launcher
 
         public ProgressBar()
         {
+            MessageBox.Show("Init comp");
             InitializeComponent();
+            MessageBox.Show("Form has started");
         }
 
         private void ProgressBar_Load(object sender, EventArgs e)
         {
             string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            MessageBox.Show("Launcher has started. Current location is " + currentLocation);
             try
             {
                 ExeConfigurationFileMap map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
@@ -90,12 +93,8 @@ namespace Launcher
                             settings.Settings.Add(key, clientSettings.Settings[key].Value);
                         }
                     }
-                    //settings.Settings.Add("Version", currentVersion);
-                    //settings.Settings.Add("login", login);
-                    //settings.Settings.Add("password", password);
                     config.Save(ConfigurationSaveMode.Modified);
                 }
-
                 Process client = new Process();
                 client.StartInfo.FileName = currentLocation + "\\Client.exe";
                 client.Start();

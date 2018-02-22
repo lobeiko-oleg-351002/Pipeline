@@ -7,13 +7,13 @@ namespace ORM.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class MigrateDB : IMigrationMetadata
+    public sealed partial class ServiceDB : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(MigrateDB));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ServiceDB));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802060618598_MigrateDB"; }
+            get { return "201802160631527_ServiceDB"; }
         }
         
         string IMigrationMetadata.Source
