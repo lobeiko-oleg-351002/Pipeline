@@ -113,11 +113,22 @@ namespace Client.EventClasses
         private void UpdateEventAccordingToCurrentStatus(UiEvent Event, int rowNum)
         {
             dataGridManager.SetStatusInRow(dataGridView.Rows[rowNum], Event.EventData);
+            var previousState = Events[rowNum].EventState;
             Events[rowNum] = EventHelper.CreateEventAccordingToStatusOrUser(Event, ownerForm.GetCurrentUser());
+            HandleSwitchNewEventToRemoved(Events[rowNum], previousState);
             Events[rowNum].SetRowStyle(dataGridView.Rows[rowNum]);
             HandleMissedStatusIndication(Events[rowNum]);
             Events[rowNum].SetMissedStatus(dataGridView.Rows[rowNum], dataGridManager.GetStatusColumnNum());           
             Signal.PlaySignalAccordingToStatusConfigValue();
+        }
+
+        private void HandleSwitchNewEventToRemoved(UiEvent currentEvent, EventStates prevState)
+        {
+            var currentStatus = EventHelper.GetCurrentEventStatus(currentEvent.EventData);
+            if (StatusesForOwner.IsStatusForOwner(currentStatus) && (prevState == EventStates.NewEvent))
+            {
+                ownerForm.indication.DecNewEventsCount();
+            }
         }
 
         private void HandleMissedStatusIndication(UiEvent Event)

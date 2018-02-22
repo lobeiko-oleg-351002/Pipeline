@@ -50,16 +50,18 @@ namespace Client.Misc
         public static List<UiEvent> DeserializeEventsFromCache()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(List<UiEvent>));
+            string mydoc = GetMyDocPath();
+            string filepath = mydoc + Properties.Resources.CACHE_XML_FILE;
             try
             {
-                string mydoc = GetMyDocPath();
-                using (Stream stream = File.Open(mydoc + Properties.Resources.CACHE_XML_FILE, FileMode.Open))
+                using (Stream stream = File.Open(filepath, FileMode.Open))
                 {
                     return (List<UiEvent>)serializer.Deserialize(stream);
                 }
             }
-            catch (IOException ex)
+            catch 
             {
+                File.Delete(filepath);
                 return new List<UiEvent>();
             }
         }

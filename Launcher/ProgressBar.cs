@@ -58,14 +58,12 @@ namespace Launcher
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
                 const string TAG_APPSETTINGS = "appSettings";
                 const string TAG_VERSION = "Version";
-                MessageBox.Show("Config is opened");
 
                 string ip = ConfigurationManager.AppSettings["hostIP"];
                 ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://" + ip + "/LauncherService/");
                 var ver = (config.GetSection(TAG_APPSETTINGS) as AppSettingsSection).Settings[TAG_VERSION];
                 string currentVersion = SourceChannel.GetClientVersion();
                 string appVersion = "";
-                MessageBox.Show("Last client version is " + currentVersion);
                 if (ver != null)
                 {
                     appVersion = ver.Value;
@@ -97,11 +95,9 @@ namespace Launcher
                     }
                     config.Save(ConfigurationSaveMode.Modified);
                 }
-                MessageBox.Show("Client is ready to start ");
                 Process client = new Process();
                 client.StartInfo.FileName = currentLocation + "\\Client.exe";
                 client.Start();
-                MessageBox.Show("Client has started.");
                 Application.Exit();
 
             }

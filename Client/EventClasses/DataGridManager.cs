@@ -182,10 +182,17 @@ namespace Client.EventClasses
 
         public void PopulateDataGrid(List<UiEvent> events, DataGridView grid)
         {
-            grid.Rows.Clear();
-            foreach(var item in events)
+            try
             {
-                AddRowToDataGridUsingEvent(grid, item);
+                grid.Rows.Clear();
+                foreach (var item in events)
+                {
+                    AddRowToDataGridUsingEvent(grid, item);
+                }
+            }
+            catch
+            {
+                PopulateDataGrid(events, grid);
             }
         }
 

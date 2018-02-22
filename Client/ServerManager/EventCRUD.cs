@@ -20,9 +20,9 @@ namespace Client.ServerManager
             {
                 return server.GetEventsForUser(user);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new ConnectionFailedException();
+                throw new ConnectionFailedException(ex.Message);
             }
         }
 

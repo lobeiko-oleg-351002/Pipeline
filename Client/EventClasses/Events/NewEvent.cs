@@ -28,6 +28,7 @@ namespace Client.EventClasses.Events
         public override void SetRowStyle(DataGridViewRow row)
         {
             RowStyleManager.MakeBoldRowFont(row);
+            RowStyleManager.MakeRowBackgroundAsRegular(row);
         }
     }
 }
