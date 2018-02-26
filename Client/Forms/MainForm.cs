@@ -566,30 +566,17 @@ namespace Client
         {
             if (listBox2.SelectedIndex >= 0)
             {
-<<<<<<< HEAD
-                string filename = EventSequence[SelectedRowIndex].FilepathLib.Entities[listBox2.SelectedIndex].Path;
-                string foldername = EventSequence[SelectedRowIndex].FilepathLib.FolderName;
-=======
                 string filename = SelectedEvent.EventData.FilepathLib.Entities[listBox2.SelectedIndex].Path;
                 string foldername = SelectedEvent.EventData.FilepathLib.FolderName;
->>>>>>> dev
                 try
                 {
                     if (checkBox2.Checked == false)
                     {
-<<<<<<< HEAD
-                        Process.Start(DownloadFile(filename, foldername));
-                    }
-                    else
-                    {
-                        string path = DownloadFile(filename, foldername);
-=======
                         Process.Start(FileDownloader.DownloadFile(filename, foldername));
                     }
                     else
                     {
                         string path = FileDownloader.DownloadFile(filename, foldername);
->>>>>>> dev
                         Process.Start("explorer.exe", "/select, \"" + path + "\"");
                     }
 
@@ -598,26 +585,6 @@ namespace Client
                 {
                     MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
-<<<<<<< HEAD
-            }
-        }
-
-        private void DeleteFromIndexLists(int i)
-        {
-            if (IndeciesOfDeletedEvents.Contains(i))
-            {
-                IndeciesOfDeletedEvents.Remove(i);
-
-            }
-            if (IndeciesOfClosedEvents.Contains(i))
-            {
-                IndeciesOfClosedEvents.Remove(i);
-            }
-            if (IndeciesOfNewEvents.Contains(i))
-            {
-                IndeciesOfNewEvents.Remove(i);
-=======
->>>>>>> dev
             }
         }
 
@@ -636,16 +603,11 @@ namespace Client
 
         private void dataGridView1_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
         {
-<<<<<<< HEAD
-            //SelectedRowIndex = -1;
-=======
->>>>>>> dev
             DisableSendOnEventButton();
             if (e.StateChanged != DataGridViewElementStates.Selected) return;
             if (dataGridView1.SelectedRows.Count == 0)
             {
                 ClearDataControls();
-                SelectedRowIndex = -1;
                 return;
             }
             SelectedRowIndex = dataGridView1.SelectedRows[0].Index;
@@ -723,7 +685,6 @@ namespace Client
             удалитьСобытиеToolStripMenuItem.Enabled = false;
             ClearNoteTextBox();
             richTextBox2.Enabled = false;
-            dataGridView1.ClearSelection();
         }
 
         private void ClearNoteTextBox()
