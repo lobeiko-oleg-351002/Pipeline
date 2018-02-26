@@ -20,7 +20,7 @@ namespace Client.ServerManager
             {
                 return server.GetStatusDeleted();
             }
-            catch
+            catch(Exception ex)
             {
                 throw new ConnectionFailedException();
             }
@@ -32,7 +32,7 @@ namespace Client.ServerManager
             {
                 return server.GetStatusClosed();
             }
-            catch
+            catch (Exception ex)
             {
                 throw new ConnectionFailedException();
             }
@@ -44,7 +44,7 @@ namespace Client.ServerManager
             {
                 return server.GetAllStatuses();
             }
-            catch
+            catch (Exception ex)
             {
                 throw new ConnectionFailedException();
             }
@@ -56,7 +56,7 @@ namespace Client.ServerManager
             {
                 return server.GetAllStatusesExceptDeletedAndClosed();
             }
-            catch
+            catch(Exception ex)
             {
                 throw new ConnectionFailedException();
             }

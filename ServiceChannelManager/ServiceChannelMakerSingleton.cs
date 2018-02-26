@@ -35,8 +35,23 @@ namespace ServiceChannelManager
         private static T CreateChannel<T>(string serviceAddress, IClientCallBack handler)
         {
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
+            InitBinding(binding);
             DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), binding, serviceAddress);
             return factory.CreateChannel();
+        }
+
+        private static void InitBinding(NetTcpBinding binding)
+        {
+            binding.CloseTimeout = TimeSpan.FromSeconds(120);
+            binding.OpenTimeout = TimeSpan.FromSeconds(120);
+            binding.ReceiveTimeout = TimeSpan.FromSeconds(600);
+            binding.SendTimeout = TimeSpan.FromSeconds(120);
+            binding.HostNameComparisonMode = HostNameComparisonMode.StrongWildcard;
+            binding.MaxBufferSize = 2147483647;
+            binding.MaxBufferPoolSize = 2147483647;
+            binding.MaxReceivedMessageSize = 2147483647;
+            binding.Security.Mode = SecurityMode.None;
+            binding.TransferMode = TransferMode.Buffered;
         }
 
     }

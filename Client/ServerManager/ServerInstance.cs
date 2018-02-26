@@ -65,7 +65,7 @@ namespace Client.ServerManager
             {
                 server.PingServer();
             }
-            catch
+            catch(Exception ex)
             {
                 throw new ConnectionFailedException();
             }

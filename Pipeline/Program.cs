@@ -15,7 +15,6 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Console.ReadLine();
             try
             {
                 BusinessService.Init();
@@ -24,24 +23,25 @@ namespace Server
                 ServiceHost fileService = new ServiceHost(typeof(FileService));
                 fileService.Open();
                 ServiceHost launcherService = new ServiceHost(typeof(LauncherService));
-                launcherService.Open();
-
-                
+                launcherService.Open();                
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            while(true)
+
+            new Thread(() =>
             {
-                Console.WriteLine("[" + DateTime.Now.ToString("HH:mm") + "]: Host is working. Users online: " + BusinessService.GetUsersOnlineCount() + ".");
-                Thread.Sleep(10000);
-                BusinessService.PingClients();
+                while (true)
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Console.WriteLine("[" + DateTime.Now.ToString("HH:mm") + "]: Host is working. Users online: " + BusinessService.GetUsersOnlineCount() + ".");
+                    Thread.Sleep(10000);
+                    BusinessService.PingClients();
+                }
+            }).Start();
 
-                //Console.ReadLine();
-            }
-
-
+            while (true) ;
         }
     }
 }

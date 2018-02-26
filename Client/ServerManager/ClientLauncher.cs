@@ -72,7 +72,7 @@ namespace Client.ServerManager
             }
             catch (ConnectionFailedException ex)
             {
-                isServerOnline = false;
+                throw ex;
             }
             catch (UserIsNullException ex)
             {
@@ -90,7 +90,10 @@ namespace Client.ServerManager
                     ownerForm.SetControlsAccordingToServerOnline();
                     isServerOnline = true;
                 }
-                serverInstance.PingServer();              
+                else
+                {
+                    serverInstance.PingServer();
+                }
             }
             catch (Exception ex)
             {
