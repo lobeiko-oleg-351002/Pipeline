@@ -66,9 +66,11 @@ namespace Client
                 client = new ClientLauncher(eventManager, this);
                 client.Launch();
                 eventManager.client = client;
-                StatusesForOwner.Init(client.GetServerInstance());                
+                StatusesForOwner.Init(client.GetServerInstance());
+                //var list = client.GetServerInstance().server.GetEventsForUser(client.GetUser());
                 eventManager.GetEventList();
                 eventManager.HideClosedEventsAccordingToConfigValue();
+                eventManager.StartCheckoutsOnTimer();
             }
             catch (UserIsNullException) //user has not logged in
             {
@@ -102,6 +104,7 @@ namespace Client
                 indication.DealWithTrayIcon();
                 InitStatusesForSelectedEvent();
                 SetUserFullnameOnLabel();
+                eventManager.DeleteUserInRemovedEvents();
             }));           
         }
 
@@ -618,6 +621,7 @@ namespace Client
             if (SelectedEvent.EventState == EventStates.DeletedEvent || SelectedEvent.EventState == EventStates.ClosedEvent)
             {
                 EnableDeleteEventButton();
+                DisableSendOnEventButton();
             }
             else
             {

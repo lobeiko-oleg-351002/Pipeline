@@ -207,6 +207,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OTK_STATUS.
+        /// </summary>
+        internal static string TAG_OTK_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_OTK_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SORT_DIR.
         /// </summary>
         internal static string TAG_SORT_DIR {

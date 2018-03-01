@@ -196,4 +196,7 @@
   <data name="PERMISSIBLE_DATE_RANGE_IN_DAYS" xml:space="preserve">
     <value>14</value>
   </data>
+  <data name="TAG_OTK_STATUS" xml:space="preserve">
+    <value>OTK_STATUS</value>
+  </data>
 </root>

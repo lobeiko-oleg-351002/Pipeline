@@ -73,5 +73,17 @@ namespace Client.ServerManager
                 throw new ConnectionFailedException();
             }
         }
+
+        public void UpdateEventRecievers(BllEvent Event)
+        {
+            try
+            {
+                server.UpdateEventRecievers(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
     }
 }

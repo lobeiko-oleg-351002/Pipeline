@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessClientProxy.cs" />
     <Compile Include="DataInteface\IAttributeService.cs" />
     <Compile Include="DataInteface\IEventTypeService.cs" />
     <Compile Include="DataInteface\IGroupService.cs" />

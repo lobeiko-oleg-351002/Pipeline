@@ -13,5 +13,6 @@ namespace Client.ServerManager.Interface
         List<BllEvent> GetEventsForUser(BllUser user);
         BllEvent CreateAndSendOutEvent(BllEvent Event);
         void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers);
+        void UpdateEventRecievers(BllEvent Event);
     }
 }

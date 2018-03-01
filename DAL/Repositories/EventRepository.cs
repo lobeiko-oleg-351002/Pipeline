@@ -30,10 +30,7 @@ namespace DAL.Repositories
             //        retElemets.Add(mapper.MapToDal(ev.First()));
             //    }
             //}
-            var events = context.Set<Event>().Where(entity =>
-                                (entity.StatusLib.SelectedStatus.OrderByDescending(o => o.id).FirstOrDefault().Status.name != Globals.Globals.STATUS_CLOSED)
-                                && (entity.StatusLib.SelectedStatus.OrderByDescending(o => o.id).FirstOrDefault().Status.name != Globals.Globals.STATUS_DELETED)
-                                && entity.UserLib.SelectedUser.Any(e => e.User.id == user_id));            
+            var events = context.Set<Event>().Where(entity => entity.UserLib.SelectedUser.Any(e => e.User.id == user_id));            
             var retElemets = new List<DalEvent>();
             foreach(var item in events)
             {

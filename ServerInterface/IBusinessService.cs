@@ -44,6 +44,12 @@ namespace ServerInterface
 
         [OperationContract]
         string PingServer();
+
+        [OperationContract]
+        void UpdateEventRecievers(BllEvent Event);
+
+        [OperationContract]
+        DateTime GetDateTime();
     }
 
 }

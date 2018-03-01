@@ -196,8 +196,6 @@ namespace Client.EventClasses
             }
         }
 
-
-
         public void SetClosedStyleForRow(DataGridViewRow row)
         {
             RowStyleManager.MakeRowBackgroungAsClosed(row);

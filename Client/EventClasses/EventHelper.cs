@@ -57,7 +57,6 @@ namespace Client.EventClasses
             }
             catch(NoItemsInCollectionException)
             {
-
             }
             if (!IsEventAcceptedByUser(data.EventData, client))
             {

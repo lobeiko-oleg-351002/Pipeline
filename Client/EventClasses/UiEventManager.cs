@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Client.EventClasses
@@ -25,6 +26,9 @@ namespace Client.EventClasses
         int SortDirection = 1;
         int SelectedEventNum = -1;
         UiEvent SelectedEvent = null;
+
+        const int CHECK_OTK_STATUS_FREQUENCY_SEC = 60 * 60;
+        const int OTK_TESTING_DAYS = 3;
 
         public UiEventManager(DataGridView dataGridView, MainForm ownerForm)
         {
@@ -115,19 +119,50 @@ namespace Client.EventClasses
             dataGridManager.SetStatusInRow(dataGridView.Rows[rowNum], Event.EventData);
             var previousState = Events[rowNum].EventState;
             Events[rowNum] = EventHelper.CreateEventAccordingToStatusOrUser(Event, ownerForm.GetCurrentUser());
-            HandleSwitchNewEventToRemoved(Events[rowNum], previousState);
+            HandleSwitchEventToRemoved(Events[rowNum], previousState);
             Events[rowNum].SetRowStyle(dataGridView.Rows[rowNum]);
             HandleMissedStatusIndication(Events[rowNum]);
-            Events[rowNum].SetMissedStatus(dataGridView.Rows[rowNum], dataGridManager.GetStatusColumnNum());           
+            Events[rowNum].SetMissedStatus(dataGridView.Rows[rowNum], dataGridManager.GetStatusColumnNum());
             Signal.PlaySignalAccordingToStatusConfigValue();
         }
 
-        private void HandleSwitchNewEventToRemoved(UiEvent currentEvent, EventStates prevState)
+        private void HandleSwitchEventToRemoved(UiEvent currentEvent, EventStates prevState)
         {
             var currentStatus = EventHelper.GetCurrentEventStatus(currentEvent.EventData);
-            if (StatusesForOwner.IsStatusForOwner(currentStatus) && (prevState == EventStates.NewEvent))
+            if (StatusesForOwner.IsStatusForOwner(currentStatus))
             {
-                ownerForm.indication.DecNewEventsCount();
+                if (prevState == EventStates.NewEvent)
+                {
+                    ownerForm.indication.DecNewEventsCount();
+                }
+                DeleteCurrentUserFromRecieversAndUpdateEvent(currentEvent);
+            }
+        }
+
+        private void DeleteCurrentUserFromRecieversAndUpdateEvent(UiEvent currentEvent)
+        {
+            var recievers = currentEvent.EventData.RecieverLib.SelectedEntities;
+            try
+            {
+                recievers.Remove(recievers.Single(r => r.Entity.Id == client.GetUser().Id));
+
+                IEventCRUD eventCrud = new EventCRUD(client.GetServerInstance().server);
+                eventCrud.UpdateEventRecievers(currentEvent.EventData);
+            }
+            catch(Exception ex)
+            {
+
+            }
+        }
+
+        public void DeleteUserInRemovedEvents()
+        {
+            foreach(var item in Events)
+            {
+                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
+                {
+                    DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                }
             }
         }
 
@@ -179,7 +214,7 @@ namespace Client.EventClasses
                         return eventCrud.GetEventsForUser(ownerForm.GetCurrentUser());
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
                     success = false;
                     client.PingServerAndIndicateHisStateOnControls();
@@ -210,15 +245,32 @@ namespace Client.EventClasses
                     if (item.EventData.Id == cachedItem.EventData.Id)
                     {
                         isCachedItemMatchsInListFromServer = true;
-                        item.Note = cachedItem.Note;
-                        item.MissedStatus = cachedItem.MissedStatus;
+                        item.Note = cachedItem.Note;                       
                         if (item.MissedStatus)
                         {
                             ownerForm.indication.IncNewStatusesCount();
                         }
+
                         if (EventHelper.IsTargetStatusObsolete(item.EventData, cachedItem.EventData))
                         {
                             HandleMissedStatusIndication(item);
+                            item.MissedStatus = true;
+                        }
+                        else
+                        {
+                            item.MissedStatus = cachedItem.MissedStatus;
+                        }
+
+                        try
+                        {
+                            if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
+                            {
+                                DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+
                         }
                         item = EventHelper.CreateEventAccordingToStatusOrUser(item, ownerForm.GetCurrentUser());
                         break;
@@ -236,6 +288,26 @@ namespace Client.EventClasses
         {
             Events.Add(Event);
             dataGridManager.AddRowToDataGridUsingEvent(dataGridView, Event);
+            MakeGreenStatusForOTK(Events.Count-1, GetDateTimeNow());
+        }
+
+        private void MakeGreenStatusForOTK(int rowNum, DateTime now)
+        {
+            try
+            {
+                var status = Events[rowNum].EventData.StatusLib.SelectedEntities.Last();
+                if (status.Entity.Name == "ОТК")
+                {
+                    if (DateTimeHelper.AreDatesLayInRange(status.Date, now, OTK_TESTING_DAYS))
+                    {
+                        RowStyleManager.MakeCellGreen(dataGridView.Rows[rowNum].Cells[dataGridManager.GetStatusColumnNum()]);
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
 
         public void AddNewEventAndSerialize(BllEvent Event)
@@ -312,9 +384,8 @@ namespace Client.EventClasses
             if (SelectedEvent.MissedStatus)
             {
                 ownerForm.indication.DecNewStatusesCount();
-                SelectedEvent = new RegularEvent(SelectedEvent);
                 SelectedEvent.SetRegularStatus(dataGridView.Rows[SelectedEventNum], dataGridManager.GetStatusColumnNum());
-                Events[SelectedEventNum] = SelectedEvent;
+                //Events[SelectedEventNum] = SelectedEvent;
                 SerializeEvents();
             }
         }
@@ -366,6 +437,44 @@ namespace Client.EventClasses
         public void SerializeEvents()
         {
             SerializeEventManager.SerializeEventsBackground(Events);
+        }
+
+        public void StartCheckoutsOnTimer()
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                while (true)
+                {
+                    HandleStatusesForOTK();
+                    Thread.Sleep(CHECK_OTK_STATUS_FREQUENCY_SEC);
+                }
+            }).Start();
+        }
+
+        private void HandleStatusesForOTK()
+        {
+            if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_OTK_STATUS))
+            {
+                DateTime now = GetDateTimeNow();
+                for (int i = 0; i < Events.Count; i++)
+                {
+                    MakeGreenStatusForOTK(i, now);
+                }
+            }
+        }
+
+        private DateTime GetDateTimeNow()
+        {
+            client.PingServerAndIndicateHisStateOnControls();
+            if (client.isServerOnline)
+            {
+                return client.GetServerInstance().server.GetDateTime();
+            }
+            else
+            {
+                return DateTime.Now;
+            }
         }
 
     }

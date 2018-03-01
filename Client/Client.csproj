@@ -69,6 +69,7 @@
     <Compile Include="Misc\Signal.cs" />
     <Compile Include="Misc\Indication.cs" />
     <Compile Include="Misc\TurnInOutController.cs" />
+    <Compile Include="ServerManager\DateTimeHelper.cs" />
     <Compile Include="ServerManager\FileServiceClient.cs" />
     <Compile Include="Misc\FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">

@@ -32,6 +32,10 @@ namespace Server
         private const string SERVER_STATE = "Online";
         private const string TAG_VERSION = "CLIENT_VERSION";
 
+        public DateTime GetDateTime()
+        {
+            return DateTime.Now;
+        }
 
         public static void Init()
         {
@@ -215,6 +219,23 @@ namespace Server
                 LogWriter.WriteMessage("UpdateEventWithRecieversExceptUsers", ex.Message + ex.InnerException, "");
             }
         }
+
+        public void UpdateEventRecievers(BllEvent Event)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    UserLibService userservice = new UserLibService(uow);
+                    userservice.Update(Event.RecieverLib);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("UpdateEventRecievers", ex.Message + ex.InnerException, "");
+            }           
+        }    
 
         public void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers)
         {

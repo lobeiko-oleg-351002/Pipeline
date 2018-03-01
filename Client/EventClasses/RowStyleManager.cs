@@ -56,5 +56,10 @@ namespace Client.EventClasses
         {
             cell.Style.Font = new Font(cell.Style.Font, FontStyle.Regular);
         }
+
+        public static void MakeCellGreen(DataGridViewCell cell)
+        {
+            cell.Style.ForeColor = Color.Green;
+        }
     }
 }
