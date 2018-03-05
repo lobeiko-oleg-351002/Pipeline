@@ -36,7 +36,7 @@ namespace ServerInterface
         [OperationContract]
         BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser updater);
 
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers);
 
         [OperationContract]
@@ -45,7 +45,7 @@ namespace ServerInterface
         [OperationContract]
         string PingServer();
 
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void UpdateEventRecievers(BllEvent Event);
 
         [OperationContract]

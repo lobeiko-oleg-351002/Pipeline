@@ -11,11 +11,11 @@ namespace ServiceChannelManager
 {
     public class ServiceChannelMakerSingleton
     {
-        private static BusinessClientProxy SourceChannel;
+        private static IBusinessService SourceChannel;
 
         private static ServiceChannelMakerSingleton instance;
 
-        public BusinessClientProxy GetServerMethods(IClientCallBack handler, string hostIP)
+        public IBusinessService GetServerMethods(IClientCallBack handler, string hostIP)
         {
             return (SourceChannel = CreateChannel<IBusinessService>("net.tcp://" + hostIP + "/ServerInterface/", handler));
         }
@@ -33,33 +33,26 @@ namespace ServiceChannelManager
             }
         }
 
-        private static BusinessClientProxy CreateChannel<T>(string serviceAddress, IClientCallBack handler)
+        private static T CreateChannel<T>(string serviceAddress, IClientCallBack handler)
         {
-            WSDualHttpBinding binding = new WSDualHttpBinding(WSDualHttpSecurityMode.None);
+            NetTcpBinding binding = new NetTcpBinding(SecurityMode.None);
             InitBinding(binding);
-            BusinessClientProxy proxy = new BusinessClientProxy(new InstanceContext(handler), binding, new EndpointAddress(serviceAddress));
-            //DuplexClientBase<T> factory = new DuplexClientBase<T>(new InstanceContext(handler), binding, serviceAddress);
-            return proxy;
+            DuplexChannelFactory<T> factory = new DuplexChannelFactory<T>(new InstanceContext(handler), binding, serviceAddress);
+            return factory.CreateChannel();
         }
 
-        private static void InitBinding(WSDualHttpBinding binding)
+        private static void InitBinding(NetTcpBinding binding)
         {
             binding.CloseTimeout = TimeSpan.FromSeconds(120);
             binding.OpenTimeout = TimeSpan.FromSeconds(120);
             binding.ReceiveTimeout = TimeSpan.FromSeconds(600);
             binding.SendTimeout = TimeSpan.FromSeconds(120);
             binding.HostNameComparisonMode = HostNameComparisonMode.StrongWildcard;
+            binding.MaxBufferSize = 2147483647;
             binding.MaxBufferPoolSize = 2147483647;
             binding.MaxReceivedMessageSize = 2147483647;
-            binding.MaxReceivedMessageSize = 2147483647;
-
-            //XmlDictionaryReaderQuotas xml = new XmlDictionaryReaderQuotas();
-            //xml.MaxArrayLength = 2147483647;
-            //xml.MaxBytesPerRead = 2147483647;
-            //xml.MaxDepth = 2147483647;
-            //xml.MaxNameTableCharCount = 2147483647;
-            //xml.MaxStringContentLength = 2147483647;
-            //binding.ReaderQuotas = xml;
+            binding.Security.Mode = SecurityMode.None;
+            binding.TransferMode = TransferMode.Buffered;
         }
 
     }

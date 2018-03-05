@@ -109,12 +109,13 @@ namespace Server
         {
             try
             {
+                LogWriter.WriteMessage("Trying to GetEventsForUser", "", user.Fullname);
                 using (ServiceDB serviceDB = new ServiceDB())
                 {
                     IUnitOfWork uow = new UnitOfWork(serviceDB);
                     IEventService eventService = new EventService(uow);
                     var events = eventService.GetEventsForUser(user).ToList();
-
+                    LogWriter.WriteMessage("Returning EventList", "", user.Fullname);
                     return events;
                 }
             }

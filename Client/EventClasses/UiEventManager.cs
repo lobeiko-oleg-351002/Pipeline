@@ -469,7 +469,14 @@ namespace Client.EventClasses
             client.PingServerAndIndicateHisStateOnControls();
             if (client.isServerOnline)
             {
-                return client.GetServerInstance().server.GetDateTime();
+                try
+                {
+                    return client.GetServerInstance().server.GetDateTime();
+                }
+                catch
+                {
+                    return DateTime.Now;
+                }
             }
             else
             {
