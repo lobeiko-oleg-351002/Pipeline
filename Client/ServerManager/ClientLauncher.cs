@@ -58,8 +58,8 @@ namespace Client.ServerManager
 
         private void SetServerInstance()
         {
-            string ip = AppConfigManager.GetKeyValue(IP_KEY);
-            //string ip = "192.168.2.100:8085";
+            //string ip = AppConfigManager.GetKeyValue(IP_KEY);
+            string ip = "192.168.2.100:8085";
             serverInstance = new ServerInstance(ip, callback);
         }
 

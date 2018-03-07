@@ -162,9 +162,16 @@ namespace Client.EventClasses
         {
             foreach(var item in Events)
             {
-                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
+                try
                 {
-                    DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                    if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
+                    {
+                        DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                    }
+                }
+                catch
+                {
+
                 }
             }
         }

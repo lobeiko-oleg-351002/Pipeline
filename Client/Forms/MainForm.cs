@@ -59,7 +59,6 @@ namespace Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            SystemEvents.SessionEnded += new SessionEndedEventHandler(SaveAndExit);
             eventManager = new UiEventManager(dataGridView1, this);
             indication = new Indication(this);
             InitializeAppProperties();
@@ -771,11 +770,25 @@ namespace Client
             Application.Exit();
         }
 
-        public static void SaveAndExit(object sender, SessionEndedEventArgs e)
+        public static void SaveAndExit()
         {
-            SystemEvents.SessionEnded -= new SessionEndedEventHandler(SaveAndExit);
+            //MessageBox.Show("Exit");
             isAppClosed = true;
             Application.Exit();
         }
+
+        private static int WM_QUERYENDSESSION = 0x11;
+        protected override void WndProc(ref System.Windows.Forms.Message m)
+        {
+            if (m.Msg == WM_QUERYENDSESSION)
+            {
+                SaveAndExit();
+            }
+
+            // If this is WM_QUERYENDSESSION, the closing event should be
+            // raised in the base WndProc.
+            base.WndProc(ref m);
+
+        } //WndProc 
     }
 }

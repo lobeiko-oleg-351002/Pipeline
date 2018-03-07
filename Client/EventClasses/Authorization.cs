@@ -27,7 +27,7 @@ namespace Client.EventClasses
         {
             try
             {
-                authorizationManager = new AuthorizationManager(serverInstance.server);
+                authorizationManager = new AuthorizationProxy(serverInstance.server);
                 if (!HasUserLoginAndPassword())
                 {
                     SetLoginAndPasswordUsingSignInForm();

@@ -36,14 +36,17 @@ namespace Client.Forms
             InitializeComponent();
             this.serverInstance = server;
             this.Sender = sender;
+        }
 
-            PopulateEventTypeComboBox(sender.EventTypeLib);
+        private void AddEventForm_Load(object sender, EventArgs e)
+        {
+            PopulateEventTypeComboBox(Sender.EventTypeLib);
             PopulateAttributeCheckList();
             PopulateRecieverTreeView();
-           
-            if (sender.EventTypeLib.SelectedEntities.Count > 0)
+
+            if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
-                CheckUserNodesAccordingEventType(sender.EventTypeLib.SelectedEntities[0].Entity.Id);
+                CheckUserNodesAccordingEventType(Sender.EventTypeLib.SelectedEntities[0].Entity.Id);
             }
         }
 
@@ -153,6 +156,7 @@ namespace Client.Forms
         private void CheckUserNodesAccordingEventType(int eventId)
         {
             UncheckAllNodes(treeView1.Nodes);
+            treeView1.CollapseAll();
             string nodesStr = AppConfigManager.GetKeyValue(eventId.ToString());
             if (nodesStr != null)
             {
@@ -342,5 +346,7 @@ namespace Client.Forms
             string eventTag = Event.Type.Id.ToString();
             AppConfigManager.AddKeyValue(eventTag, nodeName);
         }
+
+
     }
 }

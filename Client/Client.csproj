@@ -70,7 +70,7 @@
     <Compile Include="Misc\Signal.cs" />
     <Compile Include="Misc\Indication.cs" />
     <Compile Include="Misc\TurnInOutController.cs" />
-    <Compile Include="ServerManager\DateTimeHelper.cs" />
+    <Compile Include="Misc\DateTimeHelper.cs" />
     <Compile Include="ServerManager\FileServiceClient.cs" />
     <Compile Include="Misc\FlashWindow.cs" />
     <Compile Include="Forms\AddEventForm.cs">
@@ -114,20 +114,20 @@
     <Compile Include="Forms\SignInForm.Designer.cs">
       <DependentUpon>SignInForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ServerManager\AttributeGetter.cs" />
-    <Compile Include="ServerManager\GroupGetter.cs" />
-    <Compile Include="ServerManager\Interface\IAttributeGetter.cs" />
-    <Compile Include="ServerManager\Interface\IAuthorizationManager.cs" />
-    <Compile Include="ServerManager\Interface\IGroupGetter.cs" />
-    <Compile Include="ServerManager\Interface\IEventCRUD.cs" />
-    <Compile Include="ServerManager\Interface\IServerInstance.cs" />
-    <Compile Include="ServerManager\Interface\IStatusGetter.cs" />
-    <Compile Include="ServerManager\Interface\IUserGetter.cs" />
-    <Compile Include="ServerManager\UserGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\AttributeGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\GroupGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IAttributeGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IAuthorizationManager.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IGroupGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IEventCRUD.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IServerInstance.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IStatusGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\Interface\IUserGetter.cs" />
+    <Compile Include="ServerManager\EntityProxy\UserGetter.cs" />
     <Compile Include="ServerManager\ServerInstance.cs" />
-    <Compile Include="ServerManager\AuthorizationManager.cs" />
-    <Compile Include="ServerManager\EventCRUD.cs" />
-    <Compile Include="ServerManager\StatusGetter.cs" />
+    <Compile Include="ServerManager\AuthorizationProxy.cs" />
+    <Compile Include="ServerManager\EntityProxy\EventCRUD.cs" />
+    <Compile Include="ServerManager\EntityProxy\StatusGetter.cs" />
     <Compile Include="Misc\Sha1.cs" />
     <Compile Include="CustomExceptions\UserIsNullException.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">

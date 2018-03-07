@@ -10,9 +10,9 @@ using System.Text;
 
 namespace Client.ServerManager
 {
-    public class AuthorizationManager : ServerInstance, IAuthorizationManager
+    public class AuthorizationProxy : ServerInstance, IAuthorizationManager
     {
-        public AuthorizationManager(IBusinessService server) : base(server)
+        public AuthorizationProxy(IBusinessService server) : base(server)
         {
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Client.ServerManager
+namespace Client.Misc
 {
     public static class DateTimeHelper
     {
