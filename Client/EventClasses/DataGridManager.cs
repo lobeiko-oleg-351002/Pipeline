@@ -12,7 +12,7 @@ namespace Client.EventClasses
 {
     public class DataGridManager
     {
-        Dictionary<string, int> ColumnIndicies = new Dictionary<string, int>();
+        static Dictionary<string, int> ColumnIndicies = new Dictionary<string, int>();
 
         const string COL_SENDER = "От";
         const string COL_TITLE = "Заголовок";
@@ -72,10 +72,7 @@ namespace Client.EventClasses
 
             grid.Rows.Add(row);
 
-            if (uiEvent.MissedStatus)
-            {
-                RowStyleManager.MakeCellBoldFont(row.Cells[ColumnIndicies[COL_STATUS]]);
-            }
+            StatusStyleManager.SetStatusStyle(uiEvent, row);
         }
 
         public void SetStatusInRow(DataGridViewRow row, BllEvent Event)
@@ -221,7 +218,7 @@ namespace Client.EventClasses
             row.Visible = true;
         }
 
-        public int GetStatusColumnNum()
+        public static int GetStatusColumnNum()
         {
             return ColumnIndicies[COL_STATUS];
         }

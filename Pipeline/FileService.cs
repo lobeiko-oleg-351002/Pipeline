@@ -22,6 +22,17 @@ namespace Server
             return new FileStream(filePath, FileMode.Open, FileAccess.Read);
         }
 
+        public long GetFileSize(string path)
+        {
+            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string filePath = Path.Combine(storage, path);
+
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("File not found", Path.GetFileName(filePath));
+
+            return (new FileInfo(filePath)).Length;
+        }
+
         public bool IsFileExists(string filename)
         {
             string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");

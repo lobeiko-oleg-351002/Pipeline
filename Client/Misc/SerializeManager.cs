@@ -26,7 +26,7 @@ namespace Client.Misc
             }
             catch (IOException ex)
             {
-                throw ex;
+                //throw ex;
             }
         }
 

@@ -237,6 +237,7 @@ namespace Client.Forms
                 IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
                 Event = eventCRUD.CreateAndSendOutEvent(Event);
                 Close();
+                AppConfigManager.SetKeyValue(Event.Type.Name, textBox1.Text);
             }
             catch (Exception ex)
             {
@@ -275,8 +276,13 @@ namespace Client.Forms
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBox1.Text = comboBox2.Text;
-            CheckUserNodesAccordingEventType(Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity.Id);
+            var type = Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity;
+            textBox1.Text = AppConfigManager.GetKeyValue(type.Name);
+            if (textBox1.Text == "")
+            {
+                textBox1.Text = comboBox2.Text;
+            }
+            CheckUserNodesAccordingEventType(type.Id);
         }
 
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)

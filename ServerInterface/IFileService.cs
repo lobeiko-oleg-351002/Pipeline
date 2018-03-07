@@ -19,5 +19,9 @@ namespace ServerInterface
         [OperationContract]
         bool IsFileExists(string filename);
 
+        [OperationContract]
+        long GetFileSize(string path);
+        
+
     }
 }

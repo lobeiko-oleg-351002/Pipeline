@@ -199,4 +199,7 @@
   <data name="TAG_OTK_STATUS" xml:space="preserve">
     <value>OTK_STATUS</value>
   </data>
+  <data name="TAG_STOCK_STATUS" xml:space="preserve">
+    <value>STOCK_STATUS</value>
+  </data>
 </root>

@@ -29,6 +29,7 @@ namespace Client.Forms
             checkedListBox1.Items.Add("Индикация на панели задач при изменении статуса");
             checkedListBox1.Items.Add("Индикация в трэе при изменении статуса");
             checkedListBox1.Items.Add("Отметка статусов для ОТК");
+            checkedListBox1.Items.Add("Индикация только статуса СКЛАД");
 
             SetCheckListItem(Properties.Resources.TAG_SOUND_EVENT, 0);
             SetCheckListItem(Properties.Resources.TAG_SOUND_STATUS, 1);
@@ -38,6 +39,7 @@ namespace Client.Forms
             SetCheckListItem(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
             SetCheckListItem(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
             SetCheckListItem(Properties.Resources.TAG_OTK_STATUS, 7);
+            SetCheckListItem(Properties.Resources.TAG_STOCK_STATUS, 8);
 
             checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
             numericUpDown1.Value = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
@@ -59,6 +61,7 @@ namespace Client.Forms
             SetKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS, 5);
             SetKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS, 6);
             SetKeyValue(Properties.Resources.TAG_OTK_STATUS, 7);
+            SetKeyValue(Properties.Resources.TAG_STOCK_STATUS, 8);
 
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, hideClosedEvents.ToString());
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE, numericUpDown1.Value.ToString());

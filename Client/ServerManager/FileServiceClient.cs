@@ -34,5 +34,10 @@ namespace Client.ServerManager
             if (this.State == CommunicationState.Opened)
                 this.Close();
         }
+
+        public long GetFileSize(string path)
+        {
+            return base.Channel.GetFileSize(path);
+        }
     }
 }

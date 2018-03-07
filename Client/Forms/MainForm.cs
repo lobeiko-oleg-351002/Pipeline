@@ -42,6 +42,7 @@ namespace Client
 
         int SelectedRowIndex;
         bool noteTextBoxChangesProgramatically = false;
+        static bool isAppClosed = false;
 
         //for tests
         public MainForm(string pathToClient)
@@ -58,6 +59,7 @@ namespace Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            SystemEvents.SessionEnded += new SessionEndedEventHandler(SaveAndExit);
             eventManager = new UiEventManager(dataGridView1, this);
             indication = new Indication(this);
             InitializeAppProperties();
@@ -77,6 +79,8 @@ namespace Client
                 ExitApp();
             }
         }
+
+        
 
         public void SetControlsAccordingToServerOffline()
         {
@@ -321,7 +325,7 @@ namespace Client
             {
                 try
                 {
-                    Process.Start(FileDownloader.DownloadFile(name.Path, lib.FolderName));
+                    Process.Start(FileDownloader.CheckFileSizeAndDownloadFile(name.Path, lib.FolderName));
                 }
                 catch
                 {
@@ -436,8 +440,11 @@ namespace Client
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
-            indication.HideForm();
+            if (!isAppClosed)
+            {
+                e.Cancel = true;
+                indication.HideForm();
+            }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -575,16 +582,16 @@ namespace Client
                 {
                     if (checkBox2.Checked == false)
                     {
-                        Process.Start(FileDownloader.DownloadFile(filename, foldername));
+                        Process.Start(FileDownloader.CheckFileSizeAndDownloadFile(filename, foldername));
                     }
                     else
                     {
-                        string path = FileDownloader.DownloadFile(filename, foldername);
+                        string path = FileDownloader.CheckFileSizeAndDownloadFile(filename, foldername);
                         Process.Start("explorer.exe", "/select, \"" + path + "\"");
                     }
 
                 }
-                catch
+                catch(Exception ex)
                 {
                     MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
@@ -755,6 +762,20 @@ namespace Client
             {
                 eventManager.SetEventNote(richTextBox2.Text);
             }
+        }
+
+        private void выходToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            isAppClosed = true;
+            eventManager.SerializeEvents();
+            Application.Exit();
+        }
+
+        public static void SaveAndExit(object sender, SessionEndedEventArgs e)
+        {
+            SystemEvents.SessionEnded -= new SessionEndedEventHandler(SaveAndExit);
+            isAppClosed = true;
+            Application.Exit();
         }
     }
 }

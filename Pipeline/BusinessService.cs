@@ -403,32 +403,32 @@ namespace Server
             }
         }
 
-        public static void PingClients()
-        {
-            lock (locker)
-            {
-                var inactiveClients = new List<string>();
-                foreach (var client in Clients)
-                {
-                    try
-                    {
-                        client.Value.Ping() ;
-                    }
-                    catch (Exception ex)
-                    {
-                        inactiveClients.Add(client.Key);
-                    }
-                }
+        //public static void PingClients()
+        //{
+        //    lock (locker)
+        //    {
+        //        var inactiveClients = new List<string>();
+        //        foreach (var client in Clients)
+        //        {
+        //            try
+        //            {
+        //                //client.Value.Ping() ;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                inactiveClients.Add(client.Key);
+        //            }
+        //        }
 
-                if (inactiveClients.Count > 0)
-                {
-                    foreach (var client in inactiveClients)
-                    {
-                        Clients.Remove(client);
-                    }
-                }
-            }
-        }
+        //        if (inactiveClients.Count > 0)
+        //        {
+        //            foreach (var client in inactiveClients)
+        //            {
+        //                Clients.Remove(client);
+        //            }
+        //        }
+        //    }
+        //}
 
         public string PingServer()
         {

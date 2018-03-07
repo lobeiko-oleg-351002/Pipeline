@@ -43,23 +43,21 @@ namespace Launcher
 
         public ProgressBar()
         {
-            MessageBox.Show("Init comp");
             InitializeComponent();
-            MessageBox.Show("Form has started");
         }
 
         private void ProgressBar_Load(object sender, EventArgs e)
         {
             string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            MessageBox.Show("Launcher has started. Current location is " + currentLocation);
             try
             {
                 ExeConfigurationFileMap map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
                 const string TAG_APPSETTINGS = "appSettings";
                 const string TAG_VERSION = "Version";
+                const string TAG_HOST = "hostIP";
 
-                string ip = ConfigurationManager.AppSettings["hostIP"];
+                string ip = ConfigurationManager.AppSettings[TAG_HOST];
                 ILauncherMethods SourceChannel = CreateChannel<ILauncherMethods>("http://" + ip + "/LauncherService/");
                 var ver = (config.GetSection(TAG_APPSETTINGS) as AppSettingsSection).Settings[TAG_VERSION];
                 string currentVersion = SourceChannel.GetClientVersion();
@@ -88,7 +86,7 @@ namespace Launcher
                     settings.Settings.Add(TAG_VERSION, currentVersion);
                     foreach (var key in clientSettings.Settings.AllKeys)
                     {
-                        if (key != TAG_VERSION)
+                        if ((key != TAG_VERSION) && (key != TAG_HOST))
                         {
                             settings.Settings.Add(key, clientSettings.Settings[key].Value);
                         }

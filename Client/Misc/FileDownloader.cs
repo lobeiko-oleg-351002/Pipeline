@@ -22,17 +22,73 @@ namespace Client.Misc
             }
             if (!File.Exists(filePath))
             {
-                using (FileStream output = new FileStream(filePath, FileMode.Create))
-                {
-                    Stream downloadStream;
-                    using (FileServiceClient client = new FileServiceClient())
-                    {
-                        downloadStream = client.GetFile(Path.Combine(folderName, name));
-                    }
-                    downloadStream.CopyTo(output);
-                }
+                string fileInFolder = Path.Combine(folderName, name);
+                Download(filePath, fileInFolder);
+
             }
             return filePath;
+        }
+
+        private static void Download(string fullPath, string pathOnServer)
+        {
+            FileServiceClient client = new FileServiceClient();
+            do
+            {
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+                using (FileStream output = new FileStream(fullPath, FileMode.Create))
+                {
+                    Stream downloadStream;
+                    downloadStream = client.GetFile(pathOnServer);               
+                    downloadStream.CopyTo(output);
+
+                }
+            }
+            while (!IsFileSizeCorrect(fullPath, pathOnServer, client));
+        }
+
+        public static string CheckFileSizeAndDownloadFile(string name, string folderName)
+        {
+            string downloadsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Properties.Resources.DOWNLOADS_FOLDER;
+            string eventFolderPath = Path.Combine(downloadsPath, folderName);
+            string filePath = Path.Combine(downloadsPath, folderName, name);
+            if (!Directory.Exists(eventFolderPath))
+            {
+                Directory.CreateDirectory(eventFolderPath);
+            }
+            string fileInFolder = Path.Combine(folderName, name);
+            if (File.Exists(filePath))
+            {
+                FileServiceClient client = new FileServiceClient();
+                if (!IsFileSizeCorrect(filePath, fileInFolder, client))
+                {
+                    Download(filePath, fileInFolder);
+                }
+            }
+            else
+            {
+                Download(filePath, fileInFolder);
+            }
+            return filePath;
+        }
+
+        private static bool IsFileSizeCorrect(string path, string pathOnServer, FileServiceClient client)
+        {
+            try
+            {
+                var fi = new FileInfo(path);
+                if (fi.Length == client.GetFileSize(pathOnServer))
+                {
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                return false;
+            }
+            return false;
         }
 
         public static void DownloadEventFilesUsingFilepathLib(BllFilepathLib lib)

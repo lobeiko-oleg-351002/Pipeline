@@ -261,6 +261,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to STOCK_STATUS.
+        /// </summary>
+        internal static string TAG_STOCK_STATUS {
+            get {
+                return ResourceManager.GetString("TAG_STOCK_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to TASKBAR_INDICATION_STATUS.
         /// </summary>
         internal static string TAG_TASKBAR_INDICATION_STATUS {
