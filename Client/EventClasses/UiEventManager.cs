@@ -3,6 +3,7 @@ using Client.EventClasses.Events;
 using Client.EventClasses.Sorting;
 using Client.Misc;
 using Client.Misc.FileService;
+using Client.Misc.Serialization;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
 using ServerInterface;
@@ -206,16 +207,17 @@ namespace Client.EventClasses
 
         public void GetEventList()
         {
+            Serializer serializer = new Serializer();
             if (!client.GetServerInstance().IsConnected())
             {
-                Events = SerializeEventManager.DeserializeEventsFromCache();
+                Events = serializer.DeserializeEventsFromCache();
                 dataGridManager.PopulateDataGrid(Events, dataGridView);
             }
             else
             {
                 List<BllEvent> eventsFromServer = GetEventsFromServerForCurrentUser();
                 List<UiEvent> wrappedEventsFromServer = CreateSuitableUiEvents(eventsFromServer);
-                List<UiEvent> cachedEvents = SerializeEventManager.DeserializeEventsFromCache();
+                List<UiEvent> cachedEvents = serializer.DeserializeEventsFromCache();
                 if (cachedEvents != null)
                 {
                     AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(wrappedEventsFromServer, cachedEvents);
@@ -455,7 +457,8 @@ namespace Client.EventClasses
 
         public void SerializeEvents()
         {
-            SerializeEventManager.SerializeEventsBackground(Events);
+            Serializer serializer = new Serializer();
+            serializer.SerializeEventsBackground(Events);
         }
 
         public void StartCheckoutsOnTimer()

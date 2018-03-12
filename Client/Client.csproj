@@ -57,6 +57,8 @@
     <Compile Include="Misc\FileService\EventFileDownloader.cs" />
     <Compile Include="Misc\FileService\FileDownloader.cs" />
     <Compile Include="Misc\FileService\FilePathMap.cs" />
+    <Compile Include="Misc\Serialization\EventSerializer.cs" />
+    <Compile Include="Misc\Serialization\Serializer.cs" />
     <Compile Include="ServerManager\ClientLauncher.cs" />
     <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
     <Compile Include="EventClasses\Authorization.cs" />
@@ -68,7 +70,6 @@
     <Compile Include="EventClasses\Sorting\SortingBySender.cs" />
     <Compile Include="EventClasses\Sorting\SortingByStatus.cs" />
     <Compile Include="Misc\AppConfigManager.cs" />
-    <Compile Include="Misc\SerializeManager.cs" />
     <Compile Include="Misc\Signal.cs" />
     <Compile Include="Misc\Indication.cs" />
     <Compile Include="Misc\TurnInOutController.cs" />
