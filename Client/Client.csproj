@@ -54,7 +54,9 @@
     <Compile Include="EventClasses\Events\RegularEvent.cs" />
     <Compile Include="EventClasses\StatusStyleManager.cs" />
     <Compile Include="EventClasses\StatusesForOwner.cs" />
-    <Compile Include="Misc\FileDownloader.cs" />
+    <Compile Include="Misc\FileService\EventFileDownloader.cs" />
+    <Compile Include="Misc\FileService\FileDownloader.cs" />
+    <Compile Include="Misc\FileService\FilePathMap.cs" />
     <Compile Include="ServerManager\ClientLauncher.cs" />
     <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
     <Compile Include="EventClasses\Authorization.cs" />

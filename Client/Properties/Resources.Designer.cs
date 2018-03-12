@@ -180,6 +180,15 @@ namespace Client.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to COMMANDER_PATH.
+        /// </summary>
+        internal static string TAG_COMMANDER_PATH {
+            get {
+                return ResourceManager.GetString("TAG_COMMANDER_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HIDE_ALLOWANCE.
         /// </summary>
         internal static string TAG_HIDE_ALLOWANCE {
@@ -302,6 +311,15 @@ namespace Client.Properties {
         internal static string TAG_TURNOUT_STATUS {
             get {
                 return ResourceManager.GetString("TAG_TURNOUT_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to USE_COMMANDER.
+        /// </summary>
+        internal static string TAG_USE_COMMANDER {
+            get {
+                return ResourceManager.GetString("TAG_USE_COMMANDER", resourceCulture);
             }
         }
         

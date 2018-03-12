@@ -43,12 +43,14 @@ namespace Client.Forms
 
             checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
             numericUpDown1.Value = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
+
+            checkBox2.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_USE_COMMANDER);
+            textBox1.Text = AppConfigManager.GetKeyValue(Properties.Resources.TAG_COMMANDER_PATH);
         }
 
         private void SetCheckListItem(string tag, int i)
         {
-             checkedListBox1.SetItemChecked(i, AppConfigManager.GetBoolKeyValue(tag)); 
-            
+             checkedListBox1.SetItemChecked(i, AppConfigManager.GetBoolKeyValue(tag));            
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -63,8 +65,10 @@ namespace Client.Forms
             SetKeyValue(Properties.Resources.TAG_OTK_STATUS, 7);
             SetKeyValue(Properties.Resources.TAG_STOCK_STATUS, 8);
 
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, hideClosedEvents.ToString());
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_CLOSED, checkBox1.Checked.ToString());
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE, numericUpDown1.Value.ToString());
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_USE_COMMANDER, checkBox2.Checked.ToString());
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_COMMANDER_PATH, textBox1.Text.ToString());
             Close();
         }
 
@@ -89,6 +93,28 @@ namespace Client.Forms
             {
                 numericUpDown1.Enabled = false;
                 hideClosedEvents = false;
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                textBox1.Enabled = true;
+                button3.Enabled = true;
+            }
+            else
+            {
+                textBox1.Enabled = false;
+                button3.Enabled = false;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                textBox1.Text = openFileDialog1.FileName;
             }
         }
     }

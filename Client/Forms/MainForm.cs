@@ -3,6 +3,7 @@ using Client.EventClasses;
 using Client.EventClasses.Events;
 using Client.Forms;
 using Client.Misc;
+using Client.Misc.FileService;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
 using Globals;
@@ -324,7 +325,8 @@ namespace Client
             {
                 try
                 {
-                    Process.Start(FileDownloader.CheckFileSizeAndDownloadFile(name.Path, lib.FolderName));
+                    FileDownloader fileDownloader = new FileDownloader();
+                    Process.Start(fileDownloader.CheckFileSizeAndDownloadFile(new FilePathMap(name.Path, lib.FolderName)));
                 }
                 catch
                 {
@@ -579,21 +581,40 @@ namespace Client
                 string foldername = SelectedEvent.EventData.FilepathLib.FolderName;
                 try
                 {
+                    FileDownloader fileDownloader = new FileDownloader();
                     if (checkBox2.Checked == false)
                     {
-                        Process.Start(FileDownloader.CheckFileSizeAndDownloadFile(filename, foldername));
+                        Process.Start(fileDownloader.CheckFileSizeAndDownloadFile(new FilePathMap(filename, foldername)));
                     }
                     else
-                    {
-                        string path = FileDownloader.CheckFileSizeAndDownloadFile(filename, foldername);
-                        Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                    {                       
+                        string path = fileDownloader.CheckFileSizeAndDownloadFile(new FilePathMap(filename, foldername));
+                        if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_USE_COMMANDER))
+                        {
+                            OpenFileInCommander(path);
+                        }
+                        else
+                        {
+                            Process.Start("explorer.exe", "/select, \"" + path + "\"");
+                        }
                     }
-
                 }
                 catch(Exception ex)
                 {
                     MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
+            }
+        }
+
+        private void OpenFileInCommander(string path)
+        {
+            try
+            {
+                Process.Start(AppConfigManager.GetKeyValue(Properties.Resources.TAG_COMMANDER_PATH), "/O \"" + path + "\"");
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
 

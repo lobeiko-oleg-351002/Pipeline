@@ -2,6 +2,7 @@
 using Client.EventClasses.Events;
 using Client.EventClasses.Sorting;
 using Client.Misc;
+using Client.Misc.FileService;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
 using ServerInterface;
@@ -348,7 +349,8 @@ namespace Client.EventClasses
                 {
                     AddRegularEvent(item);
                 }
-                FileDownloader.DownloadEventFilesUsingFilepathLib(item.EventData.FilepathLib);
+                FileDownloader fileDownloader = new FileDownloader();
+                fileDownloader.DownloadEventFilesUsingFilepathLib(item.EventData.FilepathLib);
             }
         }
 
