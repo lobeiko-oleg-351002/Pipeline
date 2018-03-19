@@ -1,4 +1,5 @@
-﻿using Client.EventClasses.Events;
+﻿using Client.EventClasses;
+using Client.EventClasses.Events;
 using Client.Misc;
 using Client.ServerManager;
 using System;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Client.EventClasses
+namespace Client.Forms.DataGridControls
 {
     public static class StatusStyleManager
     {
@@ -23,7 +24,7 @@ namespace Client.EventClasses
                     {
                         if (Event.MissedStatus)
                         {
-                            Event.SetMissedStatus(row, DataGridManager.GetStatusColumnNum());
+                            Event.SetMissedStatus(row, DataGridPopulationManager.GetStatusColumnNum());
                         }
                     }
                 }
@@ -31,7 +32,7 @@ namespace Client.EventClasses
                 {
                     if (Event.MissedStatus)
                     {
-                        Event.SetMissedStatus(row, DataGridManager.GetStatusColumnNum());
+                        Event.SetMissedStatus(row, DataGridPopulationManager.GetStatusColumnNum());
                     }
                 }
             }
@@ -49,12 +50,12 @@ namespace Client.EventClasses
                 {
                     if (EventHelper.GetCurrentEventStatus(Event.EventData).Name == Globals.Globals.STATUS_STOCK)
                     {
-                        Event.SetMissedStatus(row, DataGridManager.GetStatusColumnNum());
+                        Event.SetMissedStatus(row, DataGridPopulationManager.GetStatusColumnNum());
                     }
                 }
                 else
                 {
-                    Event.SetMissedStatus(row, DataGridManager.GetStatusColumnNum());                    
+                    Event.SetMissedStatus(row, DataGridPopulationManager.GetStatusColumnNum());                    
                 }
             }
             catch
@@ -72,7 +73,7 @@ namespace Client.EventClasses
                 {
                     if (DateTimeHelper.AreDatesLayInRange(status.Date, now, OTK_TESTING_DAYS))
                     {
-                        RowStyleManager.MakeCellGreen(row.Cells[DataGridManager.GetStatusColumnNum()]);
+                        RowStyleManager.MakeCellGreen(row.Cells[DataGridPopulationManager.GetStatusColumnNum()]);
                     }
                 }
             }

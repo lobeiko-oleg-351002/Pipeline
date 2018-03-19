@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.ServerManager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +31,26 @@ namespace Client.Misc
                 d.AddDays(-overallDays);
             }
             return date.AddDays(overallDays);
+        }
+
+        public static DateTime GetDateTimeNow(ClientLauncher client)
+        {
+            client.PingServerAndIndicateHisStateOnControls();
+            if (client.isServerOnline)
+            {
+                try
+                {
+                    return client.GetServerInstance().server.GetDateTime();
+                }
+                catch
+                {
+                    return DateTime.Now;
+                }
+            }
+            else
+            {
+                return DateTime.Now;
+            }
         }
     }
 }

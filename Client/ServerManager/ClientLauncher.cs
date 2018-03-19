@@ -1,5 +1,6 @@
 ﻿using BllEntities;
 using Client.EventClasses;
+using Client.Forms.ServerStateControls;
 using Client.Misc;
 using Client.ServerManager;
 using ServerInterface;
@@ -20,12 +21,12 @@ namespace Client.ServerManager
         ServerInstance serverInstance;
         IClientCallBack callback;
         Authorization authorization;
-        MainForm ownerForm;
+        ServerStateControlsManager serverStateControlsManager;
 
-        public ClientLauncher(IClientCallBack clientCallBack, MainForm ownerForm)
+        public ClientLauncher(IClientCallBack clientCallBack, ServerStateControlsManager serverStateControlsManager)
         {
             callback = clientCallBack;
-            this.ownerForm = ownerForm;
+            this.serverStateControlsManager = serverStateControlsManager;
             SetServerInstance();
             authorization = new Authorization();
         }
@@ -87,7 +88,7 @@ namespace Client.ServerManager
                 if (isServerOnline == false)
                 {
                     ConnectToServerAndAuthorize();
-                    ownerForm.SetControlsAccordingToServerOnline();
+                    serverStateControlsManager.SetControlsAccordingToServerOnline();
                     isServerOnline = true;
                 }
                 else
@@ -100,7 +101,7 @@ namespace Client.ServerManager
                 if (isServerOnline == true)
                 {
                     isServerOnline = false;
-                    ownerForm.SetControlsAccordingToServerOffline();
+                    serverStateControlsManager.SetControlsAccordingToServerOffline();
                 }
             }
         }

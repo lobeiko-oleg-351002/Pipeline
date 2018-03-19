@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Client.EventClasses.Events;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
 using System;
@@ -42,6 +43,15 @@ namespace Client.EventClasses
                 {
                     return true;
                 }
+            }
+            return false;
+        }
+
+        public static bool IsEventStateRemoved(UiEvent Event)
+        {
+            if (Event.EventState == EventStates.DeletedEvent || Event.EventState == EventStates.ClosedEvent)
+            {
+                return true;
             }
             return false;
         }

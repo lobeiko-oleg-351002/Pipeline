@@ -1,12 +1,15 @@
 ﻿using BllEntities;
+using Client.CustomExceptions;
+using Client.EventClasses;
 using Client.EventClasses.Events;
 using Client.EventClasses.Sorting;
+using Client.Forms;
+using Client.Forms.DataGridControls;
 using Client.Misc;
 using Client.Misc.FileService;
 using Client.Misc.Serialization;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
-using ServerInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,65 +17,56 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Client.EventClasses
+namespace Client.Forms.EventControls
 {
-    public class UiEventManager : IClientCallBack
+    public class EventManager
     {
-        DataGridManager dataGridManager;
+        DataGridPopulationManager dataGridPopulationManager;
         DataGridView dataGridView;
+        EventControls eventControls;
         List<UiEvent> Events;
-        MainForm ownerForm;
-        public ClientLauncher client { private get; set; }
+        public ClientCallback clientCallback;
 
         const int DIRECTION_MULTIPLIER = -1;
         int SortDirection = 1;
         int SelectedEventNum = -1;
-        UiEvent SelectedEvent = null;
+        public UiEvent SelectedEvent = null;
 
         const int CHECK_OTK_STATUS_FREQUENCY_SEC = 60 * 60;
 
-        public UiEventManager(DataGridView dataGridView, MainForm ownerForm)
+        public EventManager(EventControls eventControls)
         {
-            this.dataGridView = dataGridView;
-            this.ownerForm = ownerForm;
-            dataGridManager = new DataGridManager(dataGridView);
+            this.eventControls = eventControls;
+            dataGridPopulationManager = eventControls.ControllerSet.dataGridControlsManager.dataGridPopulationManager;
+            dataGridView = eventControls.ControllerSet.dataGridControlsManager.dataGridControls.DataGrid;
+            clientCallback = new ClientCallback(eventControls.ControllerSet);
             Events = new List<UiEvent>();
         }
 
-        public void GetEvent(BllEvent Event)
-        {
-            UiEvent newEvent = new NewEvent(Event, "");
-            AddNewEvent(newEvent);
-            SerializeEvents();            
-            Signal.PlaySignalAccordingToEventConfigValue();
-            SortEventsUsingLastOrderFromCache();
-            HideClosedEventsAccordingToConfigValue();
-        }
-
-        private void AddNewEvent(UiEvent Event)
+        public void AddNewEvent(UiEvent Event)
         {
             Events.Add(Event);
-            dataGridManager.AddRowToDataGridUsingEvent(dataGridView, Event);
-            ownerForm.indication.IncNewEventsCount();
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event);
+            eventControls.ControllerSet.indication.IncNewEventsCount();
             SortEventsUsingLastOrderFromCache();
         }
 
-        private void SortEventsUsingLastOrderFromCache()
+        public void SortEventsUsingLastOrderFromCache()
         {
             string sortCol = AppConfigManager.GetKeyValue(Properties.Resources.TAG_SORT_NAME);
-            SortableColumn CurrentSorting = dataGridManager.GetSortingUsingColHeader(sortCol);
+            SortableColumn CurrentSorting = dataGridPopulationManager.GetSortingUsingColHeader(sortCol);
             CurrentSorting.Direction = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_DIR);
             CurrentSorting.Sort(Events);
-            dataGridManager.PopulateDataGrid(Events, dataGridView);
+            dataGridPopulationManager.PopulateDataGrid(Events);
         }
 
         public void SortEventsUsingHeader(string header)
         {
-            SortableColumn CurrentSorting = dataGridManager.GetSortingUsingColHeader(header);
+            SortableColumn CurrentSorting = dataGridPopulationManager.GetSortingUsingColHeader(header);
             SortDirection *= DIRECTION_MULTIPLIER;
             CurrentSorting.Direction = SortDirection;
             CurrentSorting.Sort(Events);
-            dataGridManager.PopulateDataGrid(Events, dataGridView);
+            dataGridPopulationManager.PopulateDataGrid(Events);
             SaveSortColumnAndDirectionToCache(header, SortDirection);
             HideClosedEventsAccordingToConfigValue();
         }
@@ -85,27 +79,27 @@ namespace Client.EventClasses
 
         public void Ping()
         {
-            
+
         }
 
-        public void UpdateEvent(BllEvent Event)
+        public void SetEventNote(string note)
         {
-            int updatedEventNum = FindUpdatedEventInEventSequenceById(Event.Id);
-            var updatingEvent = Events[updatedEventNum];
-            if (updatedEventNum >= 0)
-            {
-                if (EventHelper.IsTargetStatusObsolete(Event, updatingEvent.EventData))
-                {
-                    updatingEvent.EventData = Event;
-                    UpdateEventAccordingToCurrentStatus(updatingEvent, updatedEventNum);
-                }
-                updatingEvent.EventData = Event;
-                ownerForm.UpdateSelectedEvent(Event, updatedEventNum);
-                SerializeEvents();
-            }
+            SelectedEvent.Note = note;
+            dataGridPopulationManager.SetNoteToRow(dataGridView.Rows[SelectedEventNum], note);
         }
 
-        private int FindUpdatedEventInEventSequenceById(int eventId)
+        public void AdmitEventAsAcquainted()
+        {
+            IEventCRUD crud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+            SelectedEvent.EventData = crud.UpdateAcceptedUsersAndSendOutEvent(SelectedEvent.EventData, eventControls.ControllerSet.client.GetUser());
+            SelectedEvent = new RegularEvent(SelectedEvent);
+            Events[SelectedEventNum] = SelectedEvent;
+            SelectedEvent.SetRowStyle(dataGridView.Rows[SelectedEventNum]);
+            eventControls.ControllerSet.indication.DecNewEventsCount();
+            SerializeEvents();
+        }
+
+        public int GetEventNumById(int eventId)
         {
             for (int i = 0; i < Events.Count; i++)
             {
@@ -114,22 +108,25 @@ namespace Client.EventClasses
                     return i;
                 }
             }
-            return -1;
+            throw new NoItemsInCollectionException();
         }
 
-        private void UpdateEventAccordingToCurrentStatus(UiEvent Event, int rowNum)
+        public UiEvent GetEventByRowNum(int row)
         {
-            dataGridManager.SetStatusInRow(dataGridView.Rows[rowNum], Event.EventData);
+            return Events[row];
+        }
+
+        public void UpdateEventAccordingToCurrentStatus(UiEvent Event, int rowNum)
+        {
+            dataGridPopulationManager.SetStatusInRow(dataGridView.Rows[rowNum], Event.EventData);
             var previousState = Events[rowNum].EventState;
-            Events[rowNum] = EventHelper.CreateEventAccordingToStatusOrUser(Event, ownerForm.GetCurrentUser());
+            Events[rowNum] = EventHelper.CreateEventAccordingToStatusOrUser(Event, eventControls.ControllerSet.client.GetUser());
             HandleSwitchEventToRemoved(Events[rowNum], previousState);
             Events[rowNum].SetRowStyle(dataGridView.Rows[rowNum]);
             HandleMissedStatusIndication(Events[rowNum]);
             StatusStyleManager.SetMissedStatus(Events[rowNum], dataGridView.Rows[rowNum]);
             Signal.PlaySignalAccordingToStatusConfigValue();
         }
-
-
 
         private void HandleSwitchEventToRemoved(UiEvent currentEvent, EventStates prevState)
         {
@@ -138,7 +135,7 @@ namespace Client.EventClasses
             {
                 if (prevState == EventStates.NewEvent)
                 {
-                    ownerForm.indication.DecNewEventsCount();
+                    eventControls.ControllerSet.indication.DecNewEventsCount();
                 }
                 DeleteCurrentUserFromRecieversAndUpdateEvent(currentEvent);
             }
@@ -149,12 +146,12 @@ namespace Client.EventClasses
             var recievers = currentEvent.EventData.RecieverLib.SelectedEntities;
             try
             {
-                recievers.Remove(recievers.Single(r => r.Entity.Id == client.GetUser().Id));
+                recievers.Remove(recievers.Single(r => r.Entity.Id == eventControls.ControllerSet.client.GetUser().Id));
 
-                IEventCRUD eventCrud = new EventCRUD(client.GetServerInstance().server);
+                IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
                 eventCrud.UpdateEventRecievers(currentEvent.EventData);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -162,7 +159,7 @@ namespace Client.EventClasses
 
         public void DeleteUserInRemovedEvents()
         {
-            foreach(var item in Events)
+            foreach (var item in Events)
             {
                 try
                 {
@@ -197,32 +194,29 @@ namespace Client.EventClasses
         {
             if (Event.MissedStatus)
             {
-                ownerForm.indication.InvokeMissedStatusIndication();
+                eventControls.ControllerSet.indication.InvokeMissedStatusIndication();
             }
             else
             {
-                ownerForm.indication.IncNewStatusesCount();
+                eventControls.ControllerSet.indication.IncNewStatusesCount();
             }
         }
 
         public void GetEventList()
         {
             Serializer serializer = new Serializer();
-            if (!client.GetServerInstance().IsConnected())
+            if (!eventControls.ControllerSet.client.GetServerInstance().IsConnected())
             {
                 Events = serializer.DeserializeEventsFromCache();
-                dataGridManager.PopulateDataGrid(Events, dataGridView);
+                dataGridPopulationManager.PopulateDataGrid(Events);
             }
             else
             {
                 List<BllEvent> eventsFromServer = GetEventsFromServerForCurrentUser();
-                List<UiEvent> wrappedEventsFromServer = CreateSuitableUiEvents(eventsFromServer);
+                List<UiEvent> uiEventsFromServer = EventHelper.CreateSuitableUiEvents(eventsFromServer, eventControls.ControllerSet.client.GetUser());
                 List<UiEvent> cachedEvents = serializer.DeserializeEventsFromCache();
-                if (cachedEvents != null)
-                {
-                    AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(wrappedEventsFromServer, cachedEvents);
-                }
-                AddEventsFromServerAndDownloadTheirFiles(wrappedEventsFromServer);
+                AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(uiEventsFromServer, cachedEvents);
+                AddEventsFromServerAndDownloadTheirFiles(uiEventsFromServer);
             }
             HideClosedEventsAccordingToConfigValue();
             SortEventsUsingLastOrderFromCache();
@@ -237,28 +231,18 @@ namespace Client.EventClasses
                 success = true;
                 try
                 {
-                    IEventCRUD eventCrud = new EventCRUD(client.GetServerInstance().server);
+                    IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
                     {
-                        return eventCrud.GetEventsForUser(ownerForm.GetCurrentUser());
+                        return eventCrud.GetEventsForUser(eventControls.ControllerSet.client.GetUser());
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     success = false;
-                    client.PingServerAndIndicateHisStateOnControls();
+                    eventControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
                 }
             }
             return null;
-        }
-
-        private List<UiEvent> CreateSuitableUiEvents(List<BllEvent> events)
-        {
-            List<UiEvent> suitableEvents = new List<UiEvent>();
-            foreach (var item in events)
-            {
-                suitableEvents.Add(EventHelper.CreateEventAccordingToStatusOrUser(new UiEvent(item, ""), ownerForm.GetCurrentUser()));
-            }
-            return suitableEvents;
         }
 
         private void AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(List<UiEvent> serverEvents, List<UiEvent> cachedEvents)
@@ -273,60 +257,64 @@ namespace Client.EventClasses
                     if (item.EventData.Id == cachedItem.EventData.Id)
                     {
                         isCachedItemMatchsInListFromServer = true;
-                        item.Note = cachedItem.Note;                       
-                        if (item.MissedStatus)
-                        {
-                            ownerForm.indication.IncNewStatusesCount();
-                        }
-
-                        if (EventHelper.IsTargetStatusObsolete(item.EventData, cachedItem.EventData))
-                        {
-                            HandleMissedStatusIndication(item);
-                            item.MissedStatus = true;
-                        }
-                        else
-                        {
-                            item.MissedStatus = cachedItem.MissedStatus;
-                        }
-
-                        try
-                        {
-                            if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
-                            {
-                                DeleteCurrentUserFromRecieversAndUpdateEvent(item);
-                            }
-                        }
-                        catch(Exception ex)
-                        {
-
-                        }
-                        item = EventHelper.CreateEventAccordingToStatusOrUser(item, ownerForm.GetCurrentUser());
+                        UpdateCachedEventUsingEventFromServer(item, cachedItem);
                         break;
                     }
                 }
                 if (isCachedItemMatchsInListFromServer == false)
                 {
-                    cachedItem = EventHelper.CreateEventAccordingToStatusOrUser(cachedItem, ownerForm.GetCurrentUser());
+                    cachedItem = EventHelper.CreateEventAccordingToStatusOrUser(cachedItem, eventControls.ControllerSet.client.GetUser());
                     AddRegularEvent(cachedItem);
                 }
             }
         }
 
+        private void UpdateCachedEventUsingEventFromServer(UiEvent serverEvent, UiEvent cachedEvent)
+        {
+            serverEvent.Note = cachedEvent.Note;
+            if (serverEvent.MissedStatus)
+            {
+                eventControls.ControllerSet.indication.IncNewStatusesCount();
+            }
+
+            if (EventHelper.IsTargetStatusObsolete(serverEvent.EventData, cachedEvent.EventData))
+            {
+                HandleMissedStatusIndication(serverEvent);
+                serverEvent.MissedStatus = true;
+            }
+            else
+            {
+                serverEvent.MissedStatus = cachedEvent.MissedStatus;
+            }
+
+            try
+            {
+                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(serverEvent.EventData)))
+                {
+                    DeleteCurrentUserFromRecieversAndUpdateEvent(serverEvent);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            serverEvent = EventHelper.CreateEventAccordingToStatusOrUser(serverEvent, eventControls.ControllerSet.client.GetUser());
+        }
+
         private void AddRegularEvent(UiEvent Event)
         {
             Events.Add(Event);
-            dataGridManager.AddRowToDataGridUsingEvent(dataGridView, Event);
-            StatusStyleManager.MakeGreenStatusForOTK(Event, dataGridView.Rows[Events.Count - 1], GetDateTimeNow());
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event);
+            StatusStyleManager.MakeGreenStatusForOTK(Event, dataGridView.Rows[Events.Count - 1], DateTimeHelper.GetDateTimeNow(eventControls.ControllerSet.client));
         }
-
-
 
         public void AddNewEventAndSerialize(BllEvent Event)
         {
-            UiEvent wrappedEvent = new RegularEvent(Event,  "");
+            UiEvent wrappedEvent = new RegularEvent(Event, "");
             Events.Add(wrappedEvent);
-            dataGridManager.AddRowToDataGridUsingEvent(dataGridView, wrappedEvent);
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(wrappedEvent);
             SortEventsUsingLastOrderFromCache();
+            HideClosedEventsAccordingToConfigValue();
             SerializeEvents();
         }
 
@@ -339,7 +327,7 @@ namespace Client.EventClasses
                     if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
                     {
                         DeleteCurrentUserFromRecieversAndUpdateEvent(item);
-                    }                    
+                    }
                 }
                 catch { }
 
@@ -361,19 +349,19 @@ namespace Client.EventClasses
             if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
             {
                 int days = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
-                DateTime now = DateTime.Now; 
+                DateTime now = DateTimeHelper.GetDateTimeNow(eventControls.ControllerSet.client);
                 for (int i = 0; i < Events.Count; i++)
                 {
                     if (Events[i].EventState == EventStates.ClosedEvent)
                     {
-                        var currentStatusDate = Events[i].EventData.StatusLib.SelectedEntities.Last().Date;
+                        var currentStatusDate = EventHelper.GetCurrentEventStatusWithDate(Events[i].EventData).Date;
                         if (currentStatusDate.AddDays(days).CompareTo(now) < 0)
                         {
-                            dataGridManager.MakeRowInvisible(dataGridView.Rows[i]);
+                            dataGridPopulationManager.MakeRowInvisible(dataGridView.Rows[i]);
                         }
                         else
                         {
-                            dataGridManager.MakeRowVisible(dataGridView.Rows[i]);
+                            dataGridPopulationManager.MakeRowVisible(dataGridView.Rows[i]);
                         }
                     }
                 }
@@ -388,10 +376,10 @@ namespace Client.EventClasses
                 {
                     dataGridView.Rows[i].Visible = true;
                 }
-            }           
+            }
         }
 
-        public UiEvent GetSelectedEvent(int row)
+        public UiEvent SetSelectedEventUsingNum(int row)
         {
             SelectedEventNum = row;
             SelectedEvent = Events[row];
@@ -404,42 +392,38 @@ namespace Client.EventClasses
         {
             if (SelectedEvent.MissedStatus)
             {
-                ownerForm.indication.DecNewStatusesCount();
-                SelectedEvent.SetRegularStatus(dataGridView.Rows[SelectedEventNum], DataGridManager.GetStatusColumnNum());
-                //Events[SelectedEventNum] = SelectedEvent;
+                eventControls.ControllerSet.indication.DecNewStatusesCount();
+                SelectedEvent.SetRegularStatus(dataGridView.Rows[SelectedEventNum], DataGridPopulationManager.GetStatusColumnNum());
                 SerializeEvents();
             }
         }
 
-        public void AddStatusToSelectedEvent(BllStatus status)
+        public void AddStatusToSelectedEventAndIndicateHim(BllStatus status)
         {
             SelectedEvent = AddStatusToUiEvent(SelectedEvent, status);
             Events[SelectedEventNum] = SelectedEvent;
-            IEventCRUD eventCrud = new EventCRUD(client.GetServerInstance().server);
-            SelectedEvent.EventData = eventCrud.UpdateStatusAndSendOutEvent(SelectedEvent.EventData, ownerForm.GetCurrentUser());
-            var newStatus = SelectedEvent.EventData.StatusLib.SelectedEntities.Last();
-            ownerForm.AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
-            dataGridManager.SetStatusInRow(dataGridView.Rows[SelectedEventNum], SelectedEvent.EventData);
-            SelectedEvent.SetRowStyle(dataGridView.Rows[SelectedEventNum]);
-            ownerForm.SelectBlankStatus();
-            SerializeEvents();        
+
+            IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+            SelectedEvent.EventData = eventCrud.UpdateStatusAndSendOutEvent(SelectedEvent.EventData, eventControls.ControllerSet.client.GetUser());
+
+            IndicateNewStatus();
+
+            eventControls.ControllerSet.statusControlsManager.SelectBlankStatus();
+            SerializeEvents();
         }
 
         private UiEvent AddStatusToUiEvent(UiEvent Event, BllStatus status)
         {
             Event.EventData.StatusLib.SelectedEntities.Add(new BllSelectedStatus { Entity = status });
-            return EventHelper.CreateEventAccordingToStatusOrUser(Event, ownerForm.GetCurrentUser());
+            return EventHelper.CreateEventAccordingToStatusOrUser(Event, eventControls.ControllerSet.client.GetUser());
         }
 
-        public void AdmitEventAsAcquainted()
+        private void IndicateNewStatus()
         {
-            IEventCRUD crud = new EventCRUD(client.GetServerInstance().server);
-            SelectedEvent.EventData = crud.UpdateAcceptedUsersAndSendOutEvent(SelectedEvent.EventData, ownerForm.GetCurrentUser());
-            SelectedEvent = new RegularEvent(SelectedEvent);
-            Events[SelectedEventNum] = SelectedEvent;
+            var newStatus = EventHelper.GetCurrentEventStatusWithDate(SelectedEvent.EventData);
+            eventControls.ControllerSet.statusControlsManager.AddStatusToDataGrid(newStatus.Entity.Name, newStatus.Date);
+            dataGridPopulationManager.SetStatusInRow(dataGridView.Rows[SelectedEventNum], SelectedEvent.EventData);
             SelectedEvent.SetRowStyle(dataGridView.Rows[SelectedEventNum]);
-            ownerForm.indication.DecNewEventsCount();
-            SerializeEvents();
         }
 
         public void RemoveEvent(int rowNum)
@@ -449,19 +433,13 @@ namespace Client.EventClasses
             SerializeEvents();
         }
 
-        public void SetEventNote(string note)
-        {
-            SelectedEvent.Note = note;
-            dataGridManager.SetNoteToRow(dataGridView.Rows[SelectedEventNum], note);
-        }
-
         public void SerializeEvents()
         {
             Serializer serializer = new Serializer();
             serializer.SerializeEventsBackground(Events);
         }
 
-        public void StartCheckoutsOnTimer()
+        public void StartOtkStatusCheckoutsOnTimer()
         {
             new Thread(() =>
             {
@@ -478,31 +456,11 @@ namespace Client.EventClasses
         {
             if (AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_OTK_STATUS))
             {
-                DateTime now = GetDateTimeNow();
+                DateTime now = DateTimeHelper.GetDateTimeNow(eventControls.ControllerSet.client);
                 for (int i = 0; i < Events.Count; i++)
                 {
                     StatusStyleManager.MakeGreenStatusForOTK(Events[i], dataGridView.Rows[i], now);
                 }
-            }
-        }
-
-        private DateTime GetDateTimeNow()
-        {
-            client.PingServerAndIndicateHisStateOnControls();
-            if (client.isServerOnline)
-            {
-                try
-                {
-                    return client.GetServerInstance().server.GetDateTime();
-                }
-                catch
-                {
-                    return DateTime.Now;
-                }
-            }
-            else
-            {
-                return DateTime.Now;
             }
         }
 

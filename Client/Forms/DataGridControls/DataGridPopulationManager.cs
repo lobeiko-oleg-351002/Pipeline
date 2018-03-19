@@ -8,11 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Client.EventClasses
+namespace Client.Forms.DataGridControls
 {
-    public class DataGridManager
+    public class DataGridPopulationManager
     {
         static Dictionary<string, int> ColumnIndicies = new Dictionary<string, int>();
+        DataGridView grid;
 
         const string COL_SENDER = "От";
         const string COL_TITLE = "Заголовок";
@@ -27,29 +28,28 @@ namespace Client.EventClasses
         const string DATE_FORMAT = "dd.MM.yyyy";
         const string TIME_FORMAT = "HH:mm";
 
-        public DataGridManager(DataGridView dataGridView)
+        public DataGridPopulationManager(DataGridView dataGridView)
         {
             InitDataGridView(dataGridView);
+            grid = dataGridView;
         }
 
-        public DataGridView InitDataGridView(DataGridView grid)
+        public void InitDataGridView(DataGridView grid)
         {
             ColumnIndicies.Clear();
 
             grid.Columns.Add(CreateTextColumn(true, 0, COL_SENDER));
             grid.Columns.Add(CreateTextColumn(true, 0, COL_TITLE));
-            grid.Columns.Add(CreateTextColumn(true, 0, COL_DATE));
-            grid.Columns.Add(CreateTextColumn(false, 60, COL_TIME));
+            grid.Columns.Add(CreateTextColumn(true, 73, COL_DATE));
+            grid.Columns.Add(CreateTextColumn(false, 50, COL_TIME));
             grid.Columns.Add(CreateTextColumn(true, 0, COL_STATUS));
             grid.Columns.Add(CreateTextColumn(true, 90, COL_ATTRIBUTE));
             grid.Columns.Add(CreateButtonColumn(false, 50, COL_FILE));
             grid.Columns.Add(CreateTextColumn(false, 0, COL_DESCTIPTION));
             grid.Columns.Add(CreateTextColumn(false, 0, COL_NOTE));
-
-            return grid;
         }
 
-        public void AddRowToDataGridUsingEvent(DataGridView grid, UiEvent uiEvent)
+        public void AddRowToDataGridUsingEvent(UiEvent uiEvent)
         {
             DataGridViewRow row = new DataGridViewRow();
             row.CreateCells(grid);
@@ -176,20 +176,19 @@ namespace Client.EventClasses
             return clickedColumn;
         }
 
-
-        public void PopulateDataGrid(List<UiEvent> events, DataGridView grid)
+        public void PopulateDataGrid(List<UiEvent> events)
         {
             try
             {
                 grid.Rows.Clear();
                 foreach (var item in events)
                 {
-                    AddRowToDataGridUsingEvent(grid, item);
+                    AddRowToDataGridUsingEvent(item);
                 }
             }
             catch
             {
-                PopulateDataGrid(events, grid);
+                PopulateDataGrid(events);
             }
         }
 

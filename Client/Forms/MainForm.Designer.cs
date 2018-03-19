@@ -33,6 +33,7 @@
             this.переслатьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.создатьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
@@ -62,7 +63,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -90,14 +90,12 @@
             this.создатьСобытиеToolStripMenuItem1.Name = "создатьСобытиеToolStripMenuItem1";
             this.создатьСобытиеToolStripMenuItem1.Size = new System.Drawing.Size(112, 20);
             this.создатьСобытиеToolStripMenuItem1.Text = "Создать событие";
-            this.создатьСобытиеToolStripMenuItem1.Click += new System.EventHandler(this.создатьСобытиеToolStripMenuItem_Click);
             // 
             // переслатьСобытиеToolStripMenuItem
             // 
             this.переслатьСобытиеToolStripMenuItem.Name = "переслатьСобытиеToolStripMenuItem";
             this.переслатьСобытиеToolStripMenuItem.Size = new System.Drawing.Size(127, 20);
             this.переслатьСобытиеToolStripMenuItem.Text = "Переслать событие";
-            this.переслатьСобытиеToolStripMenuItem.Click += new System.EventHandler(this.переслатьСобытиеToolStripMenuItem_Click);
             // 
             // удалитьСобытиеToolStripMenuItem
             // 
@@ -105,21 +103,25 @@
             this.удалитьСобытиеToolStripMenuItem.Name = "удалитьСобытиеToolStripMenuItem";
             this.удалитьСобытиеToolStripMenuItem.Size = new System.Drawing.Size(113, 20);
             this.удалитьСобытиеToolStripMenuItem.Text = "Удалить событие";
-            this.удалитьСобытиеToolStripMenuItem.Click += new System.EventHandler(this.удалитьСобытиеToolStripMenuItem_Click);
             // 
             // настройкиToolStripMenuItem
             // 
             this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
             this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
             this.настройкиToolStripMenuItem.Text = "Настройки";
-            this.настройкиToolStripMenuItem.Click += new System.EventHandler(this.настройкиToolStripMenuItem_Click);
+            // 
+            // выходToolStripMenuItem
+            // 
+            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
+            this.выходToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
+            this.выходToolStripMenuItem.Text = "Выход";
+            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
             // 
             // создатьСобытиеToolStripMenuItem
             // 
             this.создатьСобытиеToolStripMenuItem.Name = "создатьСобытиеToolStripMenuItem";
             this.создатьСобытиеToolStripMenuItem.Size = new System.Drawing.Size(112, 20);
             this.создатьСобытиеToolStripMenuItem.Text = "Создать событие";
-            this.создатьСобытиеToolStripMenuItem.Click += new System.EventHandler(this.создатьСобытиеToolStripMenuItem_Click);
             // 
             // dataGridView1
             // 
@@ -138,9 +140,6 @@
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1013, 384);
             this.dataGridView1.TabIndex = 2;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
-            this.dataGridView1.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dataGridView1_RowStateChanged);
             // 
             // label1
             // 
@@ -255,7 +254,6 @@
             this.button1.TabIndex = 22;
             this.button1.Text = "Изменить";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // comboBox1
             // 
@@ -263,12 +261,10 @@
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.Enabled = false;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(91, 584);
+            this.comboBox1.Location = new System.Drawing.Point(90, 584);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(362, 21);
+            this.comboBox1.Size = new System.Drawing.Size(364, 21);
             this.comboBox1.TabIndex = 23;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            this.comboBox1.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
             // 
             // label9
             // 
@@ -287,7 +283,7 @@
             this.groupBox1.Controls.Add(this.listView1);
             this.groupBox1.Location = new System.Drawing.Point(711, 493);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(285, 112);
+            this.groupBox1.Size = new System.Drawing.Size(285, 109);
             this.groupBox1.TabIndex = 25;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ознакомились";
@@ -297,7 +293,7 @@
             // 
             this.listView1.Location = new System.Drawing.Point(6, 26);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(279, 83);
+            this.listView1.Size = new System.Drawing.Size(273, 83);
             this.listView1.TabIndex = 40;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
@@ -323,7 +319,6 @@
             this.button2.TabIndex = 33;
             this.button2.Text = "Подтвердить";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // checkBox1
             // 
@@ -337,7 +332,6 @@
             this.checkBox1.TabIndex = 32;
             this.checkBox1.Text = "Получено";
             this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // dataGridView2
             // 
@@ -358,7 +352,6 @@
             this.dataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView2.Size = new System.Drawing.Size(363, 86);
             this.dataGridView2.TabIndex = 31;
-            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
             // 
             // Column10
             // 
@@ -392,13 +385,12 @@
             this.checkBox2.AutoSize = true;
             this.checkBox2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBox2.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.checkBox2.Location = new System.Drawing.Point(139, 7);
+            this.checkBox2.Location = new System.Drawing.Point(145, 7);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(101, 17);
             this.checkBox2.TabIndex = 38;
             this.checkBox2.Text = "Расположение";
             this.checkBox2.UseVisualStyleBackColor = true;
-            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
             // listBox2
             // 
@@ -407,9 +399,8 @@
             this.listBox2.FormattingEnabled = true;
             this.listBox2.Location = new System.Drawing.Point(12, 27);
             this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(228, 82);
+            this.listBox2.Size = new System.Drawing.Size(234, 82);
             this.listBox2.TabIndex = 37;
-            this.listBox2.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox2_DoubleClick);
             // 
             // label4
             // 
@@ -430,8 +421,6 @@
             this.richTextBox2.Size = new System.Drawing.Size(525, 35);
             this.richTextBox2.TabIndex = 40;
             this.richTextBox2.Text = "";
-            this.richTextBox2.TextChanged += new System.EventHandler(this.richTextBox2_TextChanged);
-            this.richTextBox2.Leave += new System.EventHandler(this.richTextBox2_Leave);
             // 
             // label6
             // 
@@ -442,13 +431,6 @@
             this.label6.Size = new System.Drawing.Size(51, 13);
             this.label6.TabIndex = 39;
             this.label6.Text = "Заметки";
-            // 
-            // выходToolStripMenuItem
-            // 
-            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(53, 20);
-            this.выходToolStripMenuItem.Text = "Выход";
-            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -481,7 +463,6 @@
             this.Name = "MainForm";
             this.Text = "Pipeline";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

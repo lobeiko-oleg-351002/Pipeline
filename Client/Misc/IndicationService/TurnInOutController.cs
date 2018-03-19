@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Misc.IndicationService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,26 +11,26 @@ namespace Client.Misc
     public class TurnInOutController
     {
         Form form;
-        NotifyIcon notifyIcon;
+        TrayIconController trayIconController;
 
-        public TurnInOutController(Form form, NotifyIcon notifyIcon)
+        public TurnInOutController(Form form, TrayIconController trayIconController)
         {
             this.form = form;
-            this.notifyIcon = notifyIcon;
+            this.trayIconController = trayIconController;
         }
 
         public void TurnInForm()
         {
             form.ShowInTaskbar = false;
             form.Hide();
-            notifyIcon.Visible = true;
+            trayIconController.ShowNotifyIcon();
         }
 
         public void TurnOutForm()
         {
             form.Show();
             form.ShowInTaskbar = true;
-            notifyIcon.Visible = false;
+            trayIconController.HideNotifyIcon();
         }
 
         public void TurnOutWithEventFormIfHidden()

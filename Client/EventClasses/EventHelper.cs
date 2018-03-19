@@ -41,6 +41,15 @@ namespace Client.EventClasses
             return source.StatusLib.SelectedEntities.Last().Entity;
         }
 
+        public static BllSelectedStatus GetCurrentEventStatusWithDate(BllEvent source)
+        {
+            if (source.StatusLib.SelectedEntities.Count == 0)
+            {
+                throw new NoItemsInCollectionException();
+            }
+            return source.StatusLib.SelectedEntities.Last();
+        }
+
         public static UiEvent CreateEventAccordingToStatusOrUser(UiEvent data, BllUser client)
         {
             try
@@ -77,13 +86,54 @@ namespace Client.EventClasses
             return false;
         }
 
-        private static bool AreUsersEqual(BllUser user1, BllUser user2)
+        public static bool AreUsersEqual(BllUser user1, BllUser user2)
         {
             if (user1.Login == user2.Login)
             {
                 return true;
             }
             return false;
+        }
+
+        public static bool IsUserInChecklistByLogin(BllUser user, List<BllSelectedUser> list)
+        {
+            foreach (var item in list)
+            {
+                if (item.Entity.Login == user.Login)
+                {
+                    if (item.IsEventAccepted)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static void MarkRecieverInLib(BllUserLib RecieverLib, BllUser reciever)
+        {
+            foreach (var item in RecieverLib.SelectedEntities)
+            {
+                if (AreUsersEqual(item.Entity, reciever))
+                {
+                    item.IsEventAccepted = true;
+                    break;
+                }
+            }
+        }
+
+        public static List<UiEvent> CreateSuitableUiEvents(List<BllEvent> events, BllUser user)
+        {
+            List<UiEvent> suitableEvents = new List<UiEvent>();
+            foreach (var item in events)
+            {
+                suitableEvents.Add(CreateEventAccordingToStatusOrUser(new UiEvent(item, ""), user));
+            }
+            return suitableEvents;
         }
     }
 

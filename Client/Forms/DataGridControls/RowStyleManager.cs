@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Client.EventClasses
+namespace Client.Forms.DataGridControls
 {
     public static class RowStyleManager
     {

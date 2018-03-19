@@ -10,8 +10,14 @@ namespace Client.EventClasses.Sorting
     {
         public override void Sort(List<UiEvent> events)
         {
-            events.Sort((x, y) => Direction * string.Compare(x.EventData.StatusLib.SelectedEntities.Count != 0 ? x.EventData.StatusLib.SelectedEntities.Last().Entity.Name : "",
-                                                             y.EventData.StatusLib.SelectedEntities.Count != 0 ? y.EventData.StatusLib.SelectedEntities.Last().Entity.Name : ""));
+            events.Sort((x, y) => Direction * string.Compare(x.EventData.StatusLib.SelectedEntities.Count != 0 ? GetStatusString(x) : "",
+                                                             y.EventData.StatusLib.SelectedEntities.Count != 0 ? GetStatusString(y) : ""));
+        }
+
+        private string GetStatusString(UiEvent Event)
+        {
+            var status = EventHelper.GetCurrentEventStatusWithDate(Event.EventData);
+            return status.Entity.Name + " " + status.Date.ToString();
         }
     }
 }

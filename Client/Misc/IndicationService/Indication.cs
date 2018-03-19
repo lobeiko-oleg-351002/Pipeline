@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Misc.IndicationService;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Client.Misc
         private int NewStatusesCount;
         private Form form;
         private string formName;
-        private NotifyIcon notifyIcon = new NotifyIcon();
+        TrayIconController trayIconController;
         private TurnInOutController turnInOutController = null;
 
         public Indication(Form form)
@@ -23,14 +24,15 @@ namespace Client.Misc
             NewStatusesCount = 0;
             this.form = form;
             formName = Properties.Resources.CLIENT_NAME;
-            InitTrayIcon();
-            turnInOutController = new TurnInOutController(form, notifyIcon);
-            IndicateMissedEventsAndStatuses();
-        }
 
-        public void HideNotifyIcon()
-        {
-            notifyIcon.Visible = false;
+            IconSet iconSet = new IconSet(
+                form.Icon,
+                new Icon(Properties.Resources.NewEventTray, new Size(32, 32)),
+                new Icon(Properties.Resources.ServerOfflineTray, new Size(32, 32)));
+
+            trayIconController = new TrayIconController(iconSet, notifyIcon_MouseDoubleClick);
+            turnInOutController = new TurnInOutController(form, trayIconController);
+            IndicateMissedEventsAndStatuses();
         }
 
         public void IncNewEventsCount()
@@ -73,7 +75,7 @@ namespace Client.Misc
                 form.Text += " (" + NewEventsCount + ")";
                 haveMissedEvents = true;
                 FlashWindow.Start(form);
-                SetTrayNewEventIcon();
+                trayIconController.SetTrayNewEventIcon();
             }
 
             bool isTrayStatusEnabled = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS);
@@ -85,7 +87,7 @@ namespace Client.Misc
 
                 if (isTrayStatusEnabled)
                 {
-                    SetTrayNewEventIcon();
+                    trayIconController.SetTrayNewEventIcon();
                 }
                 if (isTaskbarStatusEnabled)
                 {
@@ -96,7 +98,7 @@ namespace Client.Misc
             if (!haveMissedEvents)
             {
                 FlashWindow.Stop(form);
-                SetTrayCommontIcon();
+                trayIconController.SetTrayCommontIcon();
             }
         }
 
@@ -107,41 +109,9 @@ namespace Client.Misc
             return name;
         }
 
-        public void DealWithTrayIcon()
+        public void HideForm()
         {
-            if ((NewEventsCount > 0) )
-            {
-                SetTrayNewEventIcon();
-            }
-            else
-            {
-                SetTrayCommontIcon();
-            }
-        }
-
-        private void SetTrayNewEventIcon()
-        {
-            notifyIcon.Icon = new Icon(Properties.Resources.NewEventTray, new Size(32, 32));
-        }
-
-        public void SetTrayServerOfflineIcon()
-        {
-            notifyIcon.Icon = new Icon(Properties.Resources.ServerOfflineTray, new Size(32, 32));
-        }
-
-        private void SetTrayCommontIcon()
-        {
-            notifyIcon.Icon = form.Icon;
-        }
-
-        private void InitTrayIcon()
-        {
-            notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
-            notifyIcon.BalloonTipText = "Программа работает в фоновом режиме.";
-            notifyIcon.BalloonTipTitle = Properties.Resources.CLIENT_NAME; ;
-            notifyIcon.Icon = form.Icon;
-            notifyIcon.Text = Properties.Resources.CLIENT_NAME; ;
-            notifyIcon.MouseDoubleClick += notifyIcon_MouseDoubleClick;
+            turnInOutController.TurnInForm();
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -150,9 +120,14 @@ namespace Client.Misc
             IndicateMissedEventsAndStatuses();
         }
 
-        public void HideForm()
+        public void DealWithTrayIcon()
         {
-            turnInOutController.TurnInForm();
+            trayIconController.DealWithTrayIcon(NewEventsCount);
+        }
+
+        public void SetTrayServerOfflineIcon()
+        {
+            trayIconController.SetTrayServerOfflineIcon();
         }
     }
 }

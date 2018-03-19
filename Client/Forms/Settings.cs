@@ -14,9 +14,6 @@ namespace Client.Forms
 {
     public partial class Settings : ParentForm
     {
-
-        bool hideClosedEvents = false;
-
         public Settings()
         {
             InitializeComponent();
@@ -87,12 +84,10 @@ namespace Client.Forms
             if (checkBox1.Checked)
             {
                 numericUpDown1.Enabled = true;
-                hideClosedEvents = true;
             }
             else
             {
                 numericUpDown1.Enabled = false;
-                hideClosedEvents = false;
             }
         }
 
