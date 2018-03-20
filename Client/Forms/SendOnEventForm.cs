@@ -24,11 +24,11 @@ namespace Client.Forms
         BllEvent Event;
         ServerInstance serverInstance;
 
-        public SendOnEventForm(ServerInstance server, BllEvent Event, BllUser sender)
+        public SendOnEventForm(ServerInstance serverInstance, BllEvent Event, BllUser sender)
         {
             InitializeComponent();
             this.Event = Event;
-            this.serverInstance = server;
+            this.serverInstance = serverInstance;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -56,6 +56,21 @@ namespace Client.Forms
 
         private void button2_Click(object sender, EventArgs e)
         {
+            List<BllUser> newRecievers = GetNewRecieversAccordingToCheckedNodes();
+            try
+            {
+                IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
+                eventCRUD.UpdateRecieversAndSendOnEvent(Event, newRecievers);
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private List<BllUser> GetNewRecieversAccordingToCheckedNodes()
+        {
             List<BllUser> newRecievers = new List<BllUser>();
             int nodeCount = 0;
             foreach (TreeNode groupNode in treeView1.Nodes)
@@ -69,17 +84,7 @@ namespace Client.Forms
                 }
                 nodeCount += groupNode.GetNodeCount(false);
             }
-
-            try
-            {
-                IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
-                eventCRUD.UpdateRecieversAndSendOnEvent(Event, newRecievers);
-                Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            return newRecievers;
         }
 
         private void SendOnEventForm_Load(object sender, EventArgs e)
@@ -87,53 +92,12 @@ namespace Client.Forms
             PopulateRecieverTreeView();
         }
 
-        private List<BllGroup> GetGroupsFromServer()
-        {
-            bool success = false;
-            List<BllGroup> groups = new List<BllGroup>();
-            while (!success)
-            {
-                try
-                {
-                    IGroupGetter gg = new GroupGetter(serverInstance.server);
-                    groups = gg.GetAllGroups();
-                    success = true;
-                }
-                catch
-                {
-                    serverInstance.ConnectToServer();
-                    success = false;
-                }
-            }
-            return groups;
-        }
-
         private void PopulateRecieverTreeView()
         {
-            List<BllGroup> groups = GetGroupsFromServer();
+            GroupService groupService = new GroupService(serverInstance);
+            List<BllGroup> groups = groupService.GetGroups();
 
             SetTreeViewNodes(groups);
-        }
-
-        private IEnumerable<BllUser> GetUserByGroups(BllGroup group)
-        {
-            IEnumerable<BllUser> users = null;
-            bool success = false;
-            while (!success)
-            {
-                try
-                {
-                    IUserGetter ug = new UserGetter(serverInstance.server);
-                    users = ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
-                    success = true;
-                }
-                catch
-                {
-                    serverInstance.ConnectToServer();
-                    success = false;
-                }
-            }
-            return users;
         }
 
         private void AddNewRecieversToTreeViewNode(IEnumerable<BllUser> users, TreeNode node)
@@ -159,10 +123,11 @@ namespace Client.Forms
 
         private void SetTreeViewNodes(List<BllGroup> groups)
         {
+            UserService userService = new UserService(serverInstance);
             foreach (var group in groups)
             {
                 var node = treeView1.Nodes.Add(group.Name);
-                IEnumerable<BllUser> users = GetUserByGroups(group);
+                List<BllUser> users = userService.GetUsersByGroup(group);
                 AddNewRecieversToTreeViewNode(users, node);
                 if (node.Nodes.Count == 0)
                 {

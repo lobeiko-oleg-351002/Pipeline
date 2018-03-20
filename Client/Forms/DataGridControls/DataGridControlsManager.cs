@@ -21,7 +21,7 @@ namespace Client.Forms.DataGridControls
             dataGridControls.DataGrid.CellContentClick += dataGridView_CellContentClick;
             dataGridControls.DataGrid.ColumnHeaderMouseClick += dataGridView_ColumnHeaderMouseClick;
             dataGridControls.DataGrid.RowStateChanged += dataGridView_RowStateChanged;
-            dataGridPopulationManager = new DataGridPopulationManager(dataGridControls.DataGrid);
+            dataGridPopulationManager = new DataGridPopulationManager(dataGridControls.DataGrid, dataGridControls.ParentFormControl);
         }
 
         public int GetSelectedRowIndex()
@@ -72,12 +72,9 @@ namespace Client.Forms.DataGridControls
             {
                 if (GetSelectedRowIndex() == rowNum)
                 {
-                  //  Invoke(new Action(() =>
-                  //  {
                     dataGridControls.ControllerSet.statusControlsManager.PopulateStatusDataGridUsingStatusLib(source.StatusLib);
                     dataGridControls.ControllerSet.recieverControlsManager.FillUserChecklist(source.RecieverLib.SelectedEntities);
                     HandleStatusChanging();
-                   // }));
                 }
             }
         }
@@ -116,7 +113,6 @@ namespace Client.Forms.DataGridControls
                 dataGridControls.ControllerSet.mainFormControlsManager.ClearDataControls();
                 return;
             }
-            //SelectedRowIndex = dataGridView1.SelectedRows[0].Index
             dataGridControls.ControllerSet.mainFormControlsManager.EnableSendOnEventButton();
             UpdateSelectedEventUsingEventManager();
             dataGridControls.ControllerSet.recieverControlsManager.UncheckCheckBox();

@@ -14,6 +14,7 @@ namespace Client.Forms.DataGridControls
     {
         static Dictionary<string, int> ColumnIndicies = new Dictionary<string, int>();
         DataGridView grid;
+        Control ParentFormControl;
 
         const string COL_SENDER = "От";
         const string COL_TITLE = "Заголовок";
@@ -28,10 +29,11 @@ namespace Client.Forms.DataGridControls
         const string DATE_FORMAT = "dd.MM.yyyy";
         const string TIME_FORMAT = "HH:mm";
 
-        public DataGridPopulationManager(DataGridView dataGridView)
+        public DataGridPopulationManager(DataGridView dataGridView, Control ParentFormControl)
         {
             InitDataGridView(dataGridView);
             grid = dataGridView;
+            this.ParentFormControl = ParentFormControl;
         }
 
         public void InitDataGridView(DataGridView grid)
@@ -70,7 +72,10 @@ namespace Client.Forms.DataGridControls
 
             uiEvent.SetRowStyle(row);
 
-            grid.Rows.Add(row);
+            ParentFormControl.Invoke(new Action(() =>
+            {
+                grid.Rows.Add(row);
+            }));
 
             StatusStyleManager.SetStatusStyle(uiEvent, row);
         }
@@ -81,7 +86,6 @@ namespace Client.Forms.DataGridControls
             {
                 var status = Event.StatusLib.SelectedEntities.Last();
                 row.Cells[ColumnIndicies[COL_STATUS]].Value = status.Entity.Name + " " + status.Date;
-
             }
         }
 

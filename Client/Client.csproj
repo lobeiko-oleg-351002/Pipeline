@@ -81,6 +81,7 @@
     <Compile Include="Misc\IndicationService\TrayIconController.cs" />
     <Compile Include="Misc\Serialization\EventSerializer.cs" />
     <Compile Include="Misc\Serialization\Serializer.cs" />
+    <Compile Include="ServerManager\AttributeService.cs" />
     <Compile Include="ServerManager\ClientLauncher.cs" />
     <Compile Include="CustomExceptions\ConnectionFailedException.cs" />
     <Compile Include="ServerManager\Authorization.cs" />
@@ -130,7 +131,7 @@
     <Compile Include="Forms\Settings.Designer.cs">
       <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
-    <Compile Include="EventClasses\ClientCallback.cs" />
+    <Compile Include="Forms\EventControls\ClientCallback.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Forms\SignInForm.cs">
@@ -149,12 +150,14 @@
     <Compile Include="ServerManager\EntityProxy\Interface\IStatusGetter.cs" />
     <Compile Include="ServerManager\EntityProxy\Interface\IUserGetter.cs" />
     <Compile Include="ServerManager\EntityProxy\UserGetter.cs" />
+    <Compile Include="ServerManager\GroupService.cs" />
     <Compile Include="ServerManager\ServerInstance.cs" />
     <Compile Include="ServerManager\AuthorizationProxy.cs" />
     <Compile Include="ServerManager\EntityProxy\EventCRUD.cs" />
     <Compile Include="ServerManager\EntityProxy\StatusGetter.cs" />
     <Compile Include="Misc\Sha1.cs" />
     <Compile Include="CustomExceptions\UserIsNullException.cs" />
+    <Compile Include="ServerManager\UserService.cs" />
     <EmbeddedResource Include="Forms\AddEventForm.resx">
       <DependentUpon>AddEventForm.cs</DependentUpon>
     </EmbeddedResource>

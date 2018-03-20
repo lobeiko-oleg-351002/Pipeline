@@ -20,22 +20,20 @@ namespace Client.EventClasses
 {
     public class ClientCallback : IClientCallBack
     {
-        EventManager eventManager;
         IFormControllerSet formControllerSet;
         public ClientCallback(IFormControllerSet set)
         {
-            this.eventManager = set.eventManager;
             formControllerSet = set;
         }
 
         public void GetEvent(BllEvent Event)
         {
             UiEvent newEvent = new NewEvent(Event, "");
-            eventManager.AddNewEvent(newEvent);
-            eventManager.SerializeEvents();            
+            formControllerSet.eventManager.AddNewEvent(newEvent);
+            formControllerSet.eventManager.SerializeEvents();            
             Signal.PlaySignalAccordingToEventConfigValue();
-            eventManager.SortEventsUsingLastOrderFromCache();
-            eventManager.HideClosedEventsAccordingToConfigValue();
+            formControllerSet.eventManager.SortEventsUsingLastOrderFromCache();
+            formControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
         }
 
         public void Ping()
@@ -45,16 +43,16 @@ namespace Client.EventClasses
 
         public void UpdateEvent(BllEvent Event)
         {
-            int row = eventManager.GetEventNumById(Event.Id);
-            UiEvent updatingEvent = eventManager.GetEventByRowNum(row);
+            int row = formControllerSet.eventManager.GetEventNumById(Event.Id);
+            UiEvent updatingEvent = formControllerSet.eventManager.GetEventByRowNum(row);
             if (EventHelper.IsTargetStatusObsolete(Event, updatingEvent.EventData))
             {
                 updatingEvent.EventData = Event;
-                eventManager.UpdateEventAccordingToCurrentStatus(updatingEvent, row);
+                formControllerSet.eventManager.UpdateEventAccordingToCurrentStatus(updatingEvent, row);
             }
             updatingEvent.EventData = Event;
             formControllerSet.dataGridControlsManager.UpdateSelectedEvent(Event, row);
-            eventManager.SerializeEvents();           
+            formControllerSet.eventManager.SerializeEvents();           
         }
     }
 }

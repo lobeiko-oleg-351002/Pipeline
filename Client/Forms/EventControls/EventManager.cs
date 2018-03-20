@@ -24,7 +24,7 @@ namespace Client.Forms.EventControls
         DataGridPopulationManager dataGridPopulationManager;
         DataGridView dataGridView;
         EventControls eventControls;
-        List<UiEvent> Events;
+        public List<UiEvent> Events { get; private set; }
         public ClientCallback clientCallback;
 
         const int DIRECTION_MULTIPLIER = -1;
@@ -352,7 +352,7 @@ namespace Client.Forms.EventControls
                 DateTime now = DateTimeHelper.GetDateTimeNow(eventControls.ControllerSet.client);
                 for (int i = 0; i < Events.Count; i++)
                 {
-                    if (Events[i].EventState == EventStates.ClosedEvent)
+                    if ((Events[i].EventState == EventStates.ClosedEvent) && (Events[i].MissedStatus == false))
                     {
                         var currentStatusDate = EventHelper.GetCurrentEventStatusWithDate(Events[i].EventData).Date;
                         if (currentStatusDate.AddDays(days).CompareTo(now) < 0)

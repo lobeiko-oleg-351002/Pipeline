@@ -46,7 +46,7 @@ namespace Client.Forms
 
             if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
-                CheckUserNodesAccordingEventType(Sender.EventTypeLib.SelectedEntities[0].Entity.Id);
+                CheckUserNodesAccordingToEventType(Sender.EventTypeLib.SelectedEntities[0].Entity.Id);
             }
         }
 
@@ -65,21 +65,8 @@ namespace Client.Forms
 
         private void PopulateAttributeCheckList()
         {
-            bool success = false;
-            while (!success)
-            {
-                try
-                {
-                    IAttributeGetter ag = new AttributeGetter(serverInstance.server);
-                    Attributes = ag.GetAllAttributes();
-                    success = true;
-                }
-                catch
-                {
-                    serverInstance.ConnectToServer();
-                    success = false;
-                }
-            }
+            AttributeService attributeService = new AttributeService(serverInstance);
+            Attributes = attributeService.GetAttributes();
             foreach (var attribute in Attributes)
             {
                 checkedListBox1.Items.Add(attribute.Name);
@@ -88,42 +75,13 @@ namespace Client.Forms
 
         private void PopulateRecieverTreeView()
         {
-            bool success = false;
-            List<BllGroup> groups = null;
-            while (!success)
-            {
-                try
-                {
-                    IGroupGetter gg = new GroupGetter(serverInstance.server);
-                    groups = gg.GetAllGroups();
-                    success = true;
-                }
-                catch
-                {
-                    serverInstance.ConnectToServer();
-                    success = false;
-                }
-            }
-
+            GroupService groupService = new GroupService(serverInstance);
+            var groups = groupService.GetGroups();
+            UserService userService = new UserService(serverInstance);
             foreach (var group in groups)
             {
                 var node = treeView1.Nodes.Add(group.Name);
-                List<BllUser> usersByGroup = new List<BllUser>();
-                success = false;
-                while (!success)
-                {
-                    try
-                    {
-                        IUserGetter ug = new UserGetter(serverInstance.server);
-                        usersByGroup = ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
-                        success = true;
-                    }
-                    catch
-                    {
-                        serverInstance.ConnectToServer();
-                        success = false;
-                    }
-                }
+                var usersByGroup = userService.GetUsersByGroup(group);
                 foreach (var user in usersByGroup)
                 {
                     if (user.Id != Sender.Id)
@@ -153,7 +111,7 @@ namespace Client.Forms
             }
         }
 
-        private void CheckUserNodesAccordingEventType(int eventId)
+        private void CheckUserNodesAccordingToEventType(int eventId)
         {
             UncheckAllNodes(treeView1.Nodes);
             treeView1.CollapseAll();
@@ -161,27 +119,31 @@ namespace Client.Forms
             if (nodesStr != null)
             {
                 List<string> nodes = nodesStr.Split(',').ToList();
-
                 foreach (TreeNode groupNode in treeView1.Nodes)
                 {
-                    bool toggle = false;
-                    if (nodes.Contains(groupNode.Text))
-                    {
-                        groupNode.Checked = true;
-                    }
-                    foreach (TreeNode userNode in groupNode.Nodes)
-                    {
-                        if (nodes.Contains(userNode.Text))
-                        {
-                            userNode.Checked = true;
-                            toggle = true;
-                        }
-                    }
-                    if (toggle)
-                    {
-                        groupNode.Toggle();
-                    }
+                    ToggleNodesWithCheckedUsers(groupNode, nodes);
                 }
+            }
+        }
+
+        private void ToggleNodesWithCheckedUsers(TreeNode groupNode, List<string> checkedNodes)
+        {
+            bool toggle = false;
+            if (checkedNodes.Contains(groupNode.Text))
+            {
+                groupNode.Checked = true;
+            }
+            foreach (TreeNode userNode in groupNode.Nodes)
+            {
+                if (checkedNodes.Contains(userNode.Text))
+                {
+                    userNode.Checked = true;
+                    toggle = true;
+                }
+            }
+            if (toggle)
+            {
+                groupNode.Toggle();
             }
         }
 
@@ -246,7 +208,6 @@ namespace Client.Forms
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                //ConnectToServerUsingParent();
             }
         }
 
@@ -273,9 +234,7 @@ namespace Client.Forms
                 }
                 Event.FilepathLib.Entities.Add(new BllFilepath { Path = fileName});
             }
-            //}
-            return true;
-            
+            return true;           
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -286,7 +245,7 @@ namespace Client.Forms
             {
                 textBox1.Text = comboBox2.Text;
             }
-            CheckUserNodesAccordingEventType(type.Id);
+            CheckUserNodesAccordingToEventType(type.Id);
         }
 
         private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
@@ -326,7 +285,6 @@ namespace Client.Forms
             }
         }
 
-
         private void textBox1_Validating(object sender, CancelEventArgs e)
         {
             string pattern = "[\\\\~#%&*{}/:<>?|\"]";
@@ -346,7 +304,5 @@ namespace Client.Forms
             string eventTag = Event.Type.Id.ToString();
             AppConfigManager.AddKeyValue(eventTag, nodeName);
         }
-
-
     }
 }

@@ -120,7 +120,6 @@ namespace Client.Forms.RecieverControls
                 ShowChecklist();
                 EventHelper.MarkRecieverInLib(recieverControls.ControllerSet.SelectedEvent.EventData.RecieverLib, recieverControls.ControllerSet.client.GetUser());
                 recieverControls.ControllerSet.eventManager.AdmitEventAsAcquainted();
-                //recieverControls.parent.statusControlsManager.UpdateSelectedEventUsingEventManager();
                 FillUserChecklist(recieverControls.ControllerSet.SelectedEvent.EventData.RecieverLib.SelectedEntities);
                 recieverControls.ControllerSet.statusControlsManager.EnableStatusControls();                
             }

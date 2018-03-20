@@ -135,7 +135,7 @@ namespace Client
 
         private void InitDataGridControls()
         {
-            var dataGridControls = new DataGridControls(dataGridView1, this);
+            var dataGridControls = new DataGridControls(dataGridView1, this, this);
             dataGridControlsManager = new DataGridControlsManager(dataGridControls); 
         }
 
@@ -180,7 +180,6 @@ namespace Client
         {
             AddAppShortcutToStartup();
             TurnAppStartupInTrayAccordingToConfigValue();
-            //serverStateControlsManager.SetControlsAccordingToServerOffline();
         }
 
         public void ExitApp()

@@ -9,10 +9,12 @@ namespace Client.Forms.DataGridControls
     public class DataGridControls : FormControls
     {
         public readonly DataGridView DataGrid;
+        public readonly Control ParentFormControl;
 
-        public DataGridControls(DataGridView dataGrid, IFormControllerSet mainForm) : base(mainForm)
+        public DataGridControls(DataGridView dataGrid, Control parentFormControl, IFormControllerSet mainForm) : base(mainForm)
         {
             this.DataGrid = dataGrid;
+            this.ParentFormControl = parentFormControl;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Client.Forms
         UiEvent SelectedEvent { get; set; }
         ClientLauncher client { get; set; }
         EventManager eventManager { get; set; }
+        Indication indication { get; set; }
 
         FileControlsManager fileControlsManager { get; set; }
         NoteControlsManager noteControlsManager { get; set; }
@@ -32,6 +33,5 @@ namespace Client.Forms
         DataGridControlsManager dataGridControlsManager { get; set; }
         MainFormControlsManager mainFormControlsManager { get; set; }
         ServerStateControlsManager serverStateControlsManager { get; set; }
-        Indication indication { get; set; }
     }
 }
