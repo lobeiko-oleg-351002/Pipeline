@@ -28,7 +28,7 @@ namespace Client.Forms.DataGridControls
                 cell.Style.Font = style.Font;
             }
         }
-
+        
         public static void MakeRowBackgroundAsRegular(DataGridViewRow row)
         {
             row.DefaultCellStyle.ForeColor = Color.Black;

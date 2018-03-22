@@ -15,8 +15,10 @@ namespace Client.Misc
         private int NewStatusesCount;
         private Form form;
         private string formName;
-        TrayIconController trayIconController;
+        public TrayIconController trayIconController;
         private TurnInOutController turnInOutController = null;
+
+        public bool IsFlashing;
 
         public Indication(Form form)
         {
@@ -33,6 +35,18 @@ namespace Client.Misc
             trayIconController = new TrayIconController(iconSet, notifyIcon_MouseDoubleClick);
             turnInOutController = new TurnInOutController(form, trayIconController);
             IndicateMissedEventsAndStatuses();
+        }
+
+        private void StartFlashing()
+        {
+            FlashWindow.Start(form);
+            IsFlashing = true;
+        }
+
+        private void StopFlashing()
+        {
+            FlashWindow.Stop(form);
+            IsFlashing = false;
         }
 
         public void IncNewEventsCount()
@@ -74,7 +88,7 @@ namespace Client.Misc
             {
                 form.Text += " (" + NewEventsCount + ")";
                 haveMissedEvents = true;
-                FlashWindow.Start(form);
+                StartFlashing();
                 trayIconController.SetTrayNewEventIcon();
             }
 
@@ -91,13 +105,13 @@ namespace Client.Misc
                 }
                 if (isTaskbarStatusEnabled)
                 {
-                    FlashWindow.Start(form);
+                    StartFlashing();
                 }
             }
 
             if (!haveMissedEvents)
             {
-                FlashWindow.Stop(form);
+                StopFlashing();
                 trayIconController.SetTrayCommontIcon();
             }
         }

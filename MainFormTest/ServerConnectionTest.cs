@@ -27,6 +27,7 @@ namespace MainFormTest
         public void ConnectToServerWithWrongIp()
         {
             IServerInstance server = new ServerInstance("123", this);
+            server.ConnectToServer();
             server.PingServer();
         }
 

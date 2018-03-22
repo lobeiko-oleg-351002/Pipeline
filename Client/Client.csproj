@@ -59,6 +59,7 @@
     <Compile Include="Forms\DataGridControls\DataGridControlsManager.cs" />
     <Compile Include="Forms\FileControls\FileControls.cs" />
     <Compile Include="Forms\FileControls\FileControlsManager.cs" />
+    <Compile Include="Forms\FormControllerSet.cs" />
     <Compile Include="Forms\IFormControllerSet.cs" />
     <Compile Include="Forms\FormControls.cs" />
     <Compile Include="Forms\MainFormControls\MainFormControls.cs" />

@@ -7,8 +7,6 @@ namespace Client.Forms.EventControls
 {
     public class EventControls : FormControls
     {
-
-
         public EventControls(IFormControllerSet set) : base(set)
         {
 

@@ -1,49 +1,26 @@
 ﻿using BllEntities;
-using Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MainFormTest
+namespace MainFormTest.GetEvent
 {
-    [TestClass]
-    public class GetEventTest
+    public class TestEvent : BllEvent
     {
-        [TestMethod]
-        public void GetEventPositiveTest()
+        public TestEvent()
         {
-            string ExecutablePath = "E:\\Projects\\Visual Studio\\Pipeline\\MainFormTest\\bin\\Debug\\Client.exe";
-            MainForm mainForm = new MainForm(ExecutablePath);
-
-            BllEvent testEvent = CreateTestEvent();
-           // mainForm.GetEvent(testEvent);
-            //isTaskBarHighliths
-            //isTrayHighlights
-            //isDataContainersPopulatedProperly
-            //isProperRowSelected
-            //isListSortedProperly
-            //HasFilesDownloaded
-            //isRowBold
-        }
-
-        private BllEvent CreateTestEvent()
-        {
-            return new BllEvent
-            {
-                Id = 1,
-                AttributeLib = CreateAttributeLib(),
-                Date = DateTime.Now,
-                Description = "test",
-                FilepathLib = CreateFilepathLib(),
-                Name = "TestEvent1",
-                RecieverLib = CreateUserLib(),
-                StatusLib = CreateStatusLib(),
-                Sender = CreateUser("sender"),
-                Type = CreateEventType("eventtype")
-            };
+            Id = 1;
+            AttributeLib = CreateAttributeLib();
+            Date = DateTime.Now;
+            Description = "test";
+            FilepathLib = CreateFilepathLib();
+            Name = "TestEvent1";
+            RecieverLib = CreateUserLib();
+            StatusLib = CreateStatusLib();
+            Sender = CreateUser("sender");
+            Type = CreateEventType("eventtype");
         }
 
         private BllAttributeLib CreateAttributeLib()

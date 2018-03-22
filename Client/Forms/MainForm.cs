@@ -37,21 +37,9 @@ using System.Xml.Serialization;
 
 namespace Client
 {
-    public partial class MainForm : ParentForm, IFormControllerSet
+    public partial class MainForm : ParentForm
     {
-        public ClientLauncher client {get; set; }
-        public UiEvent SelectedEvent { get; set; }
-        public Indication indication { get; set; }
-
-        public StatusControlsManager statusControlsManager { get; set; }
-        public FileControlsManager fileControlsManager { get; set; }
-        public RecieverControlsManager recieverControlsManager { get; set; }
-        public NoteControlsManager noteControlsManager { get; set; }
-        public StaticControlsManager staticControlsManager { get; set; }
-        public DataGridControlsManager dataGridControlsManager { get; set; }
-        public MainFormControlsManager mainFormControlsManager { get; set; }
-        public ServerStateControlsManager serverStateControlsManager { get; set; }
-        public EventManager eventManager { get; set; }
+        public IFormControllerSet formControllerSet;
 
         static bool isAppClosed = false;
 
@@ -70,15 +58,15 @@ namespace Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            formControllerSet = new FormControllerSet();
             try
             {
                 InitControlManagers();
-                client = new ClientLauncher(eventManager.clientCallback, serverStateControlsManager);
-                client.Launch();
-                StatusesForOwner.Init(client.GetServerInstance());
-                eventManager.GetEventList();
-                eventManager.HideClosedEventsAccordingToConfigValue();
-                eventManager.StartOtkStatusCheckoutsOnTimer();
+                formControllerSet.client.Launch();
+                StatusesForOwner.Init(formControllerSet.client.GetServerInstance());
+                formControllerSet.eventManager.GetEventList();
+                formControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
+                formControllerSet.eventManager.StartOtkStatusCheckoutsOnTimer();
             }
             catch (UserIsNullException) //user has not logged in
             {
@@ -98,64 +86,65 @@ namespace Client
             InitMainFormControls();
             InitServerStateControls();
             InitEventManager();
-            indication = new Indication(this);
+            formControllerSet.indication = new Indication(this);
+            formControllerSet.client = new ClientLauncher(formControllerSet.eventManager.clientCallback, formControllerSet.serverStateControlsManager);
         }
 
         private void InitStatusControls()
         {
-            var statusControls = new StatusControls(dataGridView2, comboBox1, button1, this);
-            statusControlsManager = new StatusControlsManager(statusControls);
-            statusControlsManager.AddBlankStatusToComboBox();
+            var statusControls = new StatusControls(dataGridView2, comboBox1, button1, formControllerSet);
+            formControllerSet.statusControlsManager = new StatusControlsManager(statusControls);
+            formControllerSet.statusControlsManager.AddBlankStatusToComboBox();
         }
 
         private void InitFileControls()
         {
-            var fileControls = new FileControls(checkBox2, listBox2, this);
-            fileControlsManager = new FileControlsManager(fileControls);
-            fileControlsManager.SetOpenFileLocationCheckBoxAccordingToConfigValue();
+            var fileControls = new FileControls(checkBox2, listBox2, formControllerSet);
+            formControllerSet.fileControlsManager = new FileControlsManager(fileControls);
+            formControllerSet.fileControlsManager.SetOpenFileLocationCheckBoxAccordingToConfigValue();
         }
 
         private void InitRecieverControls()
         {
-            var recieverControls = new RecieverControls(groupBox1, groupBox4, checkBox1, button2, listView1, this);
-            recieverControlsManager = new RecieverControlsManager(recieverControls);
+            var recieverControls = new RecieverControls(groupBox1, groupBox4, checkBox1, button2, listView1, formControllerSet);
+            formControllerSet.recieverControlsManager = new RecieverControlsManager(recieverControls);
         }
 
         private void InitNoteControls()
         {
-            var noteControls = new NoteControls(richTextBox2, this);
-            noteControlsManager = new NoteControlsManager(noteControls);
+            var noteControls = new NoteControls(richTextBox2, formControllerSet);
+            formControllerSet.noteControlsManager = new NoteControlsManager(noteControls);
         }
 
         private void InitStaticControls()
         {
-            var staticControls = new StaticControls(textBox2, textBox4, textBox5, textBox3, richTextBox1, this);
-            staticControlsManager = new StaticControlsManager(staticControls);
+            var staticControls = new StaticControls(textBox2, textBox4, textBox5, textBox3, richTextBox1, formControllerSet);
+            formControllerSet.staticControlsManager = new StaticControlsManager(staticControls);
         }
 
         private void InitDataGridControls()
         {
-            var dataGridControls = new DataGridControls(dataGridView1, this, this);
-            dataGridControlsManager = new DataGridControlsManager(dataGridControls); 
+            var dataGridControls = new DataGridControls(dataGridView1, this, formControllerSet);
+            formControllerSet.dataGridControlsManager = new DataGridControlsManager(dataGridControls); 
         }
 
         private void InitMainFormControls()
         {
             var mainFormControls = new MainFormControls(создатьСобытиеToolStripMenuItem1, удалитьСобытиеToolStripMenuItem, переслатьСобытиеToolStripMenuItem,
-                выходToolStripMenuItem, настройкиToolStripMenuItem, this);
-            mainFormControlsManager = new MainFormControlsManager(mainFormControls);
+                выходToolStripMenuItem, настройкиToolStripMenuItem, formControllerSet);
+            formControllerSet.mainFormControlsManager = new MainFormControlsManager(mainFormControls);
         }
 
         private void InitServerStateControls()
         {
-            var serverStateControls = new ServerStateControls(label4, label9, this, this);
-            serverStateControlsManager = new ServerStateControlsManager(serverStateControls);
+            var serverStateControls = new ServerStateControls(label4, label9, this, formControllerSet);
+            formControllerSet.serverStateControlsManager = new ServerStateControlsManager(serverStateControls);
         }
 
         private void InitEventManager()
         {
-            var eventControls = new EventControls(this);
-            eventManager = new EventManager(eventControls);
+            var eventControls = new EventControls(formControllerSet);
+            formControllerSet.eventManager = new EventManager(eventControls);
         }
 
         private void AddAppShortcutToStartup()
@@ -193,14 +182,14 @@ namespace Client
             if (!isAppClosed)
             {
                 e.Cancel = true;
-                indication.HideForm();
+                formControllerSet.indication.HideForm();
             }
         }
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
             isAppClosed = true;
-            eventManager.SerializeEvents();
+            formControllerSet.eventManager.SerializeEvents();
             Application.Exit();
         }
 
