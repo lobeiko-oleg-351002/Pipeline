@@ -70,5 +70,16 @@ namespace DAL.Repositories
             //date + range > now
             return DateTime.Now.CompareTo(date.AddDays(rangeInDays)) < 0;
         }
+
+        public List<DalUser> GetApprovers()
+        {
+            List<DalUser> users = new List<DalUser>();
+
+            foreach (var item in context.Users.Where(entity => entity.rightToApprove == true))
+            {
+                users.Add(mapper.MapToDal(item));
+            }
+            return users;
+        }
     }
 }

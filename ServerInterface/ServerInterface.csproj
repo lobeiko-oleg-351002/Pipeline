@@ -46,6 +46,7 @@
     <Compile Include="DataInteface\IStatusService.cs" />
     <Compile Include="DataInteface\IUserService.cs" />
     <Compile Include="FileUploadMessage.cs" />
+    <Compile Include="IEventApprovement.cs" />
     <Compile Include="IFileService.cs" />
     <Compile Include="IBusinessService.cs" />
     <Compile Include="IClientCallBack.cs" />

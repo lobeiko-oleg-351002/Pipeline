@@ -21,7 +21,8 @@ namespace DAL.Mapping
                 Group_id = entity.group_id,
                 EventTypeLib_id = entity.eventTypeLib_id,
                 StatusLib_id = entity.statusLib_id,
-                SignInDate = entity.signInDate
+                SignInDate = entity.signInDate,
+                RightToApprove = entity.rightToApprove
             };
         }
 
@@ -36,7 +37,8 @@ namespace DAL.Mapping
                 group_id = entity.Group_id,
                 eventTypeLib_id = entity.EventTypeLib_id,
                 statusLib_id = entity.StatusLib_id,
-                signInDate = entity.SignInDate
+                signInDate = entity.SignInDate,
+                rightToApprove = entity.RightToApprove
             };
         }
     }

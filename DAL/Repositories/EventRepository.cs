@@ -21,18 +21,13 @@ namespace DAL.Repositories
         public IEnumerable<DalEvent> GetEventsForUser(int user_id)
         {
             EventMapper mapper = new EventMapper();
-            //var user = context.Set<User>().FirstOrDefault(entity => entity.id == user_id);
-            //foreach (var element in user.SelectedUser)
-            //{
-            //    var ev = element.UserLib.Event;
-            //    if (ev.Count != 0 && ev.Status != delted or closed)
-            //    {
-            //        retElemets.Add(mapper.MapToDal(ev.First()));
-            //    }
-            //}
-            var events = context.Set<Event>().Where(entity => entity.UserLib.SelectedUser.Any(e => e.User.id == user_id));            
+            var events = context.Set<Event>().Where(entity => entity.UserLib.SelectedUser.Any(e => e.User.id == user_id)
+                && (entity.sender_id == user_id 
+                    || (entity.approver_id != null ? entity.approver_id.Value == user_id : false)
+                    || (entity.isApproved != null ? entity.isApproved.Value : false))
+                 );
             var retElemets = new List<DalEvent>();
-            foreach(var item in events)
+            foreach (var item in events)
             {
                 retElemets.Add(mapper.MapToDal(item));
             }

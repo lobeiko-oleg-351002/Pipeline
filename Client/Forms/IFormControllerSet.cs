@@ -1,5 +1,6 @@
 ﻿using Client.EventClasses;
 using Client.EventClasses.Events;
+using Client.Forms.ApproveControls;
 using Client.Forms.DataGridControls;
 using Client.Forms.EventControls;
 using Client.Forms.FileControls;
@@ -33,5 +34,6 @@ namespace Client.Forms
         DataGridControlsManager dataGridControlsManager { get; set; }
         MainFormControlsManager mainFormControlsManager { get; set; }
         ServerStateControlsManager serverStateControlsManager { get; set; }
+        ApproveControlsManager approveControlsManager { get; set; }
     }
 }

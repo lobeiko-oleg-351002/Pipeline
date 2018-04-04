@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ServerInterface
 {
     [ServiceContract(CallbackContract = typeof(IClientCallBack))]
-    public interface IBusinessService : IStatusService, IEventTypeService, IAttributeService, IGroupService, IUserService
+    public interface IBusinessService : IStatusService, IEventTypeService, IAttributeService, IGroupService, IUserService, IEventApprovement
     {
         [OperationContract]
         BllUser SignIn(string login, string password);

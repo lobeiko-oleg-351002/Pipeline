@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="CustomExceptions\NoItemsInCollectionException.cs" />
     <Compile Include="EventClasses\EventHelper.cs" />
+    <Compile Include="Forms\ApproveControls\ApproveControls.cs" />
+    <Compile Include="Forms\ApproveControls\ApproveControlsManager.cs" />
     <Compile Include="Forms\EventControls\EventControls.cs" />
     <Compile Include="Forms\EventControls\EventManager.cs" />
     <Compile Include="EventClasses\Events\ClosedEvent.cs" />

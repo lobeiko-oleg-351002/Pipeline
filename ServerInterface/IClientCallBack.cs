@@ -16,6 +16,12 @@ namespace ServerInterface
         void UpdateEvent(BllEvent Event);
 
         [OperationContract(IsOneWay = true)]
+        void DisapproveEvent(BllEvent Event);
+
+        [OperationContract(IsOneWay = true)]
+        void ApproveEvent(BllEvent Event);
+
+        [OperationContract(IsOneWay = true)]
         void Ping();
 
     }

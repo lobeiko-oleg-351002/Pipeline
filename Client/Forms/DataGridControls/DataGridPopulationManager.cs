@@ -17,6 +17,7 @@ namespace Client.Forms.DataGridControls
         Control ParentFormControl;
 
         const string COL_SENDER = "От";
+        const string COL_APPROVED = "Утвердил";
         const string COL_TITLE = "Заголовок";
         const string COL_DATE = "Дата";
         const string COL_TIME = "Время";
@@ -41,6 +42,7 @@ namespace Client.Forms.DataGridControls
             ColumnIndicies.Clear();
 
             grid.Columns.Add(CreateTextColumn(true, 0, COL_SENDER));
+            grid.Columns.Add(CreateTextColumn(true, 0, COL_APPROVED));
             grid.Columns.Add(CreateTextColumn(true, 0, COL_TITLE));
             grid.Columns.Add(CreateTextColumn(true, 73, COL_DATE));
             grid.Columns.Add(CreateTextColumn(false, 50, COL_TIME));
@@ -60,6 +62,11 @@ namespace Client.Forms.DataGridControls
             BllEvent Event = uiEvent.EventData;
 
             row.Cells[ColumnIndicies[COL_SENDER]].Value = Event.Sender.Fullname;
+            HandleApprovedMark(row, Event);
+            if ((Event.IsApproved != null) && (Event.IsApproved.Value == false))
+            {
+                SetDissaproveMark(row);
+            }
             row.Cells[ColumnIndicies[COL_TITLE]].Value = Event.Name;
             row.Cells[ColumnIndicies[COL_DATE]].Value = Event.Date.ToString(DATE_FORMAT);
             row.Cells[ColumnIndicies[COL_TIME]].Value = Event.Date.ToString(TIME_FORMAT);
@@ -80,6 +87,28 @@ namespace Client.Forms.DataGridControls
             StatusStyleManager.SetStatusStyle(uiEvent, row);
         }
 
+        private void HandleApprovedMark(DataGridViewRow row, BllEvent Event)
+        {
+            if (Event.Approver != null)
+            {
+                if (Event.IsApproved == null)
+                {
+                    SetApprovingWaitingMark(row);
+                }
+                else
+                {
+                    if (Event.IsApproved.Value == true)
+                    {
+                        row.Cells[ColumnIndicies[COL_APPROVED]].Value = Event.Approver.Fullname;
+                    }
+                    else
+                    {
+                        SetDissaproveMark(row);
+                    }
+                }
+            }
+        }
+
         public void SetStatusInRow(DataGridViewRow row, BllEvent Event)
         {
             if (Event.StatusLib.SelectedEntities.Count > 0)
@@ -93,7 +122,7 @@ namespace Client.Forms.DataGridControls
         {
             foreach (var attr in Event.AttributeLib.SelectedEntities)
             {
-                row.Cells[ColumnIndicies[COL_ATTRIBUTE]].Value += attr.Entity.Name + "; ";
+                row.Cells[ColumnIndicies[COL_ATTRIBUTE]].Value += attr.Entity.Name + " ";
             }
         }
 
@@ -229,6 +258,23 @@ namespace Client.Forms.DataGridControls
         public void SetNoteToRow(DataGridViewRow row, string note)
         {
             row.Cells[ColumnIndicies[COL_NOTE]].Value = note; 
+        }
+
+        public void SetDissaproveMark(DataGridViewRow row)
+        {
+            row.Cells[ColumnIndicies[COL_APPROVED]].Value = "Отклонено";
+            RowStyleManager.MakeCellRed(row.Cells[ColumnIndicies[COL_APPROVED]]);
+        }
+
+        public void SetApprovingWaitingMark(DataGridViewRow row)
+        {
+            row.Cells[ColumnIndicies[COL_APPROVED]].Value = "Ожидание подтверждения";
+        }
+
+        public void SetApproverToRow(DataGridViewRow row, string name)
+        {
+            row.Cells[ColumnIndicies[COL_APPROVED]].Value = name;
+            RowStyleManager.MakeCellBoldFont(row.Cells[ColumnIndicies[COL_APPROVED]]);
         }
     }
 }

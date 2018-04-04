@@ -102,7 +102,52 @@ namespace Server
                 LogWriter.WriteMessage("CreateAndSendOutEvent", ex.Message + ex.InnerException, Event.Sender.Fullname);
                 return Event;
             }
+        }
 
+        public BllEvent CreateEventAndSendToApprover(BllEvent Event)
+        {
+            try
+            {
+                var datetime = DateTime.Now;
+                Event.Date = datetime;
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    BllEvent res = eventService.Create(Event);
+                    InvokeEventWithApprover(Event);
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("CreateEventAndSendToApprover", ex.Message + ex.InnerException, Event.Sender.Fullname);
+                return Event;
+            }
+        }
+
+        private void InvokeEventWithApprover(BllEvent Event)
+        {
+            try
+            {
+                Clients[Event.Approver.Login].GetEvent(Event);
+            }
+            catch (Exception ex)
+            {
+                Clients.Remove(Event.Approver.Login);
+            }           
+        }
+
+        private void UpdateDisapprovedEventWithApprover(BllEvent Event)
+        {
+            try
+            {
+                Clients[Event.Approver.Login].DisapproveEvent(Event);
+            }
+            catch (Exception ex)
+            {
+                Clients.Remove(Event.Approver.Login);
+            }
         }
 
         public List<BllEvent> GetEventsForUser(BllUser user)
@@ -184,6 +229,45 @@ namespace Server
             {
                 LogWriter.WriteMessage("UpdateAcceptedUsersAndSendOutEvent", ex.Message + ex.InnerException, updater.Fullname);
                 return Event;
+            }
+        }
+
+        public void ApproveAndSendOutEvent(BllEvent Event)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    BllEvent res = eventService.Update(Event);
+
+                    if (Event.IsApproved.Value)
+                    {
+                        ApproveEventWithSender(Event);
+                        InvokeEventWithRecieversExceptSenderAndApprover(Event);
+                    }
+                    else
+                    {
+                        Clients[Event.Sender.Login].DisapproveEvent(Event);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("ApproveAndSendOutEvent", ex.Message + ex.InnerException, Event.Approver.Fullname);
+            }
+        }
+
+        private void ApproveEventWithSender(BllEvent Event)
+        {
+            try
+            {
+                Clients[Event.Sender.Login].ApproveEvent(Event);
+            }
+            catch
+            {
+                //sender has disconnected
             }
         }
 
@@ -324,6 +408,24 @@ namespace Server
                 try
                 {
                     if (Event.Sender.Id != reciever.Entity.Id)
+                    {
+                        Clients[reciever.Entity.Login].GetEvent(Event);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Clients.Remove(reciever.Entity.Login);
+                }
+            }
+        }
+
+        private void InvokeEventWithRecieversExceptSenderAndApprover(BllEvent Event)
+        {
+            foreach (var reciever in Event.RecieverLib.SelectedEntities)
+            {
+                try
+                {
+                    if ((Event.Sender.Id != reciever.Entity.Id) && (Event.Approver.Id != reciever.Entity.Id))
                     {
                         Clients[reciever.Entity.Login].GetEvent(Event);
                     }
@@ -639,6 +741,16 @@ namespace Server
                 IUnitOfWork uow = new UnitOfWork(serviceDB);
                 IUserService service = new UserService(uow);
                 return service.Update(entity);
+            }
+        }
+
+        public List<BllUser> GetApprovers()
+        {
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService UserService = new UserService(uow);
+                return UserService.GetApprovers();
             }
         }
         #endregion

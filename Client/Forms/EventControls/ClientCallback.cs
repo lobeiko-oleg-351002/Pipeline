@@ -26,6 +26,25 @@ namespace Client.EventClasses
             formControllerSet = set;
         }
 
+        public void DisapproveEvent(BllEvent Event)
+        {
+            int row = formControllerSet.eventManager.GetEventNumById(Event.Id);
+            UiEvent updatingEvent = formControllerSet.eventManager.GetEventByRowNum(row);
+            updatingEvent.EventData = Event;
+            formControllerSet.dataGridControlsManager.SetDisapproveMark(row);
+            formControllerSet.eventManager.SerializeEvents();
+        }
+
+        public void ApproveEvent(BllEvent Event)
+        {
+            int row = formControllerSet.eventManager.GetEventNumById(Event.Id);
+            UiEvent updatingEvent = formControllerSet.eventManager.GetEventByRowNum(row);
+            updatingEvent.EventData = Event;
+            formControllerSet.dataGridControlsManager.SetApproverToRow(row);
+            formControllerSet.dataGridControlsManager.UpdateSelectedEvent(Event, row);
+            formControllerSet.eventManager.SerializeEvents();
+        }
+
         public void GetEvent(BllEvent Event)
         {
             UiEvent newEvent = new NewEvent(Event, "");

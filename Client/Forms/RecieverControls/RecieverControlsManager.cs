@@ -19,34 +19,64 @@ namespace Client.Forms.RecieverControls
             recieverControls.Acquaint.Click += button_Click;
         }
 
-        public void PopulateRecievers()
+        public void HandleDisplayingRecievers()
         {
-            var recievers = recieverControls.ControllerSet.SelectedEvent.EventData.RecieverLib.SelectedEntities;
+            var Event = recieverControls.ControllerSet.SelectedEvent.EventData;
+            var recievers = Event.RecieverLib.SelectedEntities;
             var User = recieverControls.ControllerSet.client.GetUser();
-            if ((EventHelper.IsUserInChecklistByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, recieverControls.ControllerSet.SelectedEvent.EventData.Sender))
+
+            if (Event.IsApproved == null)
             {
-                ShowChecklist();
-                FillUserChecklist(recievers);
+                if (EventHelper.AreUsersEqual(Event.Approver, User))
+                {
+                    if (recieverControls.ControllerSet.client.isServerOnline)
+                    {
+                        recieverControls.ControllerSet.approveControlsManager.ShowApproveControls();
+                    }
+                }
+                else
+                {
+                    recieverControls.ControllerSet.dataGridControlsManager.SetApprovingWaitingMarkToSelectedRow();
+                }
             }
             else
             {
-                if (recieverControls.ControllerSet.client.isServerOnline)
+                if (Event.IsApproved.Value == true)
                 {
-                    ShowAcquaintedCheckbox();
+                    var Sender = recieverControls.ControllerSet.SelectedEvent.EventData.Sender;
+                    if ((EventHelper.IsUserInChecklistByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, Sender))
+                    {
+                        ShowChecklist();
+                    }
+                    else
+                    {
+                        if (recieverControls.ControllerSet.client.isServerOnline)
+                        {
+                            ShowAcquaintedCheckbox();
+                        }
+                    }
+                }
+                else
+                {
+                    recieverControls.ControllerSet.dataGridControlsManager.SetDisapproveMarkToSelectedRow();
+                    recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
                 }
             }
+            FillUserChecklist(recievers);
         }
 
         public void ShowChecklist()
         {
             recieverControls.GroupBoxForAcquaintButton.Visible = false;
             recieverControls.GroupBoxForRecievers.Visible = true;
+            recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
         }
 
         public void ShowAcquaintedCheckbox()
         {
             recieverControls.GroupBoxForAcquaintButton.Visible = true;
             recieverControls.GroupBoxForRecievers.Visible = false;
+            recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
         }
 
         public void HideChecklistAndCheckbox()

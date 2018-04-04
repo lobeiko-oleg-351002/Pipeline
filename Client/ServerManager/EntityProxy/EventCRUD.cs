@@ -62,6 +62,30 @@ namespace Client.ServerManager
             }
         }
 
+        public BllEvent CreateEventAndSendToApprover(BllEvent Event)
+        {
+            try
+            {
+                return server.CreateEventAndSendToApprover(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
+        public void ApproveAndSendOutEvent(BllEvent Event)
+        {
+            try
+            {
+                server.ApproveAndSendOutEvent(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
         public void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers)
         {
             try

@@ -13,6 +13,12 @@ namespace MainFormTest
     public class ServerConnectionTest : IClientCallBack
     {
         const string serverIp = "192.168.2.100:8085";
+
+        public void ApproveEvent(BllEvent Event)
+        {
+            throw new NotImplementedException();
+        }
+
         [TestMethod]
         public void ConnectToServer()
         {
@@ -29,6 +35,11 @@ namespace MainFormTest
             IServerInstance server = new ServerInstance("123", this);
             server.ConnectToServer();
             server.PingServer();
+        }
+
+        public void DisapproveEvent(BllEvent Event)
+        {
+            throw new NotImplementedException();
         }
 
         public void GetEvent(BllEvent Event)

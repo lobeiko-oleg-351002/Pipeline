@@ -33,6 +33,10 @@ namespace ORM
 
         public int type_id { get; set; }
 
+        public int? approver_id { get; set; }
+
+        public bool? isApproved { get; set; }
+
         public virtual AttributeLib AttributeLib { get; set; }
 
         public virtual EventType EventType { get; set; }

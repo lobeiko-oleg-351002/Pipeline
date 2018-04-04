@@ -24,6 +24,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
             InitializeComponent();
             textBox1.Text = entity.Fullname;
             textBox2.Text = entity.Login;
+            checkBox2.Checked = entity.RightToApprove;
 
             foreach(var entityItem in entity.EventTypeLib.SelectedEntities)
             {
@@ -60,6 +61,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 User.Password = Sha1.Encrypt(textBox3.Text);
             }
             User.Group = Groups[comboBox1.SelectedIndex];
+            User.RightToApprove = checkBox2.Checked;
             UpdateEventTypeLib(User);
             UpdateStatusLib(User);
 

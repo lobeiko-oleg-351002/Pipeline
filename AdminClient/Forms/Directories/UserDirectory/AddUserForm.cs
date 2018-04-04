@@ -42,7 +42,8 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 Password = Sha1.Encrypt(textBox3.Text),
                 Group = Groups[comboBox1.SelectedIndex],
                 StatusLib = statusLib,
-                EventTypeLib = eventTypeLib
+                EventTypeLib = eventTypeLib,
+                RightToApprove = checkBox2.Checked 
             };
             Entity = server.CreateUser((BllUser)Entity);
             base.button1_Click(sender, e);

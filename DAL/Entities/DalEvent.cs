@@ -26,6 +26,10 @@ namespace DAL.Entities
 
         public int Type_id { get; set; }
 
+        public int? Approver_id { get; set; }
+
         public DateTime Date { get; set; }
+
+        public bool? IsApproved { get; set; }
     }
 }

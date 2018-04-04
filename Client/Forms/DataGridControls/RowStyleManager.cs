@@ -61,5 +61,10 @@ namespace Client.Forms.DataGridControls
         {
             cell.Style.ForeColor = Color.Green;
         }
+
+        public static void MakeCellRed(DataGridViewCell cell)
+        {
+            cell.Style.ForeColor = Color.Red;
+        }
     }
 }

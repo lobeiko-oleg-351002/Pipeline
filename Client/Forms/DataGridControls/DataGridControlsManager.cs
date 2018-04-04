@@ -73,28 +73,64 @@ namespace Client.Forms.DataGridControls
                 if (GetSelectedRowIndex() == rowNum)
                 {
                     dataGridControls.ControllerSet.statusControlsManager.PopulateStatusDataGridUsingStatusLib(source.StatusLib);
-                    dataGridControls.ControllerSet.recieverControlsManager.FillUserChecklist(source.RecieverLib.SelectedEntities);
+                    dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers();
+                    //dataGridControls.ControllerSet.recieverControlsManager.FillUserChecklist(source.RecieverLib.SelectedEntities);
                     HandleStatusChanging();
                 }
             }
         }
 
+        public void SetDisapproveMark(int rowNum)
+        {
+            dataGridPopulationManager.SetDissaproveMark(dataGridControls.DataGrid.Rows[rowNum]);
+        }
+
+        public void SetDisapproveMarkToSelectedRow()
+        {
+            var row = dataGridControls.DataGrid.SelectedRows[0];
+            dataGridPopulationManager.SetDissaproveMark(row);
+        }
+
+        public void SetApprovingWaitingMarkToSelectedRow()
+        {
+            var row = dataGridControls.DataGrid.SelectedRows[0];
+            dataGridPopulationManager.SetApprovingWaitingMark(row);
+        }
+
+        public void SetApproverToRow(int rowNum)
+        {
+            var row = dataGridControls.DataGrid.Rows[rowNum];
+            dataGridPopulationManager.SetApproverToRow(row, dataGridControls.ControllerSet.eventManager.GetEventByRowNum(rowNum).EventData.Approver.Fullname);
+        }
+
+        public void SetApproverToSelectedRow()
+        {
+            var row = dataGridControls.DataGrid.SelectedRows[0];
+            dataGridPopulationManager.SetApproverToRow(row, dataGridControls.ControllerSet.SelectedEvent.EventData.Approver.Fullname);
+        }
+
         public void HandleStatusChanging()
         {
-            if (dataGridControls.ControllerSet.SelectedEvent.EventData.StatusLib.SelectedEntities.Count > 0)
+            var Event = dataGridControls.ControllerSet.SelectedEvent.EventData;
+            if (Event.StatusLib.SelectedEntities.Count > 0)
             {
-                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(dataGridControls.ControllerSet.SelectedEvent.EventData)))
+                if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(Event)))
                 {
-                    if (!EventHelper.AreUsersEqual(dataGridControls.ControllerSet.client.GetUser(), dataGridControls.ControllerSet.SelectedEvent.EventData.Sender))
+                    if (!EventHelper.AreUsersEqual(dataGridControls.ControllerSet.client.GetUser(), Event.Sender))
                     {
                         dataGridControls.ControllerSet.statusControlsManager.DisableStatusControls();
                         dataGridControls.ControllerSet.recieverControlsManager.HideChecklistAndCheckbox();
                     }
                 }
             }
-            if (!EventHelper.IsEventAcceptedByUser(dataGridControls.ControllerSet.SelectedEvent.EventData, dataGridControls.ControllerSet.client.GetUser()))
+
+            bool hasCurrentUserAcceptedEvent = EventHelper.IsEventAcceptedByUser(Event, dataGridControls.ControllerSet.client.GetUser());
+            bool isEventApproved = Event.IsApproved != null ? Event.IsApproved.Value : false;
+            bool isUserSender = EventHelper.AreUsersEqual(dataGridControls.ControllerSet.client.GetUser(), Event.Sender); 
+            if (!hasCurrentUserAcceptedEvent || (!isEventApproved && !isUserSender))
             {
                 dataGridControls.ControllerSet.statusControlsManager.DisableStatusControls();
+                dataGridControls.ControllerSet.mainFormControlsManager.DisableSendOnEventButton();
             }
         }
 
@@ -117,7 +153,7 @@ namespace Client.Forms.DataGridControls
             UpdateSelectedEventUsingEventManager();
             dataGridControls.ControllerSet.recieverControlsManager.UncheckCheckBox();
 
-            if (StatusesForOwner.IsEventStateRemoved(dataGridControls.ControllerSet.SelectedEvent))
+            if (StatusesForOwner.IsEventStateRemoved(dataGridControls.ControllerSet.SelectedEvent) )
             {
                 dataGridControls.ControllerSet.mainFormControlsManager.EnableDeleteEventButton();
                 dataGridControls.ControllerSet.mainFormControlsManager.DisableSendOnEventButton();
@@ -129,8 +165,8 @@ namespace Client.Forms.DataGridControls
 
             SetSelectedEventToControls();
 
-            dataGridControls.ControllerSet.recieverControlsManager.PopulateRecievers();
-            dataGridControls.ControllerSet.dataGridControlsManager.HandleStatusChanging();
+            dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers();
+            HandleStatusChanging();
         }
 
         private void SetSelectedEventToControls()

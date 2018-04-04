@@ -12,5 +12,6 @@ namespace BLL.Services.Interface
         BllUser Authorize(string login, string password);
         List<BllUser> GetUsersByGroup(int group_id);
         List<BllUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays);
+        List<BllUser> GetApprovers();
     }
 }

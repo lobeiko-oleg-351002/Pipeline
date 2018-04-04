@@ -22,5 +22,8 @@ namespace ServerInterface.DataInteface
         [OperationContract]
         BllUser UpdateUser(BllUser entity);
 
+        [OperationContract]
+        List<BllUser> GetApprovers();
+
     }
 }

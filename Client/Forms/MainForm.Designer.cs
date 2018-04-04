@@ -54,6 +54,10 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -67,6 +71,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
@@ -303,7 +308,7 @@
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox4.Controls.Add(this.button2);
             this.groupBox4.Controls.Add(this.checkBox1);
-            this.groupBox4.Location = new System.Drawing.Point(723, 493);
+            this.groupBox4.Location = new System.Drawing.Point(717, 494);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(218, 70);
             this.groupBox4.TabIndex = 30;
@@ -332,6 +337,52 @@
             this.checkBox1.TabIndex = 32;
             this.checkBox1.Text = "Получено";
             this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.button3);
+            this.groupBox2.Controls.Add(this.radioButton2);
+            this.groupBox2.Controls.Add(this.radioButton1);
+            this.groupBox2.Location = new System.Drawing.Point(718, 493);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 66);
+            this.groupBox2.TabIndex = 41;
+            this.groupBox2.TabStop = false;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(6, 33);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(187, 23);
+            this.button3.TabIndex = 2;
+            this.button3.Text = "OK";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButton2.ForeColor = System.Drawing.Color.Red;
+            this.radioButton2.Location = new System.Drawing.Point(108, 10);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(88, 17);
+            this.radioButton2.TabIndex = 1;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Отклонить";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButton1.ForeColor = System.Drawing.Color.Blue;
+            this.radioButton1.Location = new System.Drawing.Point(7, 10);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(88, 17);
+            this.radioButton1.TabIndex = 0;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "Утвердить";
+            this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // dataGridView2
             // 
@@ -437,12 +488,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1014, 672);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.richTextBox2);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.dataGridView2);
-            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.button1);
@@ -470,6 +522,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -514,6 +568,10 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ToolStripMenuItem переслатьСобытиеToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem выходToolStripMenuItem;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton radioButton2;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.Button button3;
     }
 }
 

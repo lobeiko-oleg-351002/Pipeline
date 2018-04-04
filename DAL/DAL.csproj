@@ -122,7 +122,9 @@
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -131,7 +133,7 @@
       <Name>Globals</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{CC99B2C4-1CDE-4232-A64A-340DCF395F65}</Project>
+      <Project>{0eec9e9c-8529-43db-85ff-5c30cd4a93c6}</Project>
       <Name>ORM</Name>
     </ProjectReference>
   </ItemGroup>

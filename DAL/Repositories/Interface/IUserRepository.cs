@@ -13,5 +13,6 @@ namespace DAL.Repositories.Interface
         DalUser Authorize(string login, string password);
         List<DalUser> GetUsersByGroup(int group_id);
         List<DalUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays);
+        List<DalUser> GetApprovers();
     }
 }

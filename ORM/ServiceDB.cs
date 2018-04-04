@@ -95,15 +95,15 @@ namespace ORM
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<StatusLib>()
+                .HasMany(e => e.SelectedStatus)
+                .WithRequired(e => e.StatusLib)
+                .HasForeignKey(e => e.lib_id);
+
+            modelBuilder.Entity<StatusLib>()
                 .HasMany(e => e.User)
                 .WithRequired(e => e.StatusLib)
                 .HasForeignKey(e => e.statusLib_id)
                 .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<StatusLib>()
-                .HasMany(e => e.SelectedStatus)
-                .WithRequired(e => e.StatusLib)
-                .HasForeignKey(e => e.lib_id);
 
             modelBuilder.Entity<User>()
                 .HasMany(e => e.Event)

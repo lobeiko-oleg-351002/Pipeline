@@ -94,5 +94,15 @@ namespace BLL.Services
             }
             return users;
         }
+
+        public List<BllUser> GetApprovers()
+        {
+            List<BllUser> users = new List<BllUser>();
+            foreach (var item in uow.Users.GetApprovers())
+            {
+                users.Add(mapper.MapToBll(item));
+            }
+            return users;
+        }
     }
 }

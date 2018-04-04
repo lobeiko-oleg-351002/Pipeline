@@ -77,11 +77,6 @@ namespace Client.Forms.EventControls
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_SORT_DIR, dir.ToString());
         }
 
-        public void Ping()
-        {
-
-        }
-
         public void SetEventNote(string note)
         {
             SelectedEvent.Note = note;
@@ -92,6 +87,18 @@ namespace Client.Forms.EventControls
         {
             IEventCRUD crud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
             SelectedEvent.EventData = crud.UpdateAcceptedUsersAndSendOutEvent(SelectedEvent.EventData, eventControls.ControllerSet.client.GetUser());
+            SetSelectedEventRegular();
+        }
+
+        public void AdmitEventAsApproved()
+        {
+            IEventCRUD crud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+            crud.ApproveAndSendOutEvent(SelectedEvent.EventData);
+            SetSelectedEventRegular();
+        }
+
+        private void SetSelectedEventRegular()
+        {
             SelectedEvent = new RegularEvent(SelectedEvent);
             Events[SelectedEventNum] = SelectedEvent;
             SelectedEvent.SetRowStyle(dataGridView.Rows[SelectedEventNum]);

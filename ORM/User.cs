@@ -36,6 +36,8 @@ namespace ORM
 
         public int eventTypeLib_id { get; set; }
 
+        public bool rightToApprove { get; set; }
+
         [Column(TypeName = "datetime2")]
         public DateTime? signInDate { get; set; }
 
@@ -44,11 +46,11 @@ namespace ORM
 
         public virtual EventTypeLib EventTypeLib { get; set; }
 
-        public virtual StatusLib StatusLib { get; set; }
-
         public virtual Group Group { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SelectedUser> SelectedUser { get; set; }
+
+        public virtual StatusLib StatusLib { get; set; }
     }
 }

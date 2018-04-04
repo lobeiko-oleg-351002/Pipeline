@@ -23,5 +23,7 @@ namespace DAL.Entities
         public int StatusLib_id { get; set; }
 
         public DateTime? SignInDate { get; set; }
+
+        public bool RightToApprove { get; set; }
     }
 }

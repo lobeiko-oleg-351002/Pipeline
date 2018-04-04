@@ -48,9 +48,6 @@ namespace AdminClient.Forms.Directories.UserDirectory
             {
                 checkedListBox2.Items.Add(item.Name);
             }
-
-
-
         }
     }
 }

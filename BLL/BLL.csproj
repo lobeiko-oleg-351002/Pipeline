@@ -107,7 +107,7 @@
       <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
-      <Project>{cc99b2c4-1cde-4232-a64a-340dcf395f65}</Project>
+      <Project>{0eec9e9c-8529-43db-85ff-5c30cd4a93c6}</Project>
       <Name>ORM</Name>
     </ProjectReference>
   </ItemGroup>

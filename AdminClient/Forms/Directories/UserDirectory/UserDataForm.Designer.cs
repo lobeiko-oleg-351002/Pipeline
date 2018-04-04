@@ -40,6 +40,7 @@
             this.checkedListBox2 = new System.Windows.Forms.CheckedListBox();
             this.checkedListBox3 = new System.Windows.Forms.CheckedListBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -149,11 +150,22 @@
             this.label7.TabIndex = 16;
             this.label7.Text = "Права на установку статусов";
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(38, 104);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(122, 17);
+            this.checkBox2.TabIndex = 18;
+            this.checkBox2.Text = "Может утверждать";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
             // UserDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(508, 332);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkedListBox3);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.checkedListBox2);
@@ -182,6 +194,7 @@
             this.Controls.SetChildIndex(this.checkedListBox2, 0);
             this.Controls.SetChildIndex(this.label7, 0);
             this.Controls.SetChildIndex(this.checkedListBox3, 0);
+            this.Controls.SetChildIndex(this.checkBox2, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -201,5 +214,6 @@
         protected System.Windows.Forms.Label label7;
         protected System.Windows.Forms.CheckedListBox checkedListBox2;
         protected System.Windows.Forms.CheckedListBox checkedListBox3;
+        protected System.Windows.Forms.CheckBox checkBox2;
     }
 }

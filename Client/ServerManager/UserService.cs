@@ -31,5 +31,21 @@ namespace Client.ServerManager
                 }
             }
         }
+
+        public List<BllUser> GetApprovers()
+        {
+            while (true)
+            {
+                try
+                {
+                    IUserGetter ug = new UserGetter(serverInstance.server);
+                    return ug.GetApprovers();
+                }
+                catch
+                {
+                    serverInstance.ConnectToServer();
+                }
+            }
+        }
     }
 }

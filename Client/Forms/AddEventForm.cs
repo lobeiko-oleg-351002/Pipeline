@@ -24,6 +24,7 @@ namespace Client.Forms
         List<BllAttribute> Attributes;
         List<BllUser> Users = new List<BllUser>();
         List<string> Filepaths = new List<string>();
+        List<BllUser> Approvers = new List<BllUser>();
         BllUser Sender;
         
         public AddEventForm()
@@ -43,6 +44,7 @@ namespace Client.Forms
             PopulateEventTypeComboBox(Sender.EventTypeLib);
             PopulateAttributeCheckList();
             PopulateRecieverTreeView();
+            PopulateApproversComboBox();
 
             if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
@@ -90,6 +92,32 @@ namespace Client.Forms
                         Users.Add(user);
                     }
                 }
+            }
+        }
+
+        private void PopulateApproversComboBox()
+        {
+            UserService userService = new UserService(serverInstance);
+            Approvers = userService.GetApprovers();
+            try
+            {
+                Approvers.Remove(Approvers.Single(e => e.Id == Sender.Id));
+            }
+            catch
+            {
+
+            }
+            foreach (var user in Approvers)
+            {
+                comboBox1.Items.Add(user.Fullname);
+            }
+            if (comboBox1.Items.Count > 0)
+            {
+                comboBox1.SelectedIndex = 0;
+            }
+            else
+            {
+                checkBox1.Enabled = false;
             }
         }
 
@@ -157,6 +185,7 @@ namespace Client.Forms
         {
             Event = new BllEvent();
             Event.Name = textBox1.Text;
+            Event.Sender = this.Sender;
             Event.FilepathLib = new BllFilepathLib();
             try
             {
@@ -171,11 +200,45 @@ namespace Client.Forms
             Event.Type = Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity;
             Event.Description = richTextBox1.Text;
             Event.StatusLib = new BllStatusLib();
+
             Event.AttributeLib = new BllAttributeLib();
             foreach(var item in checkedListBox1.CheckedIndices.Cast<int>().ToArray())
             {
                 Event.AttributeLib.SelectedEntities.Add(new BllSelectedEntity<BllAttribute>() { Entity = Attributes[item]});
             }
+
+            SetRecieversFromTreeView(Event);
+
+            IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
+            if (!checkBox1.Checked)
+            {
+                Event.IsApproved = true;
+                CallCreateMethod(eventCRUD.CreateAndSendOutEvent, Event);
+            }
+            else
+            {
+                Event.Approver = Approvers[comboBox1.SelectedIndex];
+                Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false});
+                CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
+            }
+        }
+
+        private void CallCreateMethod(Func<BllEvent, BllEvent> method, BllEvent arg)
+        {
+            try
+            {               
+                Event = method(Event);
+                Close();
+                AppConfigManager.SetKeyValue(Event.Type.Name, textBox1.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void SetRecieversFromTreeView(BllEvent Event)
+        {
             Event.RecieverLib = new BllUserLib();
             Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Sender, IsEventAccepted = true });
             int nodeCount = 0;
@@ -190,24 +253,17 @@ namespace Client.Forms
                 {
                     if (userNode.Checked)
                     {
-                        Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Users[userNode.Index + nodeCount] });
                         SaveUserNodeAccordingEventTypeInConfig(userNode.Text);
+
+                        if (checkBox1.Checked && (userNode.Text == comboBox1.Text))
+                        {
+                            continue;
+                        }
+
+                        Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Users[userNode.Index + nodeCount] });
                     }
                 }
                 nodeCount += groupNode.GetNodeCount(false);
-            }
-
-            Event.Sender = this.Sender;
-            try
-            {
-                IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
-                Event = eventCRUD.CreateAndSendOutEvent(Event);
-                Close();
-                AppConfigManager.SetKeyValue(Event.Type.Name, textBox1.Text);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
             }
         }
 
@@ -303,6 +359,18 @@ namespace Client.Forms
         {
             string eventTag = Event.Type.Id.ToString();
             AppConfigManager.AddKeyValue(eventTag, nodeName);
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                comboBox1.Enabled = true;
+            }
+            else
+            {
+                comboBox1.Enabled = false;
+            }
         }
     }
 }

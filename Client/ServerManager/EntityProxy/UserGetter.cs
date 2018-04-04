@@ -25,5 +25,17 @@ namespace Client.ServerManager
                 throw new ConnectionFailedException();
             }
         }
+
+        public List<BllUser> GetApprovers()
+        {
+            try
+            {
+                return server.GetApprovers();
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
     }
 }

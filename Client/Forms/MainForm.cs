@@ -2,6 +2,7 @@
 using Client.EventClasses;
 using Client.EventClasses.Events;
 using Client.Forms;
+using Client.Forms.ApproveControls;
 using Client.Forms.DataGridControls;
 using Client.Forms.EventControls;
 using Client.Forms.FileControls;
@@ -86,6 +87,7 @@ namespace Client
             InitMainFormControls();
             InitServerStateControls();
             InitEventManager();
+            InitApproveControls();
             formControllerSet.indication = new Indication(this);
             formControllerSet.client = new ClientLauncher(formControllerSet.eventManager.clientCallback, formControllerSet.serverStateControlsManager);
         }
@@ -145,6 +147,12 @@ namespace Client
         {
             var eventControls = new EventControls(formControllerSet);
             formControllerSet.eventManager = new EventManager(eventControls);
+        }
+
+        private void InitApproveControls()
+        {
+            var approveControls = new ApproveControls(radioButton1, radioButton2, button3, groupBox2, formControllerSet);
+            formControllerSet.approveControlsManager = new ApproveControlsManager(approveControls);
         }
 
         private void AddAppShortcutToStartup()

@@ -1,6 +1,6 @@
 E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\bin\Debug\ServerInterfaceForLauncher.dll
 E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\bin\Debug\ServerInterfaceForLauncher.pdb
-E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\obj\Debug\ServerInterfaceForLauncher.csprojResolveAssemblyReference.cache
 E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\obj\Debug\ServerInterfaceForLauncher.csproj.CoreCompileInputs.cache
 E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\obj\Debug\ServerInterfaceForLauncher.dll
 E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\obj\Debug\ServerInterfaceForLauncher.pdb
+E:\Projects\Visual Studio\Pipeline\ServerInterfaceForLauncher\obj\Debug\ServerInterfaceForLauncher.csprojResolveAssemblyReference.cache

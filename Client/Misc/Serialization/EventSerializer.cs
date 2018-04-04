@@ -43,7 +43,20 @@ namespace Client.Misc.Serialization
         {
             string mydoc = GetMyDocPath();
             string filepath = mydoc + Properties.Resources.CACHE_XML_FILE;
-            return serializer.DeserializeList<UiEvent>(filepath);
+            var events = serializer.DeserializeList<UiEvent>(filepath);
+            UpdateCachedEventsToApproved(events);
+            return events;
+        }
+
+        private static void UpdateCachedEventsToApproved(List<UiEvent> events)
+        {
+            foreach (var e in events)
+            {
+                if ((e.EventData.Approver == null) && (e.EventData.IsApproved == null))
+                {
+                    e.EventData.IsApproved = true;
+                }
+            }
         }
     }
 }

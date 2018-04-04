@@ -23,7 +23,9 @@ namespace DAL.Mapping
                 Type_id = entity.type_id,
                 Name = entity.name,
                 Receiver_lib_id = entity.receiver_lib_id,
-                Status_lib_id = entity.status_lib_id
+                Status_lib_id = entity.status_lib_id,
+                Approver_id = entity.approver_id,
+                IsApproved = entity.isApproved 
             };
         }
 
@@ -40,7 +42,9 @@ namespace DAL.Mapping
                 type_id = entity.Type_id,
                 name = entity.Name,
                 receiver_lib_id = entity.Receiver_lib_id,
-                status_lib_id = entity.Status_lib_id
+                status_lib_id = entity.Status_lib_id,
+                approver_id = entity.Approver_id,
+                isApproved = entity.IsApproved
             };
         }
     }

@@ -25,5 +25,7 @@ namespace BllEntities
         public string InnerId { get; set; }
 
         public DateTime? SignInDate { get; set; }
+
+        public bool RightToApprove { get; set; }
     }
 }

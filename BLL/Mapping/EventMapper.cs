@@ -47,12 +47,13 @@ namespace BLL.Mapping
                 Receiver_lib_id = entity.RecieverLib.Id,
                 Status_lib_id = entity.StatusLib.Id,
                 Sender_id = entity.Sender.Id,
-                Type_id = entity.Type.Id
+                Type_id = entity.Type.Id,
+                Approver_id = entity.Approver != null ? entity.Approver.Id : (int?)null,
+                IsApproved = entity.IsApproved
             };
 
             return dalEntity;
         }
-
 
         public BllEvent MapToBll(DalEvent entity)
         {
@@ -67,7 +68,9 @@ namespace BLL.Mapping
                 RecieverLib = userLibService.Get(entity.Receiver_lib_id),
                 StatusLib = statusLibService.Get(entity.Status_lib_id),
                 Sender = userService.Get(entity.Sender_id),
-                Type = eventTypeService.Get(entity.Type_id)
+                Type = eventTypeService.Get(entity.Type_id),
+                Approver = entity.Approver_id != null ? userService.Get(entity.Approver_id.Value) : null,
+                IsApproved = entity.IsApproved
             };
 
             return bllEntity;

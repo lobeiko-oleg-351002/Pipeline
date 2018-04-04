@@ -180,5 +180,15 @@ namespace AdminClient.Forms
             server.SetClientVersion((Double.Parse(label2.Text) + 0.01).ToString());
             label2.Text = server.GetClientVersion();
         }
+
+        public void DisapproveEvent(BllEvent Event)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ApproveEvent(BllEvent Event)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
