@@ -286,9 +286,9 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox1.Controls.Add(this.listView1);
-            this.groupBox1.Location = new System.Drawing.Point(711, 493);
+            this.groupBox1.Location = new System.Drawing.Point(623, 493);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(285, 109);
+            this.groupBox1.Size = new System.Drawing.Size(373, 109);
             this.groupBox1.TabIndex = 25;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ознакомились";
@@ -298,7 +298,7 @@
             // 
             this.listView1.Location = new System.Drawing.Point(6, 26);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(273, 83);
+            this.listView1.Size = new System.Drawing.Size(361, 83);
             this.listView1.TabIndex = 40;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.List;
@@ -308,7 +308,7 @@
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox4.Controls.Add(this.button2);
             this.groupBox4.Controls.Add(this.checkBox1);
-            this.groupBox4.Location = new System.Drawing.Point(717, 494);
+            this.groupBox4.Location = new System.Drawing.Point(623, 493);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(218, 70);
             this.groupBox4.TabIndex = 30;
@@ -344,7 +344,7 @@
             this.groupBox2.Controls.Add(this.button3);
             this.groupBox2.Controls.Add(this.radioButton2);
             this.groupBox2.Controls.Add(this.radioButton1);
-            this.groupBox2.Location = new System.Drawing.Point(718, 493);
+            this.groupBox2.Location = new System.Drawing.Point(623, 494);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(200, 66);
             this.groupBox2.TabIndex = 41;
@@ -427,7 +427,7 @@
             this.groupBox3.Controls.Add(this.listBox2);
             this.groupBox3.Location = new System.Drawing.Point(459, 493);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(252, 109);
+            this.groupBox3.Size = new System.Drawing.Size(158, 109);
             this.groupBox3.TabIndex = 37;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Файлы";
@@ -438,7 +438,7 @@
             this.checkBox2.AutoSize = true;
             this.checkBox2.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBox2.ImageAlign = System.Drawing.ContentAlignment.BottomRight;
-            this.checkBox2.Location = new System.Drawing.Point(145, 7);
+            this.checkBox2.Location = new System.Drawing.Point(51, 7);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(101, 17);
             this.checkBox2.TabIndex = 38;
@@ -452,7 +452,7 @@
             this.listBox2.FormattingEnabled = true;
             this.listBox2.Location = new System.Drawing.Point(12, 27);
             this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(234, 82);
+            this.listBox2.Size = new System.Drawing.Size(140, 82);
             this.listBox2.TabIndex = 37;
             // 
             // label4

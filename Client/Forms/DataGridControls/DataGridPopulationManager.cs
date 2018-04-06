@@ -66,13 +66,13 @@ namespace Client.Forms.DataGridControls
             if ((Event.IsApproved != null) && (Event.IsApproved.Value == false))
             {
                 SetDissaproveMark(row);
-            }
+            }  
             row.Cells[ColumnIndicies[COL_TITLE]].Value = Event.Name;
             row.Cells[ColumnIndicies[COL_DATE]].Value = Event.Date.ToString(DATE_FORMAT);
             row.Cells[ColumnIndicies[COL_TIME]].Value = Event.Date.ToString(TIME_FORMAT);
             row.Cells[ColumnIndicies[COL_DESCTIPTION]].Value = Event.Description;
             row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.Note;
-
+            
             SetStatusInRow(row, Event);
             SetAttributeInRow(row, Event);
             SetFileCountInRow(row, Event);

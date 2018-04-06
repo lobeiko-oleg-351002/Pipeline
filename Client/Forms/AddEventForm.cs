@@ -45,7 +45,6 @@ namespace Client.Forms
             PopulateAttributeCheckList();
             PopulateRecieverTreeView();
             PopulateApproversComboBox();
-            checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX);
             if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
                 CheckUserNodesAccordingToEventType(Sender.EventTypeLib.SelectedEntities[0].Entity.Id);
@@ -114,10 +113,13 @@ namespace Client.Forms
             if (comboBox1.Items.Count > 0)
             {
                 comboBox1.SelectedIndex = 0;
+                checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX);
             }
             else
             {
                 checkBox1.Enabled = false;
+                checkBox1.Checked = false;
+                comboBox1.Enabled = false;
             }
         }
 
@@ -209,6 +211,13 @@ namespace Client.Forms
 
             SetRecieversFromTreeView(Event);
 
+            HandleApprovement();
+
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX, checkBox1.Checked.ToString());
+        }
+
+        private void HandleApprovement()
+        {
             IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
             if (!checkBox1.Checked)
             {
@@ -218,11 +227,9 @@ namespace Client.Forms
             else
             {
                 Event.Approver = Approvers[comboBox1.SelectedIndex];
-                Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false});
+                Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false });
                 CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
             }
-
-            AppConfigManager.SetKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX, checkBox1.Checked.ToString());
         }
 
         private void CallCreateMethod(Func<BllEvent, BllEvent> method, BllEvent arg)

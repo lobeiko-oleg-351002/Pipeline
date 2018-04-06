@@ -27,42 +27,52 @@ namespace Client.Forms.RecieverControls
 
             if (Event.IsApproved == null)
             {
-                if (EventHelper.AreUsersEqual(Event.Approver, User))
+                ShowApproveAwaiting(Event, User);
+            }
+            else
+            {
+                ShowApprovingControls(Event, User, recievers);
+            }
+            FillUserChecklist(recievers);
+        }
+
+        private void ShowApproveAwaiting(BllEvent Event, BllUser User)
+        {
+            if (EventHelper.AreUsersEqual(Event.Approver, User))
+            {
+                if (recieverControls.ControllerSet.client.isServerOnline)
                 {
-                    if (recieverControls.ControllerSet.client.isServerOnline)
-                    {
-                        recieverControls.ControllerSet.approveControlsManager.ShowApproveControls();
-                    }
-                }
-                else
-                {
-                    recieverControls.ControllerSet.dataGridControlsManager.SetApprovingWaitingMarkToSelectedRow();
+                    recieverControls.ControllerSet.approveControlsManager.ShowApproveControls();
                 }
             }
             else
             {
-                if (Event.IsApproved.Value == true)
+                recieverControls.ControllerSet.dataGridControlsManager.SetApprovingWaitingMarkToSelectedRow();
+            }
+        }
+
+        private void ShowApprovingControls(BllEvent Event, BllUser User, List<BllSelectedUser> recievers)
+        {
+            if (Event.IsApproved.Value == true)
+            {
+                var Sender = recieverControls.ControllerSet.SelectedEvent.EventData.Sender;
+                if ((EventHelper.IsUserInChecklistByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, Sender))
                 {
-                    var Sender = recieverControls.ControllerSet.SelectedEvent.EventData.Sender;
-                    if ((EventHelper.IsUserInChecklistByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, Sender))
-                    {
-                        ShowChecklist();
-                    }
-                    else
-                    {
-                        if (recieverControls.ControllerSet.client.isServerOnline)
-                        {
-                            ShowAcquaintedCheckbox();
-                        }
-                    }
+                    ShowChecklist();
                 }
                 else
                 {
-                    recieverControls.ControllerSet.dataGridControlsManager.SetDisapproveMarkToSelectedRow();
-                    recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
+                    if (recieverControls.ControllerSet.client.isServerOnline)
+                    {
+                        ShowAcquaintedCheckbox();
+                    }
                 }
             }
-            FillUserChecklist(recievers);
+            else
+            {
+                recieverControls.ControllerSet.dataGridControlsManager.SetDisapproveMarkToSelectedRow();
+                recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
+            }
         }
 
         public void ShowChecklist()

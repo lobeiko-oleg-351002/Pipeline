@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BllEntities;
+using Client.EventClasses.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,22 +24,37 @@ namespace Client.Forms.ApproveControls
         {
             HideApproveControls();
             var SelectedEvent = approveControls.ControllerSet.eventManager.SelectedEvent;
+            HandleApproveCheck(SelectedEvent);
+            HandleDisapproveCheck(SelectedEvent);
+            AcquaintSelectedUserInSelectedEvent(SelectedEvent);
+            approveControls.ControllerSet.recieverControlsManager.FillUserChecklist(SelectedEvent.EventData.RecieverLib.SelectedEntities);
+            approveControls.ControllerSet.eventManager.AdmitEventAsApproved();
+            approveControls.ControllerSet.statusControlsManager.EnableStatusControls();
+        }
+
+        private void HandleApproveCheck(UiEvent SelectedEvent)
+        {
             if (approveControls.approveSwitch.Checked)
             {
                 SelectedEvent.EventData.IsApproved = true;
                 approveControls.ControllerSet.recieverControlsManager.ShowChecklist();
                 approveControls.ControllerSet.dataGridControlsManager.SetApproverToSelectedRow();
             }
+        }
+
+        private void HandleDisapproveCheck(UiEvent SelectedEvent)
+        {
             if (approveControls.disapproveSwitch.Checked)
             {
                 SelectedEvent.EventData.IsApproved = false;
                 approveControls.ControllerSet.dataGridControlsManager.SetDisapproveMarkToSelectedRow();
             }
+        }
+
+        private void AcquaintSelectedUserInSelectedEvent(UiEvent SelectedEvent)
+        {
             var user = SelectedEvent.EventData.RecieverLib.SelectedEntities.Single(en => en.Entity.Id == approveControls.ControllerSet.client.GetUser().Id);
             user.IsEventAccepted = true;
-            approveControls.ControllerSet.recieverControlsManager.FillUserChecklist(SelectedEvent.EventData.RecieverLib.SelectedEntities);
-            approveControls.ControllerSet.eventManager.AdmitEventAsApproved();
-            approveControls.ControllerSet.statusControlsManager.EnableStatusControls();
         }
 
         public void HideApproveControls()
