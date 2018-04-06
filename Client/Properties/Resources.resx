@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CACHE_XML_FILE" xml:space="preserve">
-    <value>\EDOC\data.xml</value>
+    <value>data.xml</value>
   </data>
   <data name="CANNOT_OPEN_FILE" xml:space="preserve">
     <value>Данному файлу не присвоена программа для запуска</value>
@@ -207,5 +207,8 @@
   </data>
   <data name="TAG_USE_COMMANDER" xml:space="preserve">
     <value>USE_COMMANDER</value>
+  </data>
+  <data name="TAG_ADDEVENT_APPROVE_BOX" xml:space="preserve">
+    <value>ADDEVENT_APPROVE_BOX</value>
   </data>
 </root>

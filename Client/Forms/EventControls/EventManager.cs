@@ -103,7 +103,7 @@ namespace Client.Forms.EventControls
             Events[SelectedEventNum] = SelectedEvent;
             SelectedEvent.SetRowStyle(dataGridView.Rows[SelectedEventNum]);
             eventControls.ControllerSet.indication.DecNewEventsCount();
-            SerializeEvents();
+            SerializeEventsBackground();
         }
 
         public int GetEventNumById(int eventId)
@@ -227,7 +227,7 @@ namespace Client.Forms.EventControls
             }
             HideClosedEventsAccordingToConfigValue();
             SortEventsUsingLastOrderFromCache();
-            SerializeEvents();
+            SerializeEventsBackground();
         }
 
         private List<BllEvent> GetEventsFromServerForCurrentUser()
@@ -279,10 +279,6 @@ namespace Client.Forms.EventControls
         private void UpdateCachedEventUsingEventFromServer(UiEvent serverEvent, UiEvent cachedEvent)
         {
             serverEvent.Note = cachedEvent.Note;
-            if (serverEvent.MissedStatus)
-            {
-                eventControls.ControllerSet.indication.IncNewStatusesCount();
-            }
 
             if (EventHelper.IsTargetStatusObsolete(serverEvent.EventData, cachedEvent.EventData))
             {
@@ -292,6 +288,11 @@ namespace Client.Forms.EventControls
             else
             {
                 serverEvent.MissedStatus = cachedEvent.MissedStatus;
+            }
+
+            if (serverEvent.MissedStatus)
+            {
+                eventControls.ControllerSet.indication.IncNewStatusesCount();
             }
 
             try
@@ -322,7 +323,7 @@ namespace Client.Forms.EventControls
             dataGridPopulationManager.AddRowToDataGridUsingEvent(wrappedEvent);
             SortEventsUsingLastOrderFromCache();
             HideClosedEventsAccordingToConfigValue();
-            SerializeEvents();
+            SerializeEventsBackground();
         }
 
         private void AddEventsFromServerAndDownloadTheirFiles(List<UiEvent> events)
@@ -401,7 +402,7 @@ namespace Client.Forms.EventControls
             {
                 eventControls.ControllerSet.indication.DecNewStatusesCount();
                 SelectedEvent.SetRegularStatus(dataGridView.Rows[SelectedEventNum], DataGridPopulationManager.GetStatusColumnNum());
-                SerializeEvents();
+                SerializeEventsBackground();
             }
         }
 
@@ -416,7 +417,7 @@ namespace Client.Forms.EventControls
             IndicateNewStatus();
 
             eventControls.ControllerSet.statusControlsManager.SelectBlankStatus();
-            SerializeEvents();
+            SerializeEventsBackground();
         }
 
         private UiEvent AddStatusToUiEvent(UiEvent Event, BllStatus status)
@@ -437,13 +438,19 @@ namespace Client.Forms.EventControls
         {
             Events.RemoveAt(rowNum);
             dataGridView.Rows.RemoveAt(rowNum);
-            SerializeEvents();
+            SerializeEventsBackground();
+        }
+
+        public void SerializeEventsBackground()
+        {
+            Serializer serializer = new Serializer();
+            serializer.SerializeEventsBackground(Events);
         }
 
         public void SerializeEvents()
         {
             Serializer serializer = new Serializer();
-            serializer.SerializeEventsBackground(Events);
+            serializer.SerializeUiEventsToCache(Events);
         }
 
         public void StartOtkStatusCheckoutsOnTimer()

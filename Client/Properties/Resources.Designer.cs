@@ -61,7 +61,7 @@ namespace Client.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \EDOC\data.xml.
+        ///   Looks up a localized string similar to data.xml.
         /// </summary>
         internal static string CACHE_XML_FILE {
             get {
@@ -176,6 +176,15 @@ namespace Client.Properties {
         internal static string STARTUP_LINK_NAME {
             get {
                 return ResourceManager.GetString("STARTUP_LINK_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ADDEVENT_APPROVE_BOX.
+        /// </summary>
+        internal static string TAG_ADDEVENT_APPROVE_BOX {
+            get {
+                return ResourceManager.GetString("TAG_ADDEVENT_APPROVE_BOX", resourceCulture);
             }
         }
         

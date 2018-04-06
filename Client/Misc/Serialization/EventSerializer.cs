@@ -14,7 +14,7 @@ namespace Client.Misc.Serialization
         {
             string mydoc = GetMyDocPath();
             CreateAppFolderInMyDoc(mydoc);
-            serializer.SerializeList(events, mydoc + Properties.Resources.CACHE_XML_FILE);
+            serializer.SerializeList(events, mydoc + "\\" + Properties.Resources.CLIENT_NAME + "\\" + Properties.Resources.CACHE_XML_FILE);
         }
 
         private static void CreateAppFolderInMyDoc(string mydoc)
@@ -42,10 +42,20 @@ namespace Client.Misc.Serialization
         public static List<UiEvent> DeserializeEventsFromCache(this Serializer serializer)
         {
             string mydoc = GetMyDocPath();
-            string filepath = mydoc + Properties.Resources.CACHE_XML_FILE;
+            string filepath = mydoc + "\\" + Properties.Resources.CLIENT_NAME + "\\" + Properties.Resources.CACHE_XML_FILE;
+            CreateFileIfNotExists(mydoc + "\\" + Properties.Resources.CLIENT_NAME);
             var events = serializer.DeserializeList<UiEvent>(filepath);
             UpdateCachedEventsToApproved(events);
+           
             return events;
+        }
+
+        public static void CreateFileIfNotExists(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }
 
         private static void UpdateCachedEventsToApproved(List<UiEvent> events)

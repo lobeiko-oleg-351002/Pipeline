@@ -41,7 +41,7 @@ namespace Client.Forms.NoteControls
 
         private void richTextBox_Leave(object sender, EventArgs e)
         {
-            noteControls.ControllerSet.eventManager.SerializeEvents();
+            noteControls.ControllerSet.eventManager.SerializeEventsBackground();
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)

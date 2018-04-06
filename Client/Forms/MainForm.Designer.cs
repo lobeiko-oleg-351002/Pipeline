@@ -340,6 +340,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox2.Controls.Add(this.button3);
             this.groupBox2.Controls.Add(this.radioButton2);
             this.groupBox2.Controls.Add(this.radioButton1);
@@ -348,6 +349,7 @@
             this.groupBox2.Size = new System.Drawing.Size(200, 66);
             this.groupBox2.TabIndex = 41;
             this.groupBox2.TabStop = false;
+            this.groupBox2.Visible = false;
             // 
             // button3
             // 
@@ -487,6 +489,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.LightGray;
             this.ClientSize = new System.Drawing.Size(1014, 672);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox4);

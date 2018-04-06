@@ -29,6 +29,7 @@ namespace Client.ServerManager
             this.serverStateControlsManager = serverStateControlsManager;
             SetServerInstance();
             authorization = new Authorization();
+            serverStateControlsManager.SetControlsAccordingToServerOffline();
         }
 
         public void Launch()
@@ -59,8 +60,8 @@ namespace Client.ServerManager
 
         private void SetServerInstance()
         {
-            //string ip = AppConfigManager.GetKeyValue(IP_KEY);
-            string ip = "192.168.2.100:8085";
+            string ip = AppConfigManager.GetKeyValue(IP_KEY);
+            //string ip = "192.168.2.100:8085";
             serverInstance = new ServerInstance(ip, callback);
         }
 
@@ -81,7 +82,7 @@ namespace Client.ServerManager
             }
         }
 
-        public void PingServerAndIndicateHisStateOnControls() //fix rename
+        public void PingServerAndIndicateHisStateOnControls() 
         {
             try
             {

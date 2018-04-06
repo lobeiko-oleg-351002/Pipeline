@@ -45,7 +45,7 @@ namespace Client.Forms
             PopulateAttributeCheckList();
             PopulateRecieverTreeView();
             PopulateApproversComboBox();
-
+            checkBox1.Checked = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX);
             if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
                 CheckUserNodesAccordingToEventType(Sender.EventTypeLib.SelectedEntities[0].Entity.Id);
@@ -221,6 +221,8 @@ namespace Client.Forms
                 Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false});
                 CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
             }
+
+            AppConfigManager.SetKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX, checkBox1.Checked.ToString());
         }
 
         private void CallCreateMethod(Func<BllEvent, BllEvent> method, BllEvent arg)

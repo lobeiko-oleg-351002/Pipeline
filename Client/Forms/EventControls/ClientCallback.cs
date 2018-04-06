@@ -32,7 +32,7 @@ namespace Client.EventClasses
             UiEvent updatingEvent = formControllerSet.eventManager.GetEventByRowNum(row);
             updatingEvent.EventData = Event;
             formControllerSet.dataGridControlsManager.SetDisapproveMark(row);
-            formControllerSet.eventManager.SerializeEvents();
+            formControllerSet.eventManager.SerializeEventsBackground();
         }
 
         public void ApproveEvent(BllEvent Event)
@@ -42,14 +42,14 @@ namespace Client.EventClasses
             updatingEvent.EventData = Event;
             formControllerSet.dataGridControlsManager.SetApproverToRow(row);
             formControllerSet.dataGridControlsManager.UpdateSelectedEvent(Event, row);
-            formControllerSet.eventManager.SerializeEvents();
+            formControllerSet.eventManager.SerializeEventsBackground();
         }
 
         public void GetEvent(BllEvent Event)
         {
             UiEvent newEvent = new NewEvent(Event, "");
             formControllerSet.eventManager.AddNewEvent(newEvent);
-            formControllerSet.eventManager.SerializeEvents();            
+            formControllerSet.eventManager.SerializeEventsBackground();            
             Signal.PlaySignalAccordingToEventConfigValue();
             formControllerSet.eventManager.SortEventsUsingLastOrderFromCache();
             formControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
@@ -71,7 +71,7 @@ namespace Client.EventClasses
             }
             updatingEvent.EventData = Event;
             formControllerSet.dataGridControlsManager.UpdateSelectedEvent(Event, row);
-            formControllerSet.eventManager.SerializeEvents();           
+            formControllerSet.eventManager.SerializeEventsBackground();           
         }
     }
 }

@@ -31,14 +31,17 @@ namespace Client.Misc.Serialization
             XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
             try
             {
-                using (Stream stream = File.Open(inputPath, FileMode.Open))
+                using (Stream stream = File.Open(inputPath, FileMode.OpenOrCreate))
                 {
                     return (List<T>)serializer.Deserialize(stream);
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                File.Delete(inputPath);
+                if (File.Exists(inputPath))
+                {
+                    File.Delete(inputPath);
+                }
                 return new List<T>();
             }
         }
