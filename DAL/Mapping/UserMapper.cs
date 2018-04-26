@@ -22,7 +22,8 @@ namespace DAL.Mapping
                 EventTypeLib_id = entity.eventTypeLib_id,
                 StatusLib_id = entity.statusLib_id,
                 SignInDate = entity.signInDate,
-                RightToApprove = entity.rightToApprove
+                RightToApprove = entity.rightToApprove,
+                RightToReconcile = entity.rightToReconcile
             };
         }
 
@@ -38,7 +39,8 @@ namespace DAL.Mapping
                 eventTypeLib_id = entity.EventTypeLib_id,
                 statusLib_id = entity.StatusLib_id,
                 signInDate = entity.SignInDate,
-                rightToApprove = entity.RightToApprove
+                rightToApprove = entity.RightToApprove,
+                rightToReconcile = entity.RightToReconcile
             };
         }
     }

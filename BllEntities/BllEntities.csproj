@@ -48,9 +48,11 @@
     <Compile Include="BllFilepath.cs" />
     <Compile Include="BllFilepathLib.cs" />
     <Compile Include="BllGroup.cs" />
+    <Compile Include="BllReconcilerLib.cs" />
     <Compile Include="BllSelectedEntity.cs" />
     <Compile Include="BllSelectedStatus.cs" />
     <Compile Include="BllSelectedUser.cs" />
+    <Compile Include="BllSelectedUserReconciler.cs" />
     <Compile Include="BllStatus.cs" />
     <Compile Include="BllStatusLib.cs" />
     <Compile Include="BllUser.cs" />

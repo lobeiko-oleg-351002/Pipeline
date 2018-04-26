@@ -17,6 +17,7 @@ namespace BLL.Mapping
         AttributeLibService attributeLibService;
         StatusLibService statusLibService;
         UserLibService userLibService;
+        ReconcilerLibService reconcilerLibService;
         FilepathLibService filepathLibService;
         UserService userService;
         EventTypeService eventTypeService;
@@ -30,6 +31,7 @@ namespace BLL.Mapping
             filepathLibService = new FilepathLibService(uow);
             userService = new UserService(uow);
             eventTypeService = new EventTypeService(uow);
+            reconcilerLibService = new ReconcilerLibService(uow);
         }
 
         public EventMapper() { }
@@ -49,7 +51,8 @@ namespace BLL.Mapping
                 Sender_id = entity.Sender.Id,
                 Type_id = entity.Type.Id,
                 Approver_id = entity.Approver != null ? entity.Approver.Id : (int?)null,
-                IsApproved = entity.IsApproved
+                IsApproved = entity.IsApproved,
+                Reconciler_lib_id = entity.ReconcilerLib != null ? entity.ReconcilerLib.Id : (int?)null
             };
 
             return dalEntity;
@@ -70,7 +73,8 @@ namespace BLL.Mapping
                 Sender = userService.Get(entity.Sender_id),
                 Type = eventTypeService.Get(entity.Type_id),
                 Approver = entity.Approver_id != null ? userService.Get(entity.Approver_id.Value) : null,
-                IsApproved = entity.IsApproved
+                IsApproved = entity.IsApproved,
+                ReconcilerLib = entity.Reconciler_lib_id != null ? reconcilerLibService.Get(entity.Reconciler_lib_id.Value) : null
             };
 
             return bllEntity;

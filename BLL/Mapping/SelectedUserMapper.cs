@@ -28,7 +28,7 @@ namespace BLL.Mapping
             {
                 Id = entity.Id,
                 Entity = bllEntity,
-                IsEventAccepted = entity.IsEventAccepted
+                IsEventAccepted = entity.IsEventAccepted,
             };
 
             return bllSelectedEntity;
@@ -40,7 +40,7 @@ namespace BLL.Mapping
             {
                 Id = entity.Id,
                 Entity_id = entity.Entity.Id,
-                IsEventAccepted = entity.IsEventAccepted
+                IsEventAccepted = entity.IsEventAccepted,
             };
 
             return dalEntity;

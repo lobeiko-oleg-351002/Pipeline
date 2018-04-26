@@ -25,5 +25,8 @@ namespace ServerInterface.DataInteface
         [OperationContract]
         List<BllUser> GetApprovers();
 
+        [OperationContract]
+        List<BllUser> GetReconcilers();
+
     }
 }

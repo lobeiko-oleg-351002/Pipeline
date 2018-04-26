@@ -31,5 +31,7 @@ namespace DAL.Entities
         public DateTime Date { get; set; }
 
         public bool? IsApproved { get; set; }
+
+        public int? Reconciler_lib_id { get; set; }
     }
 }

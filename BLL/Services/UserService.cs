@@ -104,5 +104,15 @@ namespace BLL.Services
             }
             return users;
         }
+
+        public List<BllUser> GetReconcilers()
+        {
+            List<BllUser> users = new List<BllUser>();
+            foreach (var item in uow.Users.GetReconcilers())
+            {
+                users.Add(mapper.MapToBll(item));
+            }
+            return users;
+        }
     }
 }

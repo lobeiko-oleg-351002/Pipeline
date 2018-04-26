@@ -74,6 +74,18 @@ namespace Client.ServerManager
             }
         }
 
+        public BllEvent CreateEventAndSendToReconcilers(BllEvent Event)
+        {
+            try
+            {
+                return server.CreateEventAndSendToReconcilers(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
         public void ApproveAndSendOutEvent(BllEvent Event)
         {
             try
@@ -103,6 +115,30 @@ namespace Client.ServerManager
             try
             {
                 server.UpdateEventRecievers(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
+        public void UpdateEventReconcilers(BllEvent Event)
+        {
+            try
+            {
+                server.UpdateEventReconcilers(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
+        public void UpdateReconcilers(BllEvent Event)
+        {
+            try
+            {
+                server.HandleReconcilerSigning(Event);
             }
             catch
             {

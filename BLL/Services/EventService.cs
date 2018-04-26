@@ -29,12 +29,16 @@ namespace BLL.Services
             AttributeLibService attributeLibService = new AttributeLibService(uow);
             StatusLibService statusLibService = new StatusLibService(uow);
             UserLibService userLibService = new UserLibService(uow);
-            FilepathLibService filepathLibService = new FilepathLibService(uow); 
-
+            FilepathLibService filepathLibService = new FilepathLibService(uow);
+            ReconcilerLibService reconcilerLibService = new ReconcilerLibService(uow);
             entity.StatusLib = statusLibService.Create(entity.StatusLib);
             entity.RecieverLib = userLibService.Create(entity.RecieverLib);
             entity.AttributeLib = attributeLibService.Create(entity.AttributeLib);
             entity.FilepathLib = filepathLibService.Create(entity.FilepathLib);
+            if (entity.ReconcilerLib != null)
+            {
+                entity.ReconcilerLib = reconcilerLibService.Create(entity.ReconcilerLib);
+            }
 
             var ormEntity = uow.Events.CreateAndReturnOrm(mapper.MapToDal(entity));
             uow.Commit();
@@ -51,10 +55,15 @@ namespace BLL.Services
             StatusLibService statusLibService = new StatusLibService(uow);
             UserLibService userLibService = new UserLibService(uow);
             FilepathLibService filepathLibService = new FilepathLibService(uow);
+            ReconcilerLibService reconcilerLibService = new ReconcilerLibService(uow);
             attributeLibService.Update(entity.AttributeLib);
             statusLibService.Update(entity.StatusLib);
             userLibService.Update(entity.RecieverLib);
             filepathLibService.Update(entity.FilepathLib);
+            if (entity.ReconcilerLib != null)
+            {
+                reconcilerLibService.Update(entity.ReconcilerLib);
+            }
             uow.Events.Update(mapper.MapToDal(entity));
             uow.Commit();
 

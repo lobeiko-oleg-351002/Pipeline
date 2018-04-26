@@ -13,5 +13,6 @@ namespace BLL.Services.Interface
         List<BllUser> GetUsersByGroup(int group_id);
         List<BllUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays);
         List<BllUser> GetApprovers();
+        List<BllUser> GetReconcilers();
     }
 }

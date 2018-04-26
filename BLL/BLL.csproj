@@ -49,6 +49,7 @@
     <Compile Include="Mapping\GroupMapper.cs" />
     <Compile Include="Mapping\Interface\IAttributeMapper.cs" />
     <Compile Include="Mapping\Interface\IFilepathLibMapper.cs" />
+    <Compile Include="Mapping\Interface\IReconcilerLibMapper.cs" />
     <Compile Include="Mapping\Interface\IStatusLibMapper.cs" />
     <Compile Include="Mapping\Interface\IEntityLibMapper.cs" />
     <Compile Include="Mapping\Interface\IEntitySimpleLibMapper.cs" />
@@ -61,9 +62,11 @@
     <Compile Include="Mapping\Interface\IStatusMapper.cs" />
     <Compile Include="Mapping\Interface\IUserLibMapper.cs" />
     <Compile Include="Mapping\Interface\IUserMapper.cs" />
+    <Compile Include="Mapping\ReconcilerLibMapper.cs" />
     <Compile Include="Mapping\SelectedStatusMapper.cs" />
     <Compile Include="Mapping\SelectedEntityMapper.cs" />
     <Compile Include="Mapping\SelectedUserMapper.cs" />
+    <Compile Include="Mapping\SelectedUserReconcilerMapper.cs" />
     <Compile Include="Mapping\StatusLibMapper.cs" />
     <Compile Include="Mapping\StatusMapper.cs" />
     <Compile Include="Mapping\UserLibMapper.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="Services\Interface\IService.cs" />
     <Compile Include="Services\Interface\IStatusService.cs" />
     <Compile Include="Services\Interface\IUserService.cs" />
+    <Compile Include="Services\ReconcilerLibService.cs" />
     <Compile Include="Services\SelectedEntityService.cs" />
     <Compile Include="Services\Service.cs" />
     <Compile Include="Services\StatusLibService.cs" />

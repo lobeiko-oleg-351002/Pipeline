@@ -31,5 +31,7 @@ namespace BllEntities
         public BllUser Approver { get; set; }
 
         public bool? IsApproved { get; set; }
+
+        public BllReconcilerLib ReconcilerLib { get; set; }
     }
 }

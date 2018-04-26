@@ -14,6 +14,7 @@ namespace ORM
         {
             Event = new HashSet<Event>();
             SelectedUser = new HashSet<SelectedUser>();
+            SelectedUserReconciler = new HashSet<SelectedUserReconciler>();
         }
 
         public int id { get; set; }
@@ -38,6 +39,8 @@ namespace ORM
 
         public bool rightToApprove { get; set; }
 
+        public bool rightToReconcile { get; set; }
+
         [Column(TypeName = "datetime2")]
         public DateTime? signInDate { get; set; }
 
@@ -50,6 +53,9 @@ namespace ORM
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SelectedUser> SelectedUser { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<SelectedUserReconciler> SelectedUserReconciler { get; set; }
 
         public virtual StatusLib StatusLib { get; set; }
     }

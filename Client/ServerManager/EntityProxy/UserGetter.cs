@@ -37,5 +37,17 @@ namespace Client.ServerManager
                 throw new ConnectionFailedException();
             }
         }
+
+        public List<BllUser> GetReconcilers()
+        {
+            try
+            {
+                return server.GetReconcilers();
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
     }
 }

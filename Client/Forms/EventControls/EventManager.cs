@@ -97,6 +97,13 @@ namespace Client.Forms.EventControls
             SetSelectedEventRegular();
         }
 
+        public void AdmitAgreementInReconcilers()
+        {
+            IEventCRUD crud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+            crud.UpdateReconcilers(SelectedEvent.EventData);
+            SetSelectedEventRegular();
+        }
+
         private void SetSelectedEventRegular()
         {
             SelectedEvent = new RegularEvent(SelectedEvent);
@@ -144,24 +151,33 @@ namespace Client.Forms.EventControls
                 {
                     eventControls.ControllerSet.indication.DecNewEventsCount();
                 }
-                DeleteCurrentUserFromRecieversAndUpdateEvent(currentEvent);
+                DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent(currentEvent);
             }
         }
 
-        private void DeleteCurrentUserFromRecieversAndUpdateEvent(UiEvent currentEvent)
+        private void DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent(UiEvent currentEvent)
         {
-            var recievers = currentEvent.EventData.RecieverLib.SelectedEntities;
+            IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
             try
             {
+                var recievers = currentEvent.EventData.RecieverLib.SelectedEntities;
                 recievers.Remove(recievers.Single(r => r.Entity.Id == eventControls.ControllerSet.client.GetUser().Id));
-
-                IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
                 eventCrud.UpdateEventRecievers(currentEvent.EventData);
             }
-            catch (Exception ex)
+            catch 
             {
 
             }
+            try
+            {
+                var reconcilers = currentEvent.EventData.ReconcilerLib.SelectedEntities;
+                reconcilers.Remove(reconcilers.Single(r => r.Entity.Id == eventControls.ControllerSet.client.GetUser().Id));
+                eventCrud.UpdateEventReconcilers(currentEvent.EventData);
+            }
+            catch 
+            {
+
+            }           
         }
 
         public void DeleteUserInRemovedEvents()
@@ -172,7 +188,7 @@ namespace Client.Forms.EventControls
                 {
                     if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
                     {
-                        DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                        DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent(item);
                     }
                 }
                 catch
@@ -225,7 +241,7 @@ namespace Client.Forms.EventControls
                 AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(uiEventsFromServer, cachedEvents);
                 AddEventsFromServerAndDownloadTheirFiles(uiEventsFromServer);
             }
-            HideClosedEventsAccordingToConfigValue();
+            HideClosedEventsAccordingToConfigValue(); 
             SortEventsUsingLastOrderFromCache();
             SerializeEventsBackground();
         }
@@ -299,7 +315,7 @@ namespace Client.Forms.EventControls
             {
                 if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(serverEvent.EventData)))
                 {
-                    DeleteCurrentUserFromRecieversAndUpdateEvent(serverEvent);
+                    DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent(serverEvent);
                 }
             }
             catch (Exception ex)
@@ -334,7 +350,7 @@ namespace Client.Forms.EventControls
                 {
                     if (StatusesForOwner.IsStatusForOwner(EventHelper.GetCurrentEventStatus(item.EventData)))
                     {
-                        DeleteCurrentUserFromRecieversAndUpdateEvent(item);
+                        DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent(item);
                     }
                 }
                 catch { }

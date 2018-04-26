@@ -50,6 +50,9 @@ namespace ServerInterface
 
         [OperationContract]
         DateTime GetDateTime();
+
+        [OperationContract(IsOneWay = true)]
+        void UpdateEventReconcilers(BllEvent Event);
     }
 
 }

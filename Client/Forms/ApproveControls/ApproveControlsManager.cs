@@ -27,7 +27,6 @@ namespace Client.Forms.ApproveControls
             HandleApproveCheck(SelectedEvent);
             HandleDisapproveCheck(SelectedEvent);
             AcquaintSelectedUserInSelectedEvent(SelectedEvent);
-            approveControls.ControllerSet.recieverControlsManager.FillUserChecklist(SelectedEvent.EventData.RecieverLib.SelectedEntities);
             approveControls.ControllerSet.eventManager.AdmitEventAsApproved();
             approveControls.ControllerSet.statusControlsManager.EnableStatusControls();
         }
@@ -37,7 +36,7 @@ namespace Client.Forms.ApproveControls
             if (approveControls.approveSwitch.Checked)
             {
                 SelectedEvent.EventData.IsApproved = true;
-                approveControls.ControllerSet.recieverControlsManager.ShowChecklist();
+                approveControls.ControllerSet.recieverControlsManager.AddRecieversAndReconcilersToChecklist(SelectedEvent.EventData);
                 approveControls.ControllerSet.dataGridControlsManager.SetApproverToSelectedRow();
             }
         }

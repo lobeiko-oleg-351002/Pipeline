@@ -19,12 +19,59 @@ namespace Client.Forms.RecieverControls
             recieverControls.Acquaint.Click += button_Click;
         }
 
-        public void HandleDisplayingRecievers()
+        public void HandleDisplayingRecievers(int row)
         {
+            recieverControls.ControllerSet.reconcileControlsManager.HideReconcileControls();
             var Event = recieverControls.ControllerSet.SelectedEvent.EventData;
             var recievers = Event.RecieverLib.SelectedEntities;
             var User = recieverControls.ControllerSet.client.GetUser();
 
+            if (Event.ReconcilerLib != null)
+            {
+                var reconcilers = Event.ReconcilerLib.SelectedEntities;
+                if (EventHelper.IsEventReconciled(Event))
+                {
+                    if (Event.Approver == null)
+                    {
+                        if (EventHelper.IsEventAcceptedByUser(Event, User))
+                        {
+                            AddRecieversAndReconcilersToChecklist(Event);
+                        }
+                        else
+                        {
+                            ShowAcquaintedCheckbox();
+                        }
+                    }
+                    else
+                    {
+                        HandleApprovingControls(Event, User, recievers);
+                    }
+                }
+                else
+                {
+                    recieverControls.ControllerSet.dataGridControlsManager.dataGridPopulationManager.SetReconcilingMark(row);
+                    if (!EventHelper.HasUserReconciled(Event, User))
+                    {
+                        recieverControls.ControllerSet.reconcileControlsManager.ShowReconcileControls();
+                    }
+                    else
+                    {
+                        FillReconcilerChecklist(reconcilers);
+                        ShowChecklist();
+                    }
+                 }
+            }
+            else
+            {
+                HandleApprovingControls(Event, User, recievers);
+                AddRecieversToCheckList(recievers);
+                SetAcquaintedCount(recievers, null);
+            }
+
+        }
+
+        private void HandleApprovingControls(BllEvent Event, BllUser User, List<BllSelectedUser> recievers)
+        {
             if (Event.IsApproved == null)
             {
                 ShowApproveAwaiting(Event, User);
@@ -32,8 +79,50 @@ namespace Client.Forms.RecieverControls
             else
             {
                 ShowApprovingControls(Event, User, recievers);
+            }           
+        }
+
+        private void FillReconcilerChecklist(List<BllSelectedUserReconciler> users)
+        {
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.Recievers.Items.Clear();
+            }));
+
+            foreach (var item in users)
+            {
+                if (item.IsEventReconciled == null)
+                {
+                    AddUserToChecklist(item.Entity, Color.LightGray);
+                }
+                else
+                {
+                    if (item.IsEventReconciled.Value)
+                    {
+                        AddUserToChecklist(item.Entity, Color.Blue);
+                    }
+                    else
+                    {
+                        AddUserToChecklist(item.Entity, Color.Red);
+                    }
+                }
             }
-            FillUserChecklist(recievers);
+            SetAcquaintedCount(null, users);
+        }
+
+        public void AddRecieversAndReconcilersToChecklist(BllEvent Event)
+        {
+            var recievers = Event.RecieverLib.SelectedEntities;
+            List<BllSelectedUserReconciler> reconcilers = null;
+            AddRecieversToCheckList(recievers);
+            if (Event.ReconcilerLib != null)
+            {
+                reconcilers = Event.ReconcilerLib.SelectedEntities;
+                AddReconcilersToChecklist(reconcilers);
+            }
+
+            SetAcquaintedCount(recievers, reconcilers);
+            ShowChecklist();
         }
 
         private void ShowApproveAwaiting(BllEvent Event, BllUser User)
@@ -47,6 +136,7 @@ namespace Client.Forms.RecieverControls
             }
             else
             {
+                recieverControls.ControllerSet.reconcileControlsManager.HideReconcileControls();
                 recieverControls.ControllerSet.dataGridControlsManager.SetApprovingWaitingMarkToSelectedRow();
             }
         }
@@ -56,9 +146,9 @@ namespace Client.Forms.RecieverControls
             if (Event.IsApproved.Value == true)
             {
                 var Sender = recieverControls.ControllerSet.SelectedEvent.EventData.Sender;
-                if ((EventHelper.IsUserInChecklistByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, Sender))
+                if ((EventHelper.DidUserAcquaintByLogin(User, recievers)) || EventHelper.AreUsersEqual(User, Sender) || EventHelper.IsUserReconciler(User, Event.ReconcilerLib))
                 {
-                    ShowChecklist();
+                    AddRecieversAndReconcilersToChecklist(Event);
                 }
                 else
                 {
@@ -77,57 +167,107 @@ namespace Client.Forms.RecieverControls
 
         public void ShowChecklist()
         {
-            recieverControls.GroupBoxForAcquaintButton.Visible = false;
-            recieverControls.GroupBoxForRecievers.Visible = true;
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.GroupBoxForAcquaintButton.Visible = false;
+                recieverControls.GroupBoxForRecievers.Visible = true;
+            }));
+
             recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
+            recieverControls.ControllerSet.reconcileControlsManager.HideReconcileControls();
         }
 
         public void ShowAcquaintedCheckbox()
         {
-            recieverControls.GroupBoxForAcquaintButton.Visible = true;
-            recieverControls.GroupBoxForRecievers.Visible = false;
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.GroupBoxForAcquaintButton.Visible = true;
+                recieverControls.GroupBoxForRecievers.Visible = false;
+            }));
             recieverControls.ControllerSet.approveControlsManager.HideApproveControls();
+            recieverControls.ControllerSet.reconcileControlsManager.HideReconcileControls();
         }
 
         public void HideChecklistAndCheckbox()
         {
-            recieverControls.GroupBoxForAcquaintButton.Visible = false;
-            recieverControls.GroupBoxForRecievers.Visible = false;
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.GroupBoxForAcquaintButton.Visible = false;
+                recieverControls.GroupBoxForRecievers.Visible = false;
+            }));
         }
 
-        public void FillUserChecklist(List<BllSelectedUser> users)
+        public void AddRecieversToCheckList(List<BllSelectedUser> users)
         {
-            recieverControls.Recievers.Items.Clear();
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.Recievers.Items.Clear();
+            }));
             AddUnacquaintedUsersToCheckList(users);
-            AddAcquaintedUsersToCheckListAndSetTheirCount(users);
+            AddAcquaintedUsersToCheckList(users);
         }
 
-        private void AddAcquaintedUsersToCheckListAndSetTheirCount(List<BllSelectedUser> users)
+        public void AddReconcilersToChecklist(List<BllSelectedUserReconciler> users)
         {
-            int acceptedEvents = 0;
+            foreach (var item in users)
+            {
+                AddUserToChecklist(item.Entity, Color.Green);
+            }
+        }
+
+        private void AddAcquaintedUsersToCheckList(List<BllSelectedUser> users)
+        {
             foreach (var item in users)
             {
                 if (item.IsEventAccepted)
                 {
-                    AddUserToChecklist(item.Entity, true);
-                    acceptedEvents++;
+                    AddUserToChecklist(item.Entity, Color.Green);
                 }
             }
-            recieverControls.GroupBoxForRecievers.Text = "Ознакомились " + acceptedEvents + " из " + users.Count;
         }
 
-        private void AddUserToChecklist(BllUser user, bool isAccepted)
+        private void SetAcquaintedCount(List<BllSelectedUser> recievers, List<BllSelectedUserReconciler> reconcilers)
         {
-            recieverControls.Recievers.Items.Add(user.Fullname);
-            var addedItem = recieverControls.Recievers.Items[recieverControls.Recievers.Items.Count - 1];
-            if (isAccepted)
+            int acquaintedCount = 0;
+            int reconciledCount = 0;
+            int reconcilersCount = 0;
+            int recieversCount = 0;
+            if (recievers != null)
             {
-                addedItem.ForeColor = Color.Green;
+                recieversCount = recievers.Count;
+                foreach (var item in recievers)
+                {
+                    if (item.IsEventAccepted)
+                    {
+                        acquaintedCount++;
+                    }
+                }
             }
-            else
+            if (reconcilers != null)
             {
-                addedItem.ForeColor = Color.Gray;
+                reconcilersCount = reconcilers.Count;
+                foreach (var item in reconcilers)
+                {
+                    if (item.IsEventReconciled != null)
+                    {
+                        reconciledCount++;
+                    }
+                }
             }
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.GroupBoxForRecievers.Text = "Ознакомились " + (acquaintedCount + reconciledCount) + " из " + (reconcilersCount + recieversCount);
+            }));
+        }
+
+        private void AddUserToChecklist(BllUser user, Color color)
+        {
+            recieverControls.ControllerSet.mainForm.Invoke(new Action(() =>
+            {
+                recieverControls.Recievers.Items.Add(user.Fullname);
+                var addedItem = recieverControls.Recievers.Items[recieverControls.Recievers.Items.Count - 1];
+                addedItem.ForeColor = color;
+            }));
         }
 
         private void AddUnacquaintedUsersToCheckList(List<BllSelectedUser> users)
@@ -136,7 +276,7 @@ namespace Client.Forms.RecieverControls
             {
                 if (!item.IsEventAccepted)
                 {
-                    AddUserToChecklist(item.Entity, false);
+                    AddUserToChecklist(item.Entity, Color.LightGray);
                 }
             }
         }
@@ -157,10 +297,10 @@ namespace Client.Forms.RecieverControls
         {
             if (recieverControls.Recieved.Checked)
             {
-                ShowChecklist();
-                EventHelper.MarkRecieverInLib(recieverControls.ControllerSet.SelectedEvent.EventData.RecieverLib, recieverControls.ControllerSet.client.GetUser());
+                var Event = recieverControls.ControllerSet.SelectedEvent.EventData;
+                EventHelper.MarkRecieverInLib(Event.RecieverLib, recieverControls.ControllerSet.client.GetUser());
                 recieverControls.ControllerSet.eventManager.AdmitEventAsAcquainted();
-                FillUserChecklist(recieverControls.ControllerSet.SelectedEvent.EventData.RecieverLib.SelectedEntities);
+                AddRecieversAndReconcilersToChecklist(Event);
                 recieverControls.ControllerSet.statusControlsManager.EnableStatusControls();                
             }
         }

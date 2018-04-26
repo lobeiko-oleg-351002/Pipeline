@@ -83,6 +83,16 @@ namespace Client.EventClasses
                     return true;
                 }
             }
+            if (Event.ReconcilerLib != null)
+            {
+                foreach (var item in Event.ReconcilerLib.SelectedEntities)
+                {
+                    if (AreUsersEqual(item.Entity, User) && (item.IsEventReconciled != null))
+                    {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -95,7 +105,7 @@ namespace Client.EventClasses
             return false;
         }
 
-        public static bool IsUserInChecklistByLogin(BllUser user, List<BllSelectedUser> list)
+        public static bool DidUserAcquaintByLogin(BllUser user, List<BllSelectedUser> list)
         {
             foreach (var item in list)
             {
@@ -108,6 +118,21 @@ namespace Client.EventClasses
                     else
                     {
                         return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static bool IsUserReconciler(BllUser user, BllReconcilerLib lib)
+        {
+            if (lib != null)
+            {
+                foreach (var item in lib.SelectedEntities)
+                {
+                    if (item.Entity.Login == user.Login)
+                    {
+                        return true;
                     }
                 }
             }
@@ -134,6 +159,53 @@ namespace Client.EventClasses
                 suitableEvents.Add(CreateEventAccordingToStatusOrUser(new UiEvent(item, ""), user));
             }
             return suitableEvents;
+        }
+
+        public static bool IsEventReconciled(BllEvent Event)
+        {
+            foreach(var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                if (item.IsEventReconciled == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    if (item.IsEventReconciled.Value == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static void AdmitReconciledUserInEvent(BllEvent Event, BllUser User, bool agreement)
+        {
+            foreach(var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                if (item.Entity.Id == User.Id)
+                {
+                    item.IsEventReconciled = agreement;
+                    break;
+                }
+            }
+        }
+
+        public static bool HasUserReconciled(BllEvent Event, BllUser User)
+        {
+            if ( AreUsersEqual(Event.Sender, User))
+            {
+                return true;
+            }
+            foreach (var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                if (AreUsersEqual(item.Entity, User) && (item.IsEventReconciled != null))
+                {
+                        return true;
+                }
+            }
+            return false;
         }
     }
 

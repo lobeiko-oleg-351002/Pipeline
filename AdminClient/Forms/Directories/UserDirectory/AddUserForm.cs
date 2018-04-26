@@ -43,7 +43,8 @@ namespace AdminClient.Forms.Directories.UserDirectory
                 Group = Groups[comboBox1.SelectedIndex],
                 StatusLib = statusLib,
                 EventTypeLib = eventTypeLib,
-                RightToApprove = checkBox2.Checked 
+                RightToApprove = checkBox2.Checked,
+                RightToReconcile = checkBox1.Checked
             };
             Entity = server.CreateUser((BllUser)Entity);
             base.button1_Click(sender, e);

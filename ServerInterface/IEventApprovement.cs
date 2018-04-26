@@ -13,7 +13,13 @@ namespace ServerInterface
         [OperationContract]
         BllEvent CreateEventAndSendToApprover(BllEvent Event);
 
+        [OperationContract]
+        BllEvent CreateEventAndSendToReconcilers(BllEvent Event);
+
         [OperationContract(IsOneWay = true)]
         void ApproveAndSendOutEvent(BllEvent Event);
+
+        [OperationContract(IsOneWay = true)]
+        void HandleReconcilerSigning(BllEvent Event);
     }
 }

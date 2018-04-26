@@ -40,8 +40,8 @@ namespace Client.EventClasses
             int row = formControllerSet.eventManager.GetEventNumById(Event.Id);
             UiEvent updatingEvent = formControllerSet.eventManager.GetEventByRowNum(row);
             updatingEvent.EventData = Event;
-            formControllerSet.dataGridControlsManager.SetApproverToRow(row);
             formControllerSet.dataGridControlsManager.UpdateSelectedEvent(Event, row);
+            formControllerSet.dataGridControlsManager.SetApproverToRow(row);
             formControllerSet.eventManager.SerializeEventsBackground();
         }
 

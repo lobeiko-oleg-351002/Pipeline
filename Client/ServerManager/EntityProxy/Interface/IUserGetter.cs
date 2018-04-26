@@ -10,5 +10,6 @@ namespace Client.ServerManager.Interface
     {
         List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
         List<BllUser> GetApprovers();
+        List<BllUser> GetReconcilers();
     }
 }

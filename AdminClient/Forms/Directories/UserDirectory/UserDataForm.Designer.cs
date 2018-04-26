@@ -41,6 +41,7 @@
             this.checkedListBox3 = new System.Windows.Forms.CheckedListBox();
             this.label7 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // button1
@@ -160,11 +161,22 @@
             this.checkBox2.Text = "Может утверждать";
             this.checkBox2.UseVisualStyleBackColor = true;
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(38, 127);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(141, 17);
+            this.checkBox1.TabIndex = 19;
+            this.checkBox1.Text = "Может согласовывать";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // UserDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(508, 332);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkedListBox3);
             this.Controls.Add(this.label7);
@@ -195,6 +207,7 @@
             this.Controls.SetChildIndex(this.label7, 0);
             this.Controls.SetChildIndex(this.checkedListBox3, 0);
             this.Controls.SetChildIndex(this.checkBox2, 0);
+            this.Controls.SetChildIndex(this.checkBox1, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -215,5 +228,6 @@
         protected System.Windows.Forms.CheckedListBox checkedListBox2;
         protected System.Windows.Forms.CheckedListBox checkedListBox3;
         protected System.Windows.Forms.CheckBox checkBox2;
+        protected System.Windows.Forms.CheckBox checkBox1;
     }
 }

@@ -14,5 +14,6 @@ namespace DAL.Repositories.Interface
         List<DalUser> GetUsersByGroup(int group_id);
         List<DalUser> GetUsersByGroupAndSignInDateRange(int group_id, int permissibleRangeInDays);
         List<DalUser> GetApprovers();
+        List<DalUser> GetReconcilers();
     }
 }

@@ -28,6 +28,8 @@ namespace ORM
         public virtual DbSet<StatusLib> StatusLibs { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserLib> UserLibs { get; set; }
+        public virtual DbSet<ReconcilerLib> ReconcilerLibs { get; set; }
+        public virtual DbSet<SelectedUserReconciler> SelectedUserReconcilers { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -115,6 +117,11 @@ namespace ORM
                 .WithRequired(e => e.User)
                 .HasForeignKey(e => e.entity_id);
 
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.SelectedUserReconciler)
+                .WithRequired(e => e.User)
+                .HasForeignKey(e => e.entity_id);
+
             modelBuilder.Entity<UserLib>()
                 .HasMany(e => e.Event)
                 .WithRequired(e => e.UserLib)
@@ -124,6 +131,17 @@ namespace ORM
             modelBuilder.Entity<UserLib>()
                 .HasMany(e => e.SelectedUser)
                 .WithRequired(e => e.UserLib)
+                .HasForeignKey(e => e.lib_id);
+
+            modelBuilder.Entity<ReconcilerLib>()
+                .HasMany(e => e.Event)
+                .WithRequired(e => e.Reconcilers)
+                .HasForeignKey(e => e.reconciler_lib_id)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ReconcilerLib>()
+                .HasMany(e => e.SelectedUserReconciler)
+                .WithRequired(e => e.ReconcilerLib)
                 .HasForeignKey(e => e.lib_id);
         }
     }

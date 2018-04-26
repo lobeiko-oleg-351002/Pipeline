@@ -25,5 +25,7 @@ namespace DAL.Entities
         public DateTime? SignInDate { get; set; }
 
         public bool RightToApprove { get; set; }
+
+        public bool RightToReconcile { get; set; }
     }
 }

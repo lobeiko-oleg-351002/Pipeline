@@ -1,4 +1,5 @@
 ﻿using BllEntities;
+using Client.EventClasses;
 using Client.EventClasses.Events;
 using Client.EventClasses.Sorting;
 using System;
@@ -87,7 +88,27 @@ namespace Client.Forms.DataGridControls
             StatusStyleManager.SetStatusStyle(uiEvent, row);
         }
 
+
         private void HandleApprovedMark(DataGridViewRow row, BllEvent Event)
+        {
+            if (Event.ReconcilerLib != null)
+            {
+                if (EventHelper.IsEventReconciled(Event))
+                {
+                    HandleApprover(row, Event);
+                }
+                else
+                {
+                    SetReconcilingMark(row);
+                }
+            }
+            else
+            {
+                HandleApprover(row, Event);
+            }
+        }
+
+        private void HandleApprover(DataGridViewRow row, BllEvent Event)
         {
             if (Event.Approver != null)
             {
@@ -242,12 +263,18 @@ namespace Client.Forms.DataGridControls
 
         public void MakeRowInvisible(DataGridViewRow row)
         {
-            row.Visible = false;
+            ParentFormControl.Invoke(new Action(() =>
+            {
+                row.Visible = false;
+            }));           
         }
 
         public void MakeRowVisible(DataGridViewRow row)
         {
-            row.Visible = true;
+            ParentFormControl.Invoke(new Action(() =>
+            {
+                row.Visible = true;
+            }));            
         }
 
         public static int GetStatusColumnNum()
@@ -275,6 +302,21 @@ namespace Client.Forms.DataGridControls
         {
             row.Cells[ColumnIndicies[COL_APPROVED]].Value = name;
             RowStyleManager.MakeCellBoldFont(row.Cells[ColumnIndicies[COL_APPROVED]]);
+        }
+
+        public void SetReconcilingMark(DataGridViewRow row)
+        {
+            row.Cells[ColumnIndicies[COL_APPROVED]].Value = "Согласование";
+        }
+
+        public void SetReconcilingMark(int row)
+        {
+            grid.Rows[row].Cells[ColumnIndicies[COL_APPROVED]].Value = "Согласование";
+        }
+
+        public void ClearApprovedColumn(int row)
+        {
+            grid.Rows[row].Cells[ColumnIndicies[COL_APPROVED]].Value = "";
         }
     }
 }

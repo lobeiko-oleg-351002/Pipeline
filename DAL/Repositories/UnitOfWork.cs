@@ -25,11 +25,13 @@ namespace DAL.Repositories
         private SelectedEntityRepository<SelectedAttribute> selectedAttributeRepository;
         private SelectedEntityRepository<SelectedEventType> selectedEventTypeRepository;
         private SelectedUserRepository selectedUserRepository;
+        private SelectedUserReconcilerRepository selectedUserReconcilerRepository;
 
         private StatusLibRepository statusLibRepository;
         private EntityLibRepository<AttributeLib> attributeLibRepository;
         private EntityLibRepository<EventTypeLib> eventTypeLibRepository;
         private UserLibRepository userLibRepository;
+        private ReconcilerLibRepository reconcilerLibRepository;
         private FilepathLibRepository filepathLibRepository;
 
         public IGroupRepository Groups
@@ -55,6 +57,8 @@ namespace DAL.Repositories
 
         public SelectedUserRepository SelectedUsers => selectedUserRepository ?? (selectedUserRepository = new SelectedUserRepository(context));
 
+        public SelectedUserReconcilerRepository SelectedUserReconcilers => selectedUserReconcilerRepository ?? (selectedUserReconcilerRepository = new SelectedUserReconcilerRepository(context));
+
         public StatusLibRepository StatusLibs => statusLibRepository ?? (statusLibRepository = new StatusLibRepository(context));
 
         public IRepository<IDalEntityLib, AttributeLib> AttributeLibs => attributeLibRepository ?? (attributeLibRepository = new EntityLibRepository<AttributeLib>(context));
@@ -62,6 +66,8 @@ namespace DAL.Repositories
         public IRepository<IDalEntityLib, EventTypeLib> EventTypeLibs => eventTypeLibRepository ?? (eventTypeLibRepository = new EntityLibRepository<EventTypeLib>(context));
 
         public UserLibRepository UserLibs => userLibRepository ?? (userLibRepository = new UserLibRepository(context));
+
+        public ReconcilerLibRepository ReconcilerLibs => reconcilerLibRepository ?? (reconcilerLibRepository = new ReconcilerLibRepository(context));
 
         public FilepathLibRepository FilepathLibs => filepathLibRepository ?? (filepathLibRepository = new FilepathLibRepository(context));
 

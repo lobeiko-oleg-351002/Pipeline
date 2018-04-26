@@ -17,7 +17,7 @@ namespace DAL.Mapping
                 Id = entity.id,
                 Lib_id = entity.lib_id,
                 Entity_id = entity.entity_id,
-                IsEventAccepted = entity.isEventAccepted
+                IsEventAccepted = entity.isEventAccepted,
             };
         }
 
@@ -28,7 +28,7 @@ namespace DAL.Mapping
                 id = entity.Id,
                 entity_id = entity.Entity_id,
                 lib_id = entity.Lib_id,
-                isEventAccepted = entity.IsEventAccepted
+                isEventAccepted = entity.IsEventAccepted,
             };
         }
     }

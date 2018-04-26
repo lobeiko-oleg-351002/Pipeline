@@ -82,38 +82,41 @@ namespace Client.Misc
 
         private void IndicateMissedEventsAndStatuses()
         {
-            form.Text = AddVersionToFormName(formName);
-            bool haveMissedEvents = false;
-            if (NewEventsCount > 0)
+            form.Invoke(new Action(() =>
             {
-                form.Text += " (" + NewEventsCount + ")";
-                haveMissedEvents = true;
-                StartFlashing();
-                trayIconController.SetTrayNewEventIcon();
-            }
-
-            bool isTrayStatusEnabled = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS);
-            bool isTaskbarStatusEnabled = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS);
-
-            if ((NewStatusesCount > 0) )
-            {
-                haveMissedEvents = true;
-
-                if (isTrayStatusEnabled)
+                form.Text = AddVersionToFormName(formName);
+                bool haveMissedEvents = false;
+                if (NewEventsCount > 0)
                 {
+                    form.Text += " (" + NewEventsCount + ")";
+                    haveMissedEvents = true;
+                    StartFlashing();
                     trayIconController.SetTrayNewEventIcon();
                 }
-                if (isTaskbarStatusEnabled)
-                {
-                    StartFlashing();
-                }
-            }
 
-            if (!haveMissedEvents)
-            {
-                StopFlashing();
-                trayIconController.SetTrayCommontIcon();
-            }
+                bool isTrayStatusEnabled = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TRAY_INDICATION_STATUS);
+                bool isTaskbarStatusEnabled = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_TASKBAR_INDICATION_STATUS);
+
+                if ((NewStatusesCount > 0))
+                {
+                    haveMissedEvents = true;
+
+                    if (isTrayStatusEnabled)
+                    {
+                        trayIconController.SetTrayNewEventIcon();
+                    }
+                    if (isTaskbarStatusEnabled)
+                    {
+                        StartFlashing();
+                    }
+                }
+
+                if (!haveMissedEvents)
+                {
+                    StopFlashing();
+                    trayIconController.SetTrayCommontIcon();
+                }
+            }));
         }
 
 

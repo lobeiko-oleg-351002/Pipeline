@@ -1,5 +1,6 @@
 ﻿using BllEntities;
 using BllEntities.Interface;
+using Client.EventClasses;
 using Client.Misc;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
@@ -25,8 +26,12 @@ namespace Client.Forms
         List<BllUser> Users = new List<BllUser>();
         List<string> Filepaths = new List<string>();
         List<BllUser> Approvers = new List<BllUser>();
+        List<BllUser> Reconcilers = new List<BllUser>();
         BllUser Sender;
-        
+
+        const string APPROVER_IN_RECONCILERS = "Утверждающий не должен участвовать в согласовании!";
+        const string EMPTY_RECONCILERS = "Не выбрано ни одного пользователя для согласования!";
+
         public AddEventForm()
         {
             InitializeComponent();
@@ -44,6 +49,7 @@ namespace Client.Forms
             PopulateEventTypeComboBox(Sender.EventTypeLib);
             PopulateAttributeCheckList();
             PopulateRecieverTreeView();
+            PopulateReconcilers();
             PopulateApproversComboBox();
             if (Sender.EventTypeLib.SelectedEntities.Count > 0)
             {
@@ -98,14 +104,7 @@ namespace Client.Forms
         {
             UserService userService = new UserService(serverInstance);
             Approvers = userService.GetApprovers();
-            try
-            {
-                Approvers.Remove(Approvers.Single(e => e.Id == Sender.Id));
-            }
-            catch
-            {
-
-            }
+            RemoveSenderFromApproverList();
             foreach (var user in Approvers)
             {
                 comboBox1.Items.Add(user.Fullname);
@@ -118,8 +117,47 @@ namespace Client.Forms
             else
             {
                 checkBox1.Enabled = false;
-                checkBox1.Checked = false;
                 comboBox1.Enabled = false;
+            }
+        }
+
+        private void RemoveSenderFromApproverList()
+        {
+            try
+            {
+                Approvers.Remove(Approvers.Single(e => e.Id == Sender.Id));
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void PopulateReconcilers()
+        {
+            checkedListBox2.Enabled = false;
+            UserService userService = new UserService(serverInstance);
+            Reconcilers = userService.GetReconcilers();
+            RemoveSenderFromReconcilerList();
+            foreach (var user in Reconcilers)
+            {
+                checkedListBox2.Items.Add(user.Fullname);
+            }
+            if (checkedListBox2.Items.Count == 0)
+            {
+                checkBox2.Enabled = false;
+            }
+        }
+
+        public void RemoveSenderFromReconcilerList()
+        {
+            try
+            {
+                Reconcilers.Remove(Reconcilers.Single(e => e.Id == Sender.Id));
+            }
+            catch
+            {
+
             }
         }
 
@@ -211,24 +249,65 @@ namespace Client.Forms
 
             SetRecieversFromTreeView(Event);
 
-            HandleApprovement();
+            CreateEventAccordingToApproversAndReconcilers();
 
             AppConfigManager.SetKeyValue(Properties.Resources.TAG_ADDEVENT_APPROVE_BOX, checkBox1.Checked.ToString());
         }
 
-        private void HandleApprovement()
+        private void CreateEventAccordingToApproversAndReconcilers()
         {
             IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
-            if (!checkBox1.Checked)
+            if (!checkBox1.Checked && !checkBox2.Checked)
             {
                 Event.IsApproved = true;
                 CallCreateMethod(eventCRUD.CreateAndSendOutEvent, Event);
             }
-            else
+            if (!checkBox1.Checked && checkBox2.Checked)
+            {
+                if (IsReconcilerListEmpty())
+                {
+                    MessageBox.Show(EMPTY_RECONCILERS);
+                    return;
+                }
+
+                Event.IsApproved = true;
+                Event.ReconcilerLib = new BllReconcilerLib();
+
+                foreach (var item in checkedListBox2.CheckedIndices.Cast<int>().ToArray())
+                {
+                    Event.ReconcilerLib.SelectedEntities.Add(new BllSelectedUserReconciler { Entity = Reconcilers[item] });
+                }
+                RemoveReconcilersFromRecievers();
+
+                CallCreateMethod(eventCRUD.CreateEventAndSendToReconcilers, Event);
+            }
+            if (checkBox1.Checked && !checkBox2.Checked)
             {
                 Event.Approver = Approvers[comboBox1.SelectedIndex];
                 Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false });
                 CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
+            }
+            if (checkBox1.Checked && checkBox2.Checked)
+            {
+                try
+                {
+                    CheckConflicstWithReconcilersAndApprover();
+                    Event.Approver = Approvers[comboBox1.SelectedIndex];
+                    Event.ReconcilerLib = new BllReconcilerLib();
+                    Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false });
+
+                    foreach (var item in checkedListBox2.CheckedIndices.Cast<int>().ToArray())
+                    {
+                        Event.ReconcilerLib.SelectedEntities.Add(new BllSelectedUserReconciler { Entity = Reconcilers[item] });
+                    }
+                    RemoveReconcilersFromRecievers();
+
+                    CallCreateMethod(eventCRUD.CreateEventAndSendToReconcilers, Event);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
@@ -273,6 +352,24 @@ namespace Client.Forms
                     }
                 }
                 nodeCount += groupNode.GetNodeCount(false);
+            }
+        }
+
+        private void RemoveReconcilersFromRecievers()
+        {
+            for (int i = 0; i < Event.RecieverLib.SelectedEntities.Count;)
+            {
+                var reciever = Event.RecieverLib.SelectedEntities[i].Entity;
+                i++;
+                foreach (var item in Event.ReconcilerLib.SelectedEntities)
+                {
+                    if (reciever.Id == item.Entity.Id)
+                    {
+                        i--;
+                        Event.RecieverLib.SelectedEntities.RemoveAt(i);
+                        break;
+                    }
+                }
             }
         }
 
@@ -380,6 +477,51 @@ namespace Client.Forms
             {
                 comboBox1.Enabled = false;
             }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                checkedListBox2.Enabled = true;
+            }
+            else
+            {
+                checkedListBox2.Enabled = false;
+            }
+        }
+
+        private void CheckConflicstWithReconcilersAndApprover()
+        {
+            if (IsApproverInReconcilers())
+            {
+                throw new Exception(APPROVER_IN_RECONCILERS);
+            }
+            if (IsReconcilerListEmpty())
+            {
+                throw new Exception(EMPTY_RECONCILERS);
+            }
+        }
+
+        private bool IsApproverInReconcilers()
+        {
+            for(int i = 0; i < checkedListBox2.CheckedIndices.Count; i++)
+            {
+                if (EventHelper.AreUsersEqual(Approvers[comboBox1.SelectedIndex], Reconcilers[checkedListBox2.CheckedIndices[i]]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsReconcilerListEmpty()
+        {
+            if (checkedListBox2.CheckedItems.Count == 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

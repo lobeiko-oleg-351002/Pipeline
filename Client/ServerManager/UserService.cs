@@ -47,5 +47,21 @@ namespace Client.ServerManager
                 }
             }
         }
+
+        public List<BllUser> GetReconcilers()
+        {
+            while (true)
+            {
+                try
+                {
+                    IUserGetter ug = new UserGetter(serverInstance.server);
+                    return ug.GetReconcilers();
+                }
+                catch
+                {
+                    serverInstance.ConnectToServer();
+                }
+            }
+        }
     }
 }

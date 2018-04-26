@@ -40,6 +40,7 @@ namespace BLL.Mapping
                 StatusLib_id = entity.StatusLib.Id,
                 SignInDate = entity.SignInDate,
                 RightToApprove = entity.RightToApprove,
+                RightToReconcile = entity.RightToReconcile
             };
 
             return dalEntity;
@@ -58,7 +59,8 @@ namespace BLL.Mapping
                 EventTypeLib = eventTypeLibService.Get(entity.EventTypeLib_id),
                 StatusLib = statusLibService.Get(entity.StatusLib_id),
                 SignInDate = entity.SignInDate,
-                RightToApprove = entity.RightToApprove
+                RightToApprove = entity.RightToApprove,
+                RightToReconcile = entity.RightToReconcile
             };
 
             return bllEntity;

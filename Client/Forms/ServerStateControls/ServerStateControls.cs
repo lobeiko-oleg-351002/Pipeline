@@ -10,13 +10,11 @@ namespace Client.Forms.ServerStateControls
     {
         public readonly Label ServerState;
         public readonly Label UserName;
-        public readonly Control ParentFormControl;
 
         public ServerStateControls(Label serverState, Label userName, Control parentFormControl, IFormControllerSet set) : base(set) 
         {
             this.ServerState = serverState;
             this.UserName = userName;
-            this.ParentFormControl = parentFormControl;
         }
     }
 }

@@ -9,9 +9,7 @@ using System.Text;
 namespace DAL.Mapping
 {
     public class UserLibMapper : IMapper<DalUserLib, UserLib>
-
     {
-
         public DalUserLib MapToDal(UserLib entity)
         {
             return new DalUserLib

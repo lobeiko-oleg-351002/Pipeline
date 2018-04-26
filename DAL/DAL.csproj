@@ -57,6 +57,7 @@
     <Compile Include="Entities\DalFilepath.cs" />
     <Compile Include="Entities\DalFilepathLib.cs" />
     <Compile Include="Entities\DalGroup.cs" />
+    <Compile Include="Entities\DalReconcilerLib.cs" />
     <Compile Include="Entities\DalSelectedEntity.cs" />
     <Compile Include="Entities\DalSelectedStatus.cs" />
     <Compile Include="Entities\DalSelectedUser.cs" />
@@ -85,9 +86,12 @@
     <Compile Include="Mapping\Interface\IMapper.cs" />
     <Compile Include="Mapping\Interface\IStatusMapper.cs" />
     <Compile Include="Mapping\Interface\IUserMapper.cs" />
+    <Compile Include="Mapping\ReconcilerLibMapper.cs" />
     <Compile Include="Mapping\SelectedEntityMapper.cs" />
     <Compile Include="Mapping\SelectedStatusMapper.cs" />
     <Compile Include="Mapping\SelectedUserMapper.cs" />
+    <Compile Include="Entities\DalSelectedUserReconciler.cs" />
+    <Compile Include="Mapping\SelectedUserReconcilerMapper.cs" />
     <Compile Include="Mapping\StatusLibMapper.cs" />
     <Compile Include="Mapping\StatusMapper.cs" />
     <Compile Include="Mapping\UserLibMapper.cs" />
@@ -111,9 +115,11 @@
     <Compile Include="Repositories\Interface\IStatusRepository.cs" />
     <Compile Include="Repositories\Interface\IUnitOfWork.cs" />
     <Compile Include="Repositories\Interface\IUserRepository.cs" />
+    <Compile Include="Repositories\ReconcilerLibRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Repositories\SelectedEntityRepository.cs" />
     <Compile Include="Repositories\SelectedStatusRepository.cs" />
+    <Compile Include="Repositories\SelectedUserReconcilerRepository.cs" />
     <Compile Include="Repositories\SelectedUserRepository.cs" />
     <Compile Include="Repositories\StatusLibRepository.cs" />
     <Compile Include="Repositories\StatusRepository.cs" />

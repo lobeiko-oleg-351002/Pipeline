@@ -25,7 +25,8 @@ namespace DAL.Mapping
                 Receiver_lib_id = entity.receiver_lib_id,
                 Status_lib_id = entity.status_lib_id,
                 Approver_id = entity.approver_id,
-                IsApproved = entity.isApproved 
+                IsApproved = entity.isApproved,
+                Reconciler_lib_id = entity.reconciler_lib_id
             };
         }
 
@@ -44,7 +45,8 @@ namespace DAL.Mapping
                 receiver_lib_id = entity.Receiver_lib_id,
                 status_lib_id = entity.Status_lib_id,
                 approver_id = entity.Approver_id,
-                isApproved = entity.IsApproved
+                isApproved = entity.IsApproved,
+                reconciler_lib_id = entity.Reconciler_lib_id
             };
         }
     }

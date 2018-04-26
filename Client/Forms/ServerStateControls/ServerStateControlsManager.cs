@@ -18,7 +18,7 @@ namespace Client.Forms.ServerStateControls
 
         public void SetControlsAccordingToServerOffline()
         {
-            serverStateControls.ParentFormControl.Invoke(new Action(() =>
+            serverStateControls.ControllerSet.mainForm.Invoke(new Action(() =>
             {
                 serverStateControls.ServerState.Text = Properties.Resources.SERVER_OFFLINE;
                 serverStateControls.ServerState.ForeColor = Color.Red;
@@ -30,7 +30,7 @@ namespace Client.Forms.ServerStateControls
 
         public void SetControlsAccordingToServerOnline()
         {
-            serverStateControls.ParentFormControl.Invoke(new Action(() =>
+            serverStateControls.ControllerSet.mainForm.Invoke(new Action(() =>
             {
                 serverStateControls.ServerState.Text = Properties.Resources.SERVER_ONLINE;
                 serverStateControls.ServerState.ForeColor = Color.Black;
@@ -46,7 +46,7 @@ namespace Client.Forms.ServerStateControls
 
         private void SetUserFullnameOnLabel()
         {
-            serverStateControls.ParentFormControl.Invoke(new Action(() =>
+            serverStateControls.ControllerSet.mainForm.Invoke(new Action(() =>
             {
                 serverStateControls.UserName.Text = serverStateControls.ControllerSet.client.GetUser().Fullname;
             }));

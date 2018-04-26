@@ -9,6 +9,7 @@ using Client.Forms.FileControls;
 using Client.Forms.MainFormControls;
 using Client.Forms.NoteControls;
 using Client.Forms.RecieverControls;
+using Client.Forms.ReconcileControls;
 using Client.Forms.ServerStateControls;
 using Client.Forms.StaticControls;
 using Client.Forms.StatusControls;
@@ -78,6 +79,7 @@ namespace Client
 
         private void InitControlManagers()
         {
+            formControllerSet.mainForm = this;
             InitStatusControls();
             InitFileControls();
             InitRecieverControls();
@@ -88,6 +90,7 @@ namespace Client
             InitServerStateControls();
             InitEventManager();
             InitApproveControls();
+            InitReconcileControls();
             formControllerSet.indication = new Indication(this);
             formControllerSet.client = new ClientLauncher(formControllerSet.eventManager.clientCallback, formControllerSet.serverStateControlsManager);
         }
@@ -153,6 +156,12 @@ namespace Client
         {
             var approveControls = new ApproveControls(radioButton1, radioButton2, button3, groupBox2, formControllerSet);
             formControllerSet.approveControlsManager = new ApproveControlsManager(approveControls);
+        }
+
+        private void InitReconcileControls()
+        {
+            var reconcileControls = new ReconcileControls(radioButton4, radioButton3, button4, groupBox5, formControllerSet);
+            formControllerSet.reconcileControlsManager = new ReconcileControlsManager(reconcileControls);
         }
 
         private void AddAppShortcutToStartup()

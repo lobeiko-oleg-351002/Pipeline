@@ -37,6 +37,10 @@ namespace ORM
 
         public bool? isApproved { get; set; }
 
+        public int? reconciler_lib_id { get; set; }
+
+        public virtual ReconcilerLib Reconcilers {get;set;}
+
         public virtual AttributeLib AttributeLib { get; set; }
 
         public virtual EventType EventType { get; set; }

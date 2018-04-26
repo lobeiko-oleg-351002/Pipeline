@@ -126,6 +126,77 @@ namespace Server
             }
         }
 
+        public BllEvent CreateEventAndSendToReconcilers(BllEvent Event)
+        {
+            try
+            {
+                var datetime = DateTime.Now;
+                Event.Date = datetime;
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    BllEvent res = eventService.Create(Event);
+                    InvokeEventWithReconcilers(Event);
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("CreateEventAndSendToReconcilers", ex.Message + ex.InnerException, Event.Sender.Fullname);
+                return Event;
+            }
+        }
+
+        public void HandleReconcilerSigning(BllEvent Event)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    Event = eventService.Update(Event);
+                    if (IsEventReconciled(Event))
+                    {
+                        if (Event.Approver != null)
+                        {
+                            InvokeEventWithApprover(Event);
+                        }
+                        else
+                        {
+                            InvokeEventWithRecievers(Event);
+                        }
+                    }
+                    UpdateEventWithReconcilers(Event);
+                    Clients[Event.Sender.Login].UpdateEvent(Event);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("UpdateReconcilers", ex.Message + ex.InnerException, "");
+            }
+        }
+
+        public static bool IsEventReconciled(BllEvent Event)
+        {
+            foreach (var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                if (item.IsEventReconciled == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    if (item.IsEventReconciled.Value == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private void InvokeEventWithApprover(BllEvent Event)
         {
             try
@@ -136,6 +207,36 @@ namespace Server
             {
                 Clients.Remove(Event.Approver.Login);
             }           
+        }
+
+        private void InvokeEventWithReconcilers(BllEvent Event)
+        {
+            foreach (var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                try
+                {
+                    Clients[item.Entity.Login].GetEvent(Event);
+                }
+                catch (Exception ex)
+                {
+                    Clients.Remove(item.Entity.Login);
+                }
+            }
+        }
+
+        private void UpdateEventWithReconcilers(BllEvent Event)
+        {
+            foreach (var item in Event.ReconcilerLib.SelectedEntities)
+            {
+                try
+                {
+                    Clients[item.Entity.Login].UpdateEvent(Event);
+                }
+                catch (Exception ex)
+                {
+                    Clients.Remove(item.Entity.Login);
+                }
+            }
         }
 
         private void UpdateDisapprovedEventWithApprover(BllEvent Event)
@@ -221,6 +322,10 @@ namespace Server
                     new Thread(() =>
                     {
                         UpdateEventWithUsers(Event, updater);
+                        if (Event.ReconcilerLib != null)
+                        {
+                            UpdateEventWithReconcilers(Event);
+                        }
                     }).Start();
                     return Event;
                 }
@@ -249,7 +354,22 @@ namespace Server
                     }
                     else
                     {
-                        Clients[Event.Sender.Login].DisapproveEvent(Event);
+                        try
+                        {
+                            Clients[Event.Sender.Login].DisapproveEvent(Event);
+                        }
+                        catch { }
+                        if (Event.ReconcilerLib != null)
+                        {
+                            foreach(var item in Event.ReconcilerLib.SelectedEntities)
+                            {
+                                try
+                                {
+                                    Clients[item.Entity.Login].DisapproveEvent(Event);
+                                }
+                                catch { }
+                            }
+                        }
                     }
                 }
             }
@@ -320,7 +440,24 @@ namespace Server
             {
                 LogWriter.WriteMessage("UpdateEventRecievers", ex.Message + ex.InnerException, "");
             }           
-        }    
+        }
+
+        public void UpdateEventReconcilers(BllEvent Event)
+        {
+            try
+            {
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    ReconcilerLibService userservice = new ReconcilerLibService(uow);
+                    userservice.Update(Event.ReconcilerLib);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("UpdateEventReconcilers", ex.Message + ex.InnerException, "");
+            }
+        }
 
         public void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers)
         {
@@ -336,6 +473,10 @@ namespace Server
                     {
                         InvokeEventWithUsers(Event, newRecievers);
                         UpdateEventWithRecieversExceptUsers(Event, newRecievers);
+                        if (Event.ReconcilerLib != null)
+                        {
+                            UpdateEventWithReconcilers(Event);
+                        }
                     }).Start();
                 }
             }
@@ -360,10 +501,29 @@ namespace Server
                     UserLibService userservice = new UserLibService(uow);
                     Event.RecieverLib = userservice.Update(Event.RecieverLib);
 
-                    new Thread(() =>
+                    if (Event.ReconcilerLib == null)
                     {
-                        UpdateEventWithUsers(Event, updater);
-                    }).Start();
+                        new Thread(() =>
+                        {
+                            UpdateEventWithUsers(Event, updater);
+                        }).Start();
+                    }
+                    else
+                    {
+                        if (IsEventReconciled(Event))
+                        {
+                            new Thread(() =>
+                            {
+                                UpdateEventWithUsers(Event, updater);
+                            }).Start();
+                        }
+                        new Thread(() =>
+                        {
+                            UpdateEventWithReconcilers(Event);
+                        }).Start();
+                    }
+
+
                     return Event;
                 }
             }
@@ -751,6 +911,16 @@ namespace Server
                 IUnitOfWork uow = new UnitOfWork(serviceDB);
                 IUserService UserService = new UserService(uow);
                 return UserService.GetApprovers();
+            }
+        }
+
+        public List<BllUser> GetReconcilers()
+        {
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IUserService UserService = new UserService(uow);
+                return UserService.GetReconcilers();
             }
         }
         #endregion

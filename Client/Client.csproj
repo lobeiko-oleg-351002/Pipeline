@@ -70,6 +70,8 @@
     <Compile Include="Forms\NoteControls\NoteControlsManager.cs" />
     <Compile Include="Forms\RecieverControls\RecieverControls.cs" />
     <Compile Include="Forms\RecieverControls\RecieverControlsManager.cs" />
+    <Compile Include="Forms\ReconcileControls\ReconcileControls.cs" />
+    <Compile Include="Forms\ReconcileControls\ReconcileControlsManager.cs" />
     <Compile Include="Forms\ServerStateControls\ServerStateControls.cs" />
     <Compile Include="Forms\ServerStateControls\ServerStateControlsManager.cs" />
     <Compile Include="Forms\StaticControls\StaticControls.cs" />

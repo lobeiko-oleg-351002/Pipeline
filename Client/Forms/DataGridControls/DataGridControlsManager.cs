@@ -68,13 +68,13 @@ namespace Client.Forms.DataGridControls
 
         public void UpdateSelectedEvent(BllEvent source, int rowNum)
         {
+            dataGridPopulationManager.ClearApprovedColumn(rowNum);
             if (dataGridControls.DataGrid.SelectedRows.Count > 0)
             {
                 if (GetSelectedRowIndex() == rowNum)
                 {
                     dataGridControls.ControllerSet.statusControlsManager.PopulateStatusDataGridUsingStatusLib(source.StatusLib);
-                    dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers();
-                    //dataGridControls.ControllerSet.recieverControlsManager.FillUserChecklist(source.RecieverLib.SelectedEntities);
+                    dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers(rowNum);
                     HandleStatusChanging();
                 }
             }
@@ -165,7 +165,7 @@ namespace Client.Forms.DataGridControls
 
             SetSelectedEventToControls();
 
-            dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers();
+            dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers(e.Row.Index);
             HandleStatusChanging();
         }
 

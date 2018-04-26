@@ -14,7 +14,10 @@ namespace Client.ServerManager.Interface
         BllEvent CreateAndSendOutEvent(BllEvent Event);
         void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers);
         void UpdateEventRecievers(BllEvent Event);
+        void UpdateEventReconcilers(BllEvent Event);
         BllEvent CreateEventAndSendToApprover(BllEvent Event);
         void ApproveAndSendOutEvent(BllEvent Event);
+        BllEvent CreateEventAndSendToReconcilers(BllEvent Event);
+        void UpdateReconcilers(BllEvent Event);
     }
 }

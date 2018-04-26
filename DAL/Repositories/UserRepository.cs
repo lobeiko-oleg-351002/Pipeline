@@ -81,5 +81,16 @@ namespace DAL.Repositories
             }
             return users;
         }
+
+        public List<DalUser> GetReconcilers()
+        {
+            List<DalUser> users = new List<DalUser>();
+
+            foreach (var item in context.Users.Where(entity => entity.rightToReconcile == true))
+            {
+                users.Add(mapper.MapToDal(item));
+            }
+            return users;
+        }
     }
 }

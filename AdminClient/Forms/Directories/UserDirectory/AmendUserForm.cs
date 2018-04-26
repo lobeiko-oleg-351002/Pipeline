@@ -25,6 +25,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
             textBox1.Text = entity.Fullname;
             textBox2.Text = entity.Login;
             checkBox2.Checked = entity.RightToApprove;
+            checkBox1.Checked = entity.RightToReconcile;
 
             foreach(var entityItem in entity.EventTypeLib.SelectedEntities)
             {
@@ -62,6 +63,7 @@ namespace AdminClient.Forms.Directories.UserDirectory
             }
             User.Group = Groups[comboBox1.SelectedIndex];
             User.RightToApprove = checkBox2.Checked;
+            User.RightToReconcile = checkBox1.Checked;
             UpdateEventTypeLib(User);
             UpdateStatusLib(User);
 

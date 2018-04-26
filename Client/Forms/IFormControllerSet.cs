@@ -7,6 +7,7 @@ using Client.Forms.FileControls;
 using Client.Forms.MainFormControls;
 using Client.Forms.NoteControls;
 using Client.Forms.RecieverControls;
+using Client.Forms.ReconcileControls;
 using Client.Forms.ServerStateControls;
 using Client.Forms.StaticControls;
 using Client.Forms.StatusControls;
@@ -16,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Client.Forms
 {
@@ -25,6 +27,7 @@ namespace Client.Forms
         ClientLauncher client { get; set; }
         EventManager eventManager { get; set; }
         Indication indication { get; set; }
+        Control mainForm { get; set; }
 
         FileControlsManager fileControlsManager { get; set; }
         NoteControlsManager noteControlsManager { get; set; }
@@ -35,5 +38,6 @@ namespace Client.Forms
         MainFormControlsManager mainFormControlsManager { get; set; }
         ServerStateControlsManager serverStateControlsManager { get; set; }
         ApproveControlsManager approveControlsManager { get; set; }
+        ReconcileControlsManager reconcileControlsManager { get; set; }
     }
 }
