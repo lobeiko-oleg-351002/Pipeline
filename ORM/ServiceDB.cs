@@ -135,7 +135,7 @@ namespace ORM
 
             modelBuilder.Entity<ReconcilerLib>()
                 .HasMany(e => e.Event)
-                .WithRequired(e => e.Reconcilers)
+                .WithOptional(e => e.Reconcilers)
                 .HasForeignKey(e => e.reconciler_lib_id)
                 .WillCascadeOnDelete(false);
 

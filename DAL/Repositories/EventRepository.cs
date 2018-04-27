@@ -22,18 +22,20 @@ namespace DAL.Repositories
         {
             EventMapper mapper = new EventMapper();
 
-            var events = context.Set<Event>().Where(entity =>
-                (entity.sender_id == user_id) //IsUserSender
-                || entity.Reconcilers.SelectedUserReconciler.Any(e => e.User.id == user_id) //IsUserMatchInReconcilerLib;
-                || ((entity.UserLib.SelectedUser.Any(e => e.User.id == user_id) //IsUserMatchInRecieverLib
-                    &&
+            var events = context.Set<Event>().Where(entity =>                
+                entity.Reconcilers.SelectedUserReconciler.Any(e => e.User.id == user_id) //IsUserMatchInReconcilerLib;
+                    || 
+                entity.UserLib.SelectedUser.Any(e => e.User.id == user_id) //IsUserMatchInRecieverLib
+                    &&  (
+                        (entity.sender_id == user_id) //IsUserSender
+                            ||
                         (entity.reconciler_lib_id != null ? entity.Reconcilers.SelectedUserReconciler.Where(en => en.isEventReconciled.HasValue ? en.isEventReconciled.Value : false).Count() == entity.Reconcilers.SelectedUserReconciler.Count : true) // IsEventReconciled
-                    ))
-                && (
-                    (entity.approver_id != null ? entity.approver_id.Value == user_id : false) //IsUserApprover
-                    || (entity.isApproved != null ? entity.isApproved.Value : false) //IsEventApproved  
-                    
-                   )
+                            &&  (
+                                (entity.approver_id != null ? entity.approver_id.Value == user_id : false) //IsUserApprover
+                                    ||
+                                (entity.isApproved != null ? entity.isApproved.Value : false) //IsEventApproved  
+                                )
+                        )
                 );
 
             var retElemets = new List<DalEvent>();

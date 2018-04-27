@@ -23,7 +23,7 @@ namespace ORM.Migrations
             //      p => p.FullName,
             //      new Person { FullName = "Andrew Peters" },
             //      new Person { FullName = "Brice Lambson" },
-            //      new Person { FullName = "Rowan Miller" } 
+            //      new Person { FullName = "Rowan Miller" }
             //    );
             //
         }

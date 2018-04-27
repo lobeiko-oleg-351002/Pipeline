@@ -60,9 +60,9 @@
     <Compile Include="Group.cs" />
     <Compile Include="IOrmEntity.cs" />
     <Compile Include="ISelectedEntity.cs" />
-    <Compile Include="Migrations\201804260914575_InitialCreate.cs" />
-    <Compile Include="Migrations\201804260914575_InitialCreate.Designer.cs">
-      <DependentUpon>201804260914575_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\201804261344387_InitialCreate.cs" />
+    <Compile Include="Migrations\201804261344387_InitialCreate.Designer.cs">
+      <DependentUpon>201804261344387_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ReconcilerLib.cs" />
@@ -83,8 +83,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201804260914575_InitialCreate.resx">
-      <DependentUpon>201804260914575_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201804261344387_InitialCreate.resx">
+      <DependentUpon>201804261344387_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
