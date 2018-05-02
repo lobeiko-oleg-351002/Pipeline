@@ -15,6 +15,7 @@ using Client.Forms.StaticControls;
 using Client.Forms.StatusControls;
 using Client.Misc;
 using Client.Misc.FileService;
+using Client.Misc.Printing;
 using Client.ServerManager;
 using Client.ServerManager.Interface;
 using Globals;
@@ -225,6 +226,12 @@ namespace Client
             }
 
             base.WndProc(ref m);
+        }
+
+        private void печатьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PrintHandler printHandler = new PrintHandler(printDocument1);
+            printHandler.PrintDataGrid(dataGridView1);
         }
     }
 }
