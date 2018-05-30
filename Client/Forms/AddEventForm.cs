@@ -256,40 +256,40 @@ namespace Client.Forms
 
         private void CreateEventAccordingToApproversAndReconcilers()
         {
-            IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
-            if (!checkBox1.Checked && !checkBox2.Checked)
+            try
             {
-                Event.IsApproved = true;
-                CallCreateMethod(eventCRUD.CreateAndSendOutEvent, Event);
-            }
-            if (!checkBox1.Checked && checkBox2.Checked)
-            {
-                if (IsReconcilerListEmpty())
+                IEventCRUD eventCRUD = new EventCRUD(serverInstance.server);
+                if (!checkBox1.Checked && !checkBox2.Checked)
                 {
-                    MessageBox.Show(EMPTY_RECONCILERS);
-                    return;
+                    Event.IsApproved = true;
+                    CallCreateMethod(eventCRUD.CreateAndSendOutEvent, Event);
                 }
-
-                Event.IsApproved = true;
-                Event.ReconcilerLib = new BllReconcilerLib();
-
-                foreach (var item in checkedListBox2.CheckedIndices.Cast<int>().ToArray())
+                if (!checkBox1.Checked && checkBox2.Checked)
                 {
-                    Event.ReconcilerLib.SelectedEntities.Add(new BllSelectedUserReconciler { Entity = Reconcilers[item] });
-                }
-                RemoveReconcilersFromRecievers();
+                    if (IsReconcilerListEmpty())
+                    {
+                        MessageBox.Show(EMPTY_RECONCILERS);
+                        return;
+                    }
 
-                CallCreateMethod(eventCRUD.CreateEventAndSendToReconcilers, Event);
-            }
-            if (checkBox1.Checked && !checkBox2.Checked)
-            {
-                Event.Approver = Approvers[comboBox1.SelectedIndex];
-                Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false });
-                CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
-            }
-            if (checkBox1.Checked && checkBox2.Checked)
-            {
-                try
+                    Event.IsApproved = true;
+                    Event.ReconcilerLib = new BllReconcilerLib();
+
+                    foreach (var item in checkedListBox2.CheckedIndices.Cast<int>().ToArray())
+                    {
+                        Event.ReconcilerLib.SelectedEntities.Add(new BllSelectedUserReconciler { Entity = Reconcilers[item] });
+                    }
+                    RemoveReconcilersFromRecievers();
+
+                    CallCreateMethod(eventCRUD.CreateEventAndSendToReconcilers, Event);
+                }
+                if (checkBox1.Checked && !checkBox2.Checked)
+                {
+                    Event.Approver = Approvers[comboBox1.SelectedIndex];
+                    Event.RecieverLib.SelectedEntities.Add(new BllSelectedUser { Entity = Event.Approver, IsEventAccepted = false });
+                    CallCreateMethod(eventCRUD.CreateEventAndSendToApprover, Event);
+                }
+                if (checkBox1.Checked && checkBox2.Checked)
                 {
                     CheckConflicstWithReconcilersAndApprover();
                     Event.Approver = Approvers[comboBox1.SelectedIndex];
@@ -304,10 +304,10 @@ namespace Client.Forms
 
                     CallCreateMethod(eventCRUD.CreateEventAndSendToReconcilers, Event);
                 }
-                catch(Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка");
             }
         }
 
@@ -316,12 +316,12 @@ namespace Client.Forms
             try
             {               
                 Event = method(Event);
-                Close();
                 AppConfigManager.SetKeyValue(Event.Type.Name, textBox1.Text);
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                throw ex;
             }
         }
 

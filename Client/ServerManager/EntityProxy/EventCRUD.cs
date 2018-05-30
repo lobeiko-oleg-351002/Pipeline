@@ -56,9 +56,9 @@ namespace Client.ServerManager
             {
                 return server.CreateAndSendOutEvent(Event);
             }
-            catch
+            catch(Exception ex)
             {
-                throw new ConnectionFailedException();
+                throw new ConnectionFailedException(ex.Message);
             }
         }
 
