@@ -19,6 +19,9 @@ namespace ServerInterface
         List<BllUser> GetUsersByGroup(BllGroup group);
 
         [OperationContract]
+        List<BllEvent> GetAllEvents();
+
+        [OperationContract]
         List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
 
         [OperationContract]

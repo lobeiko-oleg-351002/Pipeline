@@ -76,6 +76,7 @@ namespace Client
                 ExitApp();
             }
             InitializeAppProperties();
+            this.KeyDown += new KeyEventHandler(MainForm_KeyDown);
         }
 
         private void InitControlManagers()
@@ -232,6 +233,14 @@ namespace Client
         {
             PrintHandler printHandler = new PrintHandler(printDocument1);
             printHandler.PrintDataGrid(dataGridView1);
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.P)
+            {
+                formControllerSet.eventManager.GetAllEvents();
+            }
         }
     }
 }

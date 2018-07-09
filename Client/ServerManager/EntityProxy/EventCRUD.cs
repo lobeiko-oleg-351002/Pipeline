@@ -26,6 +26,18 @@ namespace Client.ServerManager
             }
         }
 
+        public List<BllEvent> GetAllEvents()
+        {
+            try
+            {
+                return server.GetAllEvents();
+            }
+            catch (Exception ex)
+            {
+                throw new ConnectionFailedException(ex.Message);
+            }
+        }
+
         public BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser sender)
         {
             try

@@ -246,6 +246,18 @@ namespace Client.Forms.EventControls
             SerializeEventsBackground();
         }
 
+        public void GetAllEvents()
+        {
+            Events.Clear();
+            List<BllEvent> eventsFromServer = GetAllEventsFromServer();
+            List<UiEvent> uiEventsFromServer = EventHelper.CreateSuitableUiEvents(eventsFromServer, eventControls.ControllerSet.client.GetUser());
+            AddEventsFromServerAndDownloadTheirFiles(uiEventsFromServer);
+            
+            //HideClosedEventsAccordingToConfigValue();
+            SortEventsUsingLastOrderFromCache();
+            SerializeEventsBackground();
+        }
+
         private List<BllEvent> GetEventsFromServerForCurrentUser()
         {
             bool success = false;
@@ -257,6 +269,28 @@ namespace Client.Forms.EventControls
                     IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
                     {
                         return eventCrud.GetEventsForUser(eventControls.ControllerSet.client.GetUser());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    success = false;
+                    eventControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
+                }
+            }
+            return null;
+        }
+
+        private List<BllEvent> GetAllEventsFromServer()
+        {
+            bool success = false;
+            while (!success)
+            {
+                success = true;
+                try
+                {
+                    IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+                    {
+                        return eventCrud.GetAllEvents();
                     }
                 }
                 catch (Exception ex)

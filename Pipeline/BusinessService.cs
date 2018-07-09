@@ -272,6 +272,27 @@ namespace Server
             }
         }
 
+        public List<BllEvent> GetAllEvents()
+        {
+            try
+            {
+                LogWriter.WriteMessage("Trying to GetAllEvents", "", "");
+                using (ServiceDB serviceDB = new ServiceDB())
+                {
+                    IUnitOfWork uow = new UnitOfWork(serviceDB);
+                    IEventService eventService = new EventService(uow);
+                    var events = eventService.GetAll().ToList();
+                    LogWriter.WriteMessage("Returning All Events", "", "");
+                    return events;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("GetAllEvents", ex.Message + ex.InnerException, "");
+                return null;
+            }
+        }
+
         public List<BllUser> GetUsersByGroup(BllGroup group)
         {
             try
