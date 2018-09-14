@@ -42,6 +42,12 @@ namespace Client.Forms
             InitializeComponent();
             this.serverInstance = server;
             this.Sender = sender;
+            
+            if (sender.Group.Name != Globals.Globals.VED_GROUP)
+            {
+                label3.Visible = false;
+                textBox2.Visible = false;
+            }
         }
 
         private void AddEventForm_Load(object sender, EventArgs e)
@@ -223,6 +229,12 @@ namespace Client.Forms
 
         private void button3_Click(object sender, EventArgs e)
         {
+            if ((textBox2.Text == "") && (Sender.Group.Name == Globals.Globals.VED_GROUP))
+            {
+                MessageBox.Show("Введите заказчика");
+                return;
+            }
+
             Event = new BllEvent();
             Event.Name = textBox1.Text;
             Event.Sender = this.Sender;
@@ -239,6 +251,7 @@ namespace Client.Forms
 
             Event.Type = Sender.EventTypeLib.SelectedEntities[comboBox2.SelectedIndex].Entity;
             Event.Description = richTextBox1.Text;
+            Event.CustomerNote = textBox2.Text;
             Event.StatusLib = new BllStatusLib();
 
             Event.AttributeLib = new BllAttributeLib();

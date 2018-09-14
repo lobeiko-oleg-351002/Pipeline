@@ -33,5 +33,7 @@ namespace BllEntities
         public bool? IsApproved { get; set; }
 
         public BllReconcilerLib ReconcilerLib { get; set; }
+
+        public string CustomerNote { get; set; }
     }
 }

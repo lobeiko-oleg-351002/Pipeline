@@ -52,7 +52,8 @@ namespace BLL.Mapping
                 Type_id = entity.Type.Id,
                 Approver_id = entity.Approver != null ? entity.Approver.Id : (int?)null,
                 IsApproved = entity.IsApproved,
-                Reconciler_lib_id = entity.ReconcilerLib != null ? entity.ReconcilerLib.Id : (int?)null
+                Reconciler_lib_id = entity.ReconcilerLib != null ? entity.ReconcilerLib.Id : (int?)null,
+                CustomerNote = entity.CustomerNote
             };
 
             return dalEntity;
@@ -74,7 +75,8 @@ namespace BLL.Mapping
                 Type = eventTypeService.Get(entity.Type_id),
                 Approver = entity.Approver_id != null ? userService.Get(entity.Approver_id.Value) : null,
                 IsApproved = entity.IsApproved,
-                ReconcilerLib = entity.Reconciler_lib_id != null ? reconcilerLibService.Get(entity.Reconciler_lib_id.Value) : null
+                ReconcilerLib = entity.Reconciler_lib_id != null ? reconcilerLibService.Get(entity.Reconciler_lib_id.Value) : null,
+                CustomerNote = entity.CustomerNote
             };
 
             return bllEntity;

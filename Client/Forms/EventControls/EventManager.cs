@@ -43,10 +43,16 @@ namespace Client.Forms.EventControls
             Events = new List<UiEvent>();
         }
 
+        public void UpdateEvent(UiEvent Event)
+        {
+            IEventCRUD crud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
+            crud.Update(Event.EventData);
+        }
+
         public void AddNewEvent(UiEvent Event)
         {
             Events.Add(Event);
-            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event);
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event, eventControls.ControllerSet.client.GetUser());
             eventControls.ControllerSet.indication.IncNewEventsCount();
             SortEventsUsingLastOrderFromCache();
         }
@@ -57,7 +63,7 @@ namespace Client.Forms.EventControls
             SortableColumn CurrentSorting = dataGridPopulationManager.GetSortingUsingColHeader(sortCol);
             CurrentSorting.Direction = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_DIR);
             CurrentSorting.Sort(Events);
-            dataGridPopulationManager.PopulateDataGrid(Events);
+            dataGridPopulationManager.PopulateDataGrid(Events, eventControls.ControllerSet.client.GetUser());
         }
 
         public void SortEventsUsingHeader(string header)
@@ -66,7 +72,7 @@ namespace Client.Forms.EventControls
             SortDirection *= DIRECTION_MULTIPLIER;
             CurrentSorting.Direction = SortDirection;
             CurrentSorting.Sort(Events);
-            dataGridPopulationManager.PopulateDataGrid(Events);
+            dataGridPopulationManager.PopulateDataGrid(Events, eventControls.ControllerSet.client.GetUser());
             SaveSortColumnAndDirectionToCache(header, SortDirection);
             HideClosedEventsAccordingToConfigValue();
         }
@@ -231,7 +237,7 @@ namespace Client.Forms.EventControls
             if (!eventControls.ControllerSet.client.GetServerInstance().IsConnected())
             {
                 Events = serializer.DeserializeEventsFromCache();
-                dataGridPopulationManager.PopulateDataGrid(Events);
+                dataGridPopulationManager.PopulateDataGrid(Events, eventControls.ControllerSet.client.GetUser());
             }
             else
             {
@@ -246,14 +252,23 @@ namespace Client.Forms.EventControls
             SerializeEventsBackground();
         }
 
-        public void GetAllEvents()
+        public void GetAllEventsForSender(BllUser user)
         {
             Events.Clear();
-            List<BllEvent> eventsFromServer = GetAllEventsFromServer();
-            List<UiEvent> uiEventsFromServer = EventHelper.CreateSuitableUiEvents(eventsFromServer, eventControls.ControllerSet.client.GetUser());
-            AddEventsFromServerAndDownloadTheirFiles(uiEventsFromServer);
-            
-            //HideClosedEventsAccordingToConfigValue();
+            Serializer serializer = new Serializer();
+            if (!eventControls.ControllerSet.client.GetServerInstance().IsConnected())
+            {
+                Events = serializer.DeserializeEventsFromCache();
+                dataGridPopulationManager.PopulateDataGrid(Events, user);
+            }
+            else
+            {
+                List<BllEvent> eventsFromServer = GetAllEventsFromServer(user);
+                List<UiEvent> uiEventsFromServer = EventHelper.CreateSuitableUiEvents(eventsFromServer, eventControls.ControllerSet.client.GetUser());
+                List<UiEvent> cachedEvents = serializer.DeserializeEventsFromCache();
+                AddLocalCachedEventsAndGetUpdateEventsFromServerUsingCache(uiEventsFromServer, cachedEvents);
+                AddEventsFromServerAndDownloadTheirFiles(uiEventsFromServer);
+            }
             SortEventsUsingLastOrderFromCache();
             SerializeEventsBackground();
         }
@@ -280,7 +295,7 @@ namespace Client.Forms.EventControls
             return null;
         }
 
-        private List<BllEvent> GetAllEventsFromServer()
+        private List<BllEvent> GetAllEventsFromServer(BllUser user)
         {
             bool success = false;
             while (!success)
@@ -290,7 +305,7 @@ namespace Client.Forms.EventControls
                 {
                     IEventCRUD eventCrud = new EventCRUD(eventControls.ControllerSet.client.GetServerInstance().server);
                     {
-                        return eventCrud.GetAllEvents();
+                        return eventCrud.GetAllEventsForSender(user);
                     }
                 }
                 catch (Exception ex)
@@ -362,7 +377,7 @@ namespace Client.Forms.EventControls
         private void AddRegularEvent(UiEvent Event)
         {
             Events.Add(Event);
-            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event);
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event, eventControls.ControllerSet.client.GetUser());
             StatusStyleManager.MakeGreenStatusForOTK(Event, dataGridView.Rows[Events.Count - 1], DateTimeHelper.GetDateTimeNow(eventControls.ControllerSet.client));
         }
 
@@ -370,7 +385,7 @@ namespace Client.Forms.EventControls
         {
             UiEvent wrappedEvent = new RegularEvent(Event, "");
             Events.Add(wrappedEvent);
-            dataGridPopulationManager.AddRowToDataGridUsingEvent(wrappedEvent);
+            dataGridPopulationManager.AddRowToDataGridUsingEvent(wrappedEvent, eventControls.ControllerSet.client.GetUser());
             SortEventsUsingLastOrderFromCache();
             HideClosedEventsAccordingToConfigValue();
             SerializeEventsBackground();

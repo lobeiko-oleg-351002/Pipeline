@@ -26,11 +26,11 @@ namespace Client.ServerManager
             }
         }
 
-        public List<BllEvent> GetAllEvents()
+        public List<BllEvent> GetAllEventsForSender(BllUser user)
         {
             try
             {
-                return server.GetAllEvents();
+                return server.GetAllForSender(user);
             }
             catch (Exception ex)
             {
@@ -151,6 +151,18 @@ namespace Client.ServerManager
             try
             {
                 server.HandleReconcilerSigning(Event);
+            }
+            catch
+            {
+                throw new ConnectionFailedException();
+            }
+        }
+
+        public void Update(BllEvent Event)
+        {
+            try
+            {
+                server.UpdateEvent(Event);
             }
             catch
             {

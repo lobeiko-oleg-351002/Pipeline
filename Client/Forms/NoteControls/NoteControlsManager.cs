@@ -50,6 +50,11 @@ namespace Client.Forms.NoteControls
             {
                 noteControls.ControllerSet.eventManager.SetEventNote(noteControls.Note.Text);
             }
+            if (noteControls.ControllerSet.client.GetUser().Group.Name == Globals.Globals.VED_GROUP)
+            {
+                noteControls.ControllerSet.SelectedEvent.EventData.CustomerNote = noteControls.Note.Text;
+                noteControls.ControllerSet.eventManager.UpdateEvent(noteControls.ControllerSet.SelectedEvent);
+            }
         }
 
         public void ClearNoteTextBox()

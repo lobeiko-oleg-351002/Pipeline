@@ -47,5 +47,23 @@ namespace DAL.Repositories
 
             return retElemets;       
         }
+
+        public IEnumerable<DalEvent> GetAllForSender(int user_id)
+        {
+            EventMapper mapper = new EventMapper();
+
+            var events = context.Set<Event>().Where(entity =>
+                        (entity.sender_id == user_id) //IsUserSender
+                );
+
+            var retElemets = new List<DalEvent>();
+
+            foreach (var item in events)
+            {
+                retElemets.Add(mapper.MapToDal(item));
+            }
+
+            return retElemets;
+        }
     }
 }

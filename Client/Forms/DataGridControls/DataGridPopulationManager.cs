@@ -54,7 +54,7 @@ namespace Client.Forms.DataGridControls
             grid.Columns.Add(CreateTextColumn(false, 0, COL_NOTE));
         }
 
-        public void AddRowToDataGridUsingEvent(UiEvent uiEvent)
+        public void AddRowToDataGridUsingEvent(UiEvent uiEvent, BllUser user)
         {
             DataGridViewRow row = new DataGridViewRow();
             row.CreateCells(grid);
@@ -72,7 +72,14 @@ namespace Client.Forms.DataGridControls
             row.Cells[ColumnIndicies[COL_DATE]].Value = Event.Date.ToString(DATE_FORMAT);
             row.Cells[ColumnIndicies[COL_TIME]].Value = Event.Date.ToString(TIME_FORMAT);
             row.Cells[ColumnIndicies[COL_DESCTIPTION]].Value = Event.Description;
-            row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.Note;
+            if (user.Group.Name == Globals.Globals.VED_GROUP)
+            {
+                row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.EventData.CustomerNote;
+            }
+            else
+            {
+                row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.Note;
+            }
             
             SetStatusInRow(row, Event);
             SetAttributeInRow(row, Event);
@@ -230,19 +237,19 @@ namespace Client.Forms.DataGridControls
             return clickedColumn;
         }
 
-        public void PopulateDataGrid(List<UiEvent> events)
+        public void PopulateDataGrid(List<UiEvent> events, BllUser user)
         {
             try
             {
                 grid.Rows.Clear();
                 foreach (var item in events)
                 {
-                    AddRowToDataGridUsingEvent(item);
+                    AddRowToDataGridUsingEvent(item, user);
                 }
             }
             catch
             {
-                PopulateDataGrid(events);
+                PopulateDataGrid(events, user);
             }
         }
 

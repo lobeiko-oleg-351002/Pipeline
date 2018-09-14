@@ -33,5 +33,7 @@ namespace DAL.Entities
         public bool? IsApproved { get; set; }
 
         public int? Reconciler_lib_id { get; set; }
+
+        public string CustomerNote { get; set; }
     }
 }

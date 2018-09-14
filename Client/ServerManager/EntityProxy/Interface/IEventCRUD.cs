@@ -11,7 +11,7 @@ namespace Client.ServerManager.Interface
         BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser sender);
         BllEvent UpdateStatusAndSendOutEvent(BllEvent Event, BllUser sender);
         List<BllEvent> GetEventsForUser(BllUser user);
-        List<BllEvent> GetAllEvents();
+        List<BllEvent> GetAllEventsForSender(BllUser user);
         BllEvent CreateAndSendOutEvent(BllEvent Event);
         void UpdateRecieversAndSendOnEvent(BllEvent Event, List<BllUser> newRecievers);
         void UpdateEventRecievers(BllEvent Event);
@@ -20,5 +20,6 @@ namespace Client.ServerManager.Interface
         void ApproveAndSendOutEvent(BllEvent Event);
         BllEvent CreateEventAndSendToReconcilers(BllEvent Event);
         void UpdateReconcilers(BllEvent Event);
+        void Update(BllEvent Event);
     }
 }

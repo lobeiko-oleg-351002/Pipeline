@@ -19,9 +19,6 @@ namespace ServerInterface
         List<BllUser> GetUsersByGroup(BllGroup group);
 
         [OperationContract]
-        List<BllEvent> GetAllEvents();
-
-        [OperationContract]
         List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
 
         [OperationContract]
@@ -46,10 +43,16 @@ namespace ServerInterface
         List<BllEvent> GetEventsForUser(BllUser user);
 
         [OperationContract]
+        List<BllEvent> GetAllForSender(BllUser user);
+
+        [OperationContract]
         string PingServer();
 
         [OperationContract(IsOneWay = true)]
         void UpdateEventRecievers(BllEvent Event);
+
+        [OperationContract(IsOneWay = true)]
+        void UpdateEvent(BllEvent Event);
 
         [OperationContract]
         DateTime GetDateTime();

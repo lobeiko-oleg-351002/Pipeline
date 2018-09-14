@@ -272,23 +272,23 @@ namespace Server
             }
         }
 
-        public List<BllEvent> GetAllEvents()
+        public List<BllEvent> GetAllForSender(BllUser user)
         {
             try
             {
-                LogWriter.WriteMessage("Trying to GetAllEvents", "", "");
+                LogWriter.WriteMessage("Trying to GetAllForSender", "", "");
                 using (ServiceDB serviceDB = new ServiceDB())
                 {
                     IUnitOfWork uow = new UnitOfWork(serviceDB);
                     IEventService eventService = new EventService(uow);
-                    var events = eventService.GetAll().ToList();
-                    LogWriter.WriteMessage("Returning All Events", "", "");
+                    var events = eventService.GetAllForSender(user).ToList();
+                    LogWriter.WriteMessage("Returning All Events For Sender", "", "");
                     return events;
                 }
             }
             catch (Exception ex)
             {
-                LogWriter.WriteMessage("GetAllEvents", ex.Message + ex.InnerException, "");
+                LogWriter.WriteMessage("GetAllForSender", ex.Message + ex.InnerException, "");
                 return null;
             }
         }
@@ -984,6 +984,16 @@ namespace Server
                 IUnitOfWork uow = new UnitOfWork(serviceDB);
                 IEventTypeService service = new EventTypeService(uow);
                 return service.Update(entity);
+            }
+        }
+
+        public void UpdateEvent(BllEvent Event)
+        {
+            using (ServiceDB serviceDB = new ServiceDB())
+            {
+                IUnitOfWork uow = new UnitOfWork(serviceDB);
+                IEventService service = new EventService(uow);
+                service.Update(Event);
             }
         }
         #endregion

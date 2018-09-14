@@ -239,7 +239,7 @@ namespace Client
         {
             if (e.Modifiers == Keys.Control && e.KeyCode == Keys.P)
             {
-                formControllerSet.eventManager.GetAllEvents();
+                formControllerSet.eventManager.GetAllEventsForSender(formControllerSet.client.GetUser());
             }
         }
     }

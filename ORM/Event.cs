@@ -39,6 +39,8 @@ namespace ORM
 
         public int? reconciler_lib_id { get; set; }
 
+        public string customerNote { get; set; }
+
         public virtual ReconcilerLib Reconcilers {get;set;}
 
         public virtual AttributeLib AttributeLib { get; set; }

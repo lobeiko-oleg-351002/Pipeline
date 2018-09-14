@@ -81,5 +81,16 @@ namespace BLL.Services
             }
             return result;
         }
+
+        public IEnumerable<BllEvent> GetAllForSender(BllUser user)
+        {
+            var events = uow.Events.GetAllForSender(user.Id);
+            List<BllEvent> result = new List<BllEvent>();
+            foreach (var item in events)
+            {
+                result.Add(mapper.MapToBll(item));
+            }
+            return result;
+        }
     }
 }

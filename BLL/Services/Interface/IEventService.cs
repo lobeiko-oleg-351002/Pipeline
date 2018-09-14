@@ -9,5 +9,6 @@ namespace BLL.Services.Interface
     public interface IEventService : IService<BllEvent>
     {
         IEnumerable<BllEvent> GetEventsForUser(BllUser user);
+        IEnumerable<BllEvent> GetAllForSender(BllUser user);
     }
 }

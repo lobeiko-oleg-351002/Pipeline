@@ -10,5 +10,6 @@ namespace DAL.Repositories.Interface
     public interface IEventRepository : IRepository<DalEvent, Event>
     {
         IEnumerable<DalEvent> GetEventsForUser(int user_id);
+        IEnumerable<DalEvent> GetAllForSender(int user_id);
     }
 }
