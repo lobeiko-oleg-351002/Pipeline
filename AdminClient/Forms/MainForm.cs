@@ -102,6 +102,7 @@ namespace AdminClient.Forms
             }).Start();
 
             label2.Text = server.GetClientVersion();
+            label3.Text = server.GetLauncherVersion();
         }
 
         private void PingServer()
@@ -189,6 +190,12 @@ namespace AdminClient.Forms
         public void ApproveEvent(BllEvent Event)
         {
             throw new NotImplementedException();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            server.SetLauncherVersion((Double.Parse(label3.Text) + 0.01).ToString());
+            label2.Text = server.GetLauncherVersion();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Client.ServerManager
 
         public GroupService(ServerInstance serverInstance)
         {
-            this.serverInstance = serverInstance;
+            this.serverInstance = serverInstance; 
         }
 
         public List<BllGroup> GetGroups()

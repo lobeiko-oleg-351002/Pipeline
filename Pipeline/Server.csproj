@@ -132,11 +132,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\ServiceDB.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Data\ServiceDB.mdf" />
     <Content Include="Data\ServiceDB_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>ServiceDB.mdf</DependentUpon>
     </Content>
   </ItemGroup>

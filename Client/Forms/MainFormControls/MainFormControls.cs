@@ -13,15 +13,17 @@ namespace Client.Forms.MainFormControls
         public readonly ToolStripMenuItem SendOnEventButton;
         public readonly ToolStripMenuItem ExitButton;
         public readonly ToolStripMenuItem SettingsButton;
+        public readonly IMessageBox MessageBox;
 
         public MainFormControls(ToolStripMenuItem createEventButton, ToolStripMenuItem deleteEventButton, 
-            ToolStripMenuItem sendOnEventButton, ToolStripMenuItem exitButton, ToolStripMenuItem settingsButton, IFormControllerSet set) : base(set)
+            ToolStripMenuItem sendOnEventButton, ToolStripMenuItem exitButton, ToolStripMenuItem settingsButton, IFormControllerSet set, IMessageBox messageBox) : base(set)
         {
             this.CreateEventButton = createEventButton;
             this.DeleteEventButton = deleteEventButton;
             this.ExitButton = exitButton;
             this.SendOnEventButton = sendOnEventButton;
             this.SettingsButton = settingsButton;
+            this.MessageBox = messageBox;
         }
     }
 }

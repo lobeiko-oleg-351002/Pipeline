@@ -11,8 +11,6 @@ E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterfaceForLauncher
 E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\ServerInterfaceForLauncher.pdb
 E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Pipeline.Properties.Resources.resources
 E:\Projects\Visual Studio\Pipeline\Pipeline\obj\Debug\Server.csproj.GenerateResource.Cache
-E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\Data\ServiceDB.mdf
-E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\Data\ServiceDB_log.ldf
 E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\BLL.dll
 E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\BllEntities.dll
 E:\Projects\Visual Studio\Pipeline\Pipeline\bin\Debug\DAL.dll

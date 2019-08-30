@@ -51,19 +51,33 @@ namespace Client.Forms.EventControls
 
         public void AddNewEvent(UiEvent Event)
         {
-            Events.Add(Event);
-            dataGridPopulationManager.AddRowToDataGridUsingEvent(Event, eventControls.ControllerSet.client.GetUser());
-            eventControls.ControllerSet.indication.IncNewEventsCount();
-            SortEventsUsingLastOrderFromCache();
+            try
+            {
+                Events.Add(Event);
+                dataGridPopulationManager.AddRowToDataGridUsingEvent(Event, eventControls.ControllerSet.client.GetUser());
+                eventControls.ControllerSet.indication.IncNewEventsCount();
+                SortEventsUsingLastOrderFromCache();
+            }
+            catch(Exception ex)
+            {
+                eventControls.ControllerSet.mainFormControlsManager.ShowMessage(ex.Message, "Ошибка");
+            }
         }
 
         public void SortEventsUsingLastOrderFromCache()
         {
-            string sortCol = AppConfigManager.GetKeyValue(Properties.Resources.TAG_SORT_NAME);
-            SortableColumn CurrentSorting = dataGridPopulationManager.GetSortingUsingColHeader(sortCol);
-            CurrentSorting.Direction = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_DIR);
-            CurrentSorting.Sort(Events);
-            dataGridPopulationManager.PopulateDataGrid(Events, eventControls.ControllerSet.client.GetUser());
+            try
+            {
+                string sortCol = AppConfigManager.GetKeyValue(Properties.Resources.TAG_SORT_NAME);
+                SortableColumn CurrentSorting = dataGridPopulationManager.GetSortingUsingColHeader(sortCol);
+                CurrentSorting.Direction = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_SORT_DIR);
+                CurrentSorting.Sort(Events);
+                dataGridPopulationManager.PopulateDataGrid(Events, eventControls.ControllerSet.client.GetUser());
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("SortEventsUsingLastOrderFromCache  " + ex.Message);
+            }
         }
 
         public void SortEventsUsingHeader(string header)

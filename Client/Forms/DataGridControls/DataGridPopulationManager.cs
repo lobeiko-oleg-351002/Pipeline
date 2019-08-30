@@ -56,43 +56,62 @@ namespace Client.Forms.DataGridControls
 
         public void AddRowToDataGridUsingEvent(UiEvent uiEvent, BllUser user)
         {
-            DataGridViewRow row = new DataGridViewRow();
-            row.CreateCells(grid);
-            row.DefaultCellStyle.Font = new Font("Tahoma", 9);
-
-            BllEvent Event = uiEvent.EventData;
-
-            row.Cells[ColumnIndicies[COL_SENDER]].Value = Event.Sender.Fullname;
-            HandleApprovedMark(row, Event);
-            if ((Event.IsApproved != null) && (Event.IsApproved.Value == false))
+            try
             {
-                SetDissaproveMark(row);
-            }  
-            row.Cells[ColumnIndicies[COL_TITLE]].Value = Event.Name;
-            row.Cells[ColumnIndicies[COL_DATE]].Value = Event.Date.ToString(DATE_FORMAT);
-            row.Cells[ColumnIndicies[COL_TIME]].Value = Event.Date.ToString(TIME_FORMAT);
-            row.Cells[ColumnIndicies[COL_DESCTIPTION]].Value = Event.Description;
-            if (user.Group.Name == Globals.Globals.VED_GROUP)
-            {
-                row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.EventData.CustomerNote;
+                DataGridViewRow row = new DataGridViewRow();
+                row.CreateCells(grid);
+                row.DefaultCellStyle.Font = new Font("Tahoma", 9);
+
+                BllEvent Event = uiEvent.EventData;
+
+                row.Cells[ColumnIndicies[COL_SENDER]].Value = Event.Sender.Fullname;
+                HandleApprovedMark(row, Event);
+                if ((Event.IsApproved != null) && (Event.IsApproved.Value == false))
+                {
+                    SetDissaproveMark(row);
+                }
+                row.Cells[ColumnIndicies[COL_TITLE]].Value = Event.Name;
+                row.Cells[ColumnIndicies[COL_DATE]].Value = Event.Date.ToString(DATE_FORMAT);
+                row.Cells[ColumnIndicies[COL_TIME]].Value = Event.Date.ToString(TIME_FORMAT);
+                row.Cells[ColumnIndicies[COL_DESCTIPTION]].Value = Event.Description;
+                if (user.Group != null)
+                {
+                    if (user.Group.Name == Globals.Globals.VED_GROUP)
+                    {
+                        row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.EventData.CustomerNote;
+                        uiEvent.Note = uiEvent.EventData.CustomerNote;
+                    }
+                    else
+                    {
+                        row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.Note;
+                    }
+                }
+                else
+                {
+                    if (user.Login == "ved2")
+                    {
+                        row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.EventData.CustomerNote;
+                        uiEvent.Note = uiEvent.EventData.CustomerNote;
+                    }
+                }
+
+                SetStatusInRow(row, Event);
+                SetAttributeInRow(row, Event);
+                SetFileCountInRow(row, Event);
+
+                uiEvent.SetRowStyle(row);
+
+                ParentFormControl.Invoke(new Action(() =>
+                {
+                    grid.Rows.Add(row);
+                }));
+
+                StatusStyleManager.SetStatusStyle(uiEvent, row);
             }
-            else
+            catch(Exception ex)
             {
-                row.Cells[ColumnIndicies[COL_NOTE]].Value = uiEvent.Note;
+                throw new Exception("AddRowToDataGridUsingEvent  " + ex.Message);
             }
-            
-            SetStatusInRow(row, Event);
-            SetAttributeInRow(row, Event);
-            SetFileCountInRow(row, Event);
-
-            uiEvent.SetRowStyle(row);
-
-            ParentFormControl.Invoke(new Action(() =>
-            {
-                grid.Rows.Add(row);
-            }));
-
-            StatusStyleManager.SetStatusStyle(uiEvent, row);
         }
 
 

@@ -40,7 +40,7 @@ using System.Xml.Serialization;
 
 namespace Client
 {
-    public partial class MainForm : ParentForm
+    public partial class MainForm : ParentForm, IMessageBox
     {
         public IFormControllerSet formControllerSet;
 
@@ -66,6 +66,7 @@ namespace Client
             {
                 InitControlManagers();
                 formControllerSet.client.Launch();
+                UpdateLauncher();
                 StatusesForOwner.Init(formControllerSet.client.GetServerInstance());
                 formControllerSet.eventManager.GetEventList();
                 formControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
@@ -138,7 +139,7 @@ namespace Client
         private void InitMainFormControls()
         {
             var mainFormControls = new MainFormControls(создатьСобытиеToolStripMenuItem1, удалитьСобытиеToolStripMenuItem, переслатьСобытиеToolStripMenuItem,
-                выходToolStripMenuItem, настройкиToolStripMenuItem, formControllerSet);
+                выходToolStripMenuItem, настройкиToolStripMenuItem, formControllerSet, this);
             formControllerSet.mainFormControlsManager = new MainFormControlsManager(mainFormControls);
         }
 
@@ -231,8 +232,15 @@ namespace Client
 
         private void печатьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PrintHandler printHandler = new PrintHandler(printDocument1);
-            printHandler.PrintDataGrid(dataGridView1);
+            try
+            {
+                PrintHandler printHandler = new PrintHandler(printDocument1);
+                printHandler.PrintDataGrid(dataGridView1);
+            }
+            catch(Exception ex)
+            {
+                ShowMessage(ex.Message, "Ошибка");
+            }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -241,6 +249,47 @@ namespace Client
             {
                 formControllerSet.eventManager.GetAllEventsForSender(formControllerSet.client.GetUser());
             }
+        }
+
+        private void UpdateLauncher()
+        {
+            try
+            {
+                const string LAUNCHER_VERSION = "LAUNCHER_VERSION";
+                string launcherVersionFromServer = formControllerSet.client.GetLauncherVersion();
+                string currentLauncherVersion = AppConfigManager.GetKeyValue(LAUNCHER_VERSION);
+
+                if ((launcherVersionFromServer != currentLauncherVersion) || (currentLauncherVersion == null))
+                {
+                    DownloadLauncher();
+                    AppConfigManager.SetKeyValue(LAUNCHER_VERSION, launcherVersionFromServer);
+                }
+            }
+            catch
+            {
+                ShowMessage("Нет соединения с сервером", "Ошибка");
+            }
+        }
+
+        private void DownloadLauncher()
+        {
+            string updatePath = formControllerSet.client.GetLauncherPath();
+            string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            CopyDirectory(updatePath, currentLocation);
+        }
+
+        private void CopyDirectory(string sourceLocation, string destinationLocation)
+        {
+            int fileCount = Directory.GetFiles(sourceLocation, "*.*", SearchOption.AllDirectories).Count();
+            foreach (string newPath in Directory.GetFiles(sourceLocation, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(newPath, newPath.Replace(sourceLocation, destinationLocation), true);
+            }
+        }
+
+        public void ShowMessage(string text, string title)
+        {
+            MessageBox.Show(text, title);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ServerInterface
         List<BllUser> GetUsersByGroup(BllGroup group);
 
         [OperationContract]
-        List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
+        List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group);
 
         [OperationContract]
         BllEvent CreateAndSendOutEvent(BllEvent Event);
@@ -29,6 +29,15 @@ namespace ServerInterface
         
         [OperationContract]
         string GetClientVersion();
+
+        [OperationContract]
+        void SetLauncherVersion(string version);
+
+        [OperationContract]
+        string GetLauncherVersion();
+
+        [OperationContract]
+        string GetLauncherPath();
 
         [OperationContract]
         BllEvent UpdateAcceptedUsersAndSendOutEvent(BllEvent Event, BllUser updater);

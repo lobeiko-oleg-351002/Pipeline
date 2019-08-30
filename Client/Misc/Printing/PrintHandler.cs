@@ -33,32 +33,39 @@ namespace Client.Misc.Printing
 
         public void PrintDataGrid(DataGridView dataGridView)
         {
-            dataGridView1 = dataGridView;
-            foreach(DataGridViewColumn col in dataGridView1.Columns)
+            try
             {
-                if (col.HeaderText == "Файлы")
+                dataGridView1 = dataGridView;
+                foreach (DataGridViewColumn col in dataGridView1.Columns)
                 {
-                    col.Visible = false;
-                    break;
+                    if (col.HeaderText == "Файлы")
+                    {
+                        col.Visible = false;
+                        break;
+                    }
                 }
-            }
-            PrintDialog printDialog = new PrintDialog();
-            printDialog.Document = printDocument1;
-            printDialog.UseEXDialog = true;
-            //Get the document
-            if (DialogResult.OK == printDialog.ShowDialog())
-            {
-                printDocument1.DocumentName = "EDOC";
-                printDocument1.Print();
-            }
+                PrintDialog printDialog = new PrintDialog();
+                printDialog.Document = printDocument1;
+                printDialog.UseEXDialog = true;
+                //Get the document
+                if (DialogResult.OK == printDialog.ShowDialog())
+                {
+                    printDocument1.DocumentName = "EDOC";
+                    printDocument1.Print();
+                }
 
-            foreach (DataGridViewColumn col in dataGridView1.Columns)
-            {
-                if (col.HeaderText == "Файлы")
+                foreach (DataGridViewColumn col in dataGridView1.Columns)
                 {
-                    col.Visible = true;
-                    break;
+                    if (col.HeaderText == "Файлы")
+                    {
+                        col.Visible = true;
+                        break;
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
 
         }

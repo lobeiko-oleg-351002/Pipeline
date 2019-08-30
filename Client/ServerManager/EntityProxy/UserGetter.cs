@@ -14,11 +14,11 @@ namespace Client.ServerManager
         {
         }
 
-        public List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays)
+        public List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group)
         {
             try
             {
-                return server.GetUsersByGroupAndSignInDateRange(group, permissibleRangeInDays);
+                return server.GetUsersByGroupAndSignInDateRange(group);
             }
             catch
             {

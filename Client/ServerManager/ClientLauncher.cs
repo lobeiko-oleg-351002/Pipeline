@@ -116,5 +116,15 @@ namespace Client.ServerManager
         {
             return authorization.User;
         }
+
+        public string GetLauncherVersion()
+        {
+            return serverInstance.server.GetLauncherVersion();
+        }
+
+        public string GetLauncherPath()
+        {
+            return serverInstance.server.GetLauncherPath();
+        }
     }
 }

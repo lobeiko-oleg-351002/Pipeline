@@ -30,7 +30,10 @@ namespace Server
         private static object locker = new object();
 
         private const string SERVER_STATE = "Online";
-        private const string TAG_VERSION = "CLIENT_VERSION";
+        private const string CLIENT_VERSION = "CLIENT_VERSION";
+        private const string LAUNCHER_VERSION = "LAUNCHER_VERSION";
+        private const string LAUNCHER_PATH = "LAUNCHER_PATH";
+        private const string TAG_DAYS_FOR_USER_LOGOUT = "DAYS_FOR_USER_LOGOUT";
 
         public DateTime GetDateTime()
         {
@@ -57,13 +60,13 @@ namespace Server
         public void SetClientVersion(string version)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            if (config.AppSettings.Settings[TAG_VERSION] != null)
+            if (config.AppSettings.Settings[CLIENT_VERSION] != null)
             {
-                config.AppSettings.Settings[TAG_VERSION].Value = version;
+                config.AppSettings.Settings[CLIENT_VERSION].Value = version;
             }
             else
             {
-                config.AppSettings.Settings.Add(TAG_VERSION, version);
+                config.AppSettings.Settings.Add(CLIENT_VERSION, version);
             }
             config.Save(ConfigurationSaveMode.Minimal);
         }
@@ -71,9 +74,38 @@ namespace Server
         public string GetClientVersion()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            if (config.AppSettings.Settings[TAG_VERSION] != null)
+            if (config.AppSettings.Settings[CLIENT_VERSION] != null)
             {
-                return config.AppSettings.Settings[TAG_VERSION].Value;
+                return config.AppSettings.Settings[CLIENT_VERSION].Value;
+            }
+            return null;
+        }
+
+        public string GetLauncherPath()
+        {
+            return ConfigurationManager.AppSettings[LAUNCHER_PATH];
+        }
+
+        public void SetLauncherVersion(string version)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings[LAUNCHER_VERSION] != null)
+            {
+                config.AppSettings.Settings[LAUNCHER_VERSION].Value = version;
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(LAUNCHER_VERSION, version);
+            }
+            config.Save(ConfigurationSaveMode.Minimal);
+        }
+
+        public string GetLauncherVersion()
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings[LAUNCHER_VERSION] != null)
+            {
+                return config.AppSettings.Settings[LAUNCHER_VERSION].Value;
             }
             return null;
         }
@@ -311,15 +343,16 @@ namespace Server
             }
         }
 
-        public List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays)
+        public List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group)
         {
             try
             {
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 using (ServiceDB serviceDB = new ServiceDB())
                 {
                     IUnitOfWork uow = new UnitOfWork(serviceDB);
                     IUserService userService = new UserService(uow);
-                    return userService.GetUsersByGroupAndSignInDateRange(group.Id, permissibleRangeInDays);
+                    return userService.GetUsersByGroupAndSignInDateRange(group.Id, int.Parse(config.AppSettings.Settings[TAG_DAYS_FOR_USER_LOGOUT].Value));
                 }
             }
             catch (Exception ex)
@@ -554,7 +587,6 @@ namespace Server
                 return Event;
             }
         }
-
 
 
         private void UpdateEventWithUsers(BllEvent Event, BllUser updater)

@@ -59,23 +59,5 @@ namespace Pipeline.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to \\\\192.168.2.100\\share\\ish\\Олег\\PipelineStorage.
-        /// </summary>
-        internal static string STORAGE_PATH {
-            get {
-                return ResourceManager.GetString("STORAGE_PATH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to \\\\192.168.2.100\\share\\ish\\Олег\\PipelineUpdate.
-        /// </summary>
-        internal static string UPDATE_PATH {
-            get {
-                return ResourceManager.GetString("UPDATE_PATH", resourceCulture);
-            }
-        }
     }
 }

@@ -46,15 +46,20 @@ namespace Client.Forms.NoteControls
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (!noteTextBoxChangesProgramatically)
+            try
             {
-                noteControls.ControllerSet.eventManager.SetEventNote(noteControls.Note.Text);
+                if (!noteTextBoxChangesProgramatically)
+                {
+                    noteControls.ControllerSet.eventManager.SetEventNote(noteControls.Note.Text);
+                }
+                if (noteControls.ControllerSet.client.GetUser().Group.Name == Globals.Globals.VED_GROUP)
+                {
+
+                    noteControls.ControllerSet.SelectedEvent.EventData.CustomerNote = noteControls.Note.Text;
+                    noteControls.ControllerSet.eventManager.UpdateEvent(noteControls.ControllerSet.SelectedEvent);
+                }
             }
-            if (noteControls.ControllerSet.client.GetUser().Group.Name == Globals.Globals.VED_GROUP)
-            {
-                noteControls.ControllerSet.SelectedEvent.EventData.CustomerNote = noteControls.Note.Text;
-                noteControls.ControllerSet.eventManager.UpdateEvent(noteControls.ControllerSet.SelectedEvent);
-            }
+            catch { }
         }
 
         public void ClearNoteTextBox()

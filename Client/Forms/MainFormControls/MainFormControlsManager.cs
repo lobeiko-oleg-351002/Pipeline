@@ -138,5 +138,10 @@ namespace Client.Forms.MainFormControls
                 sendOnEventForm.ShowDialog();
             }
         }
+
+        public void ShowMessage(string text, string title)
+        {
+            mainFormControls.MessageBox.ShowMessage(text, title);
+        }
     }
 }

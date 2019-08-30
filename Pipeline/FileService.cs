@@ -1,6 +1,7 @@
 ﻿using ServerInterface;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
@@ -11,9 +12,10 @@ namespace Server
     [ServiceBehavior(IncludeExceptionDetailInFaults = true, InstanceContextMode = InstanceContextMode.Single)]
     public class FileService : IFileService
     {
+        const string STORAGE_PATH = "STORAGE_PATH";
         public Stream GetFile(string virtualPath)
         {
-            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string storage = ConfigurationManager.AppSettings[STORAGE_PATH];
             string filePath = Path.Combine(storage, virtualPath);
 
             if (!File.Exists(filePath))
@@ -24,7 +26,7 @@ namespace Server
 
         public long GetFileSize(string path)
         {
-            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string storage = ConfigurationManager.AppSettings[STORAGE_PATH];
             string filePath = Path.Combine(storage, path);
 
             if (!File.Exists(filePath))
@@ -35,7 +37,7 @@ namespace Server
 
         public bool IsFileExists(string filename)
         {
-            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string storage = ConfigurationManager.AppSettings[STORAGE_PATH];
             string filePath = Path.Combine(storage, filename);
 
             if (File.Exists(filePath))
@@ -47,7 +49,7 @@ namespace Server
 
         public void PutFile(FileUploadMessage msg)
         {
-            string storage = Pipeline.Properties.Resources.ResourceManager.GetString("STORAGE_PATH");
+            string storage = ConfigurationManager.AppSettings[STORAGE_PATH];
             string fileFolder = Path.Combine(storage, msg.FolderName);
             string filePath = Path.Combine(fileFolder, msg.VirtualPath);
 

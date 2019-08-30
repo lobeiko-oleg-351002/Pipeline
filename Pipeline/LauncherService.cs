@@ -12,6 +12,7 @@ namespace Server
 
 
         private const string TAG_VERSION = "CLIENT_VERSION";
+        private const string UPDATE_PATH = "UPDATE_PATH";
 
         public string GetClientVersion()
         {
@@ -23,14 +24,9 @@ namespace Server
             return null;
         }
 
-
-
         public string GetUpdatePath()
         {
-            return Pipeline.Properties.Resources.ResourceManager.GetString("UPDATE_PATH");
+            return ConfigurationManager.AppSettings[UPDATE_PATH];
         }
-
-     
-
     }
 }

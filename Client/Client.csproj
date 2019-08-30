@@ -64,6 +64,7 @@
     <Compile Include="Forms\FormControllerSet.cs" />
     <Compile Include="Forms\IFormControllerSet.cs" />
     <Compile Include="Forms\FormControls.cs" />
+    <Compile Include="Forms\MainFormControls\IMessageBox.cs" />
     <Compile Include="Forms\MainFormControls\MainFormControls.cs" />
     <Compile Include="Forms\MainFormControls\MainFormControlsManager.cs" />
     <Compile Include="Forms\NoteControls\NoteControls.cs" />

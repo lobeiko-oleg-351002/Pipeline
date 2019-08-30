@@ -23,7 +23,7 @@ namespace Client.ServerManager
                 try
                 {
                     IUserGetter ug = new UserGetter(serverInstance.server);
-                    return ug.GetUsersByGroupAndSignInDateRange(group, int.Parse(Properties.Resources.PERMISSIBLE_DATE_RANGE_IN_DAYS));
+                    return ug.GetUsersByGroupAndSignInDateRange(group);
                 }
                 catch
                 {

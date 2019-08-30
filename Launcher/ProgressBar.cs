@@ -71,13 +71,6 @@ namespace Launcher
                 {
                     string updatePath = SourceChannel.GetUpdatePath();
                     var clientSettings = (config.GetSection(TAG_APPSETTINGS) as AppSettingsSection);
-                    string login = "";
-                    string password = "";
-                    if (clientSettings.Settings["login"] != null)
-                    {
-                        login = clientSettings.Settings["login"].Value;
-                        password = clientSettings.Settings["password"].Value;
-                    }
                         
                     CopyDirectory(updatePath, currentLocation);
                     map = new ExeConfigurationFileMap { ExeConfigFilename = currentLocation + "\\Client.exe.config" };
@@ -93,15 +86,17 @@ namespace Launcher
                     }
                     config.Save(ConfigurationSaveMode.Modified);
                 }
-                Process client = new Process();
-                client.StartInfo.FileName = currentLocation + "\\Client.exe";
-                client.Start();
-                Application.Exit();
-
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                Process client = new Process();
+                client.StartInfo.FileName = currentLocation + "\\Client.exe";
+                client.Start();
+                Application.Exit();
             }
 
 

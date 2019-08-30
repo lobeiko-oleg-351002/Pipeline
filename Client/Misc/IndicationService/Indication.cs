@@ -51,9 +51,16 @@ namespace Client.Misc
 
         public void IncNewEventsCount()
         {
-            NewEventsCount++;
-            IndicateMissedEventsAndStatuses();
-            turnInOutController.TurnOutWithEventFormIfHidden();
+            try
+            {
+                NewEventsCount++;
+                IndicateMissedEventsAndStatuses();
+                turnInOutController.TurnOutWithEventFormIfHidden();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("IncNewEventsCount  " + ex.Message);
+            }
         }
 
         public void DecNewEventsCount()

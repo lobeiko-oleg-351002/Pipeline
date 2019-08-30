@@ -8,7 +8,7 @@ namespace Client.ServerManager.Interface
 {
     public interface IUserGetter
     {
-        List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group, int permissibleRangeInDays);
+        List<BllUser> GetUsersByGroupAndSignInDateRange(BllGroup group);
         List<BllUser> GetApprovers();
         List<BllUser> GetReconcilers();
     }
