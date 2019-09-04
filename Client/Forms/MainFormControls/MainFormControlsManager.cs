@@ -53,14 +53,21 @@ namespace Client.Forms.MainFormControls
 
         private void удалитьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (mainFormControls.ControllerSet.dataGridControlsManager.GetSelectedRowIndex() >= 0)
+            try
             {
-                mainFormControls.ControllerSet.eventManager.RemoveEvent(mainFormControls.ControllerSet.dataGridControlsManager.GetSelectedRowIndex());
-                if (!mainFormControls.ControllerSet.dataGridControlsManager.IsAnyRowSelected())
+                if (mainFormControls.ControllerSet.dataGridControlsManager.GetSelectedRowIndex() >= 0)
                 {
-                    DisableDeleteEventButton();
-                    ClearDataControls();
+                    mainFormControls.ControllerSet.eventManager.RemoveEvent(mainFormControls.ControllerSet.dataGridControlsManager.GetSelectedRowIndex());
+                    if (!mainFormControls.ControllerSet.dataGridControlsManager.IsAnyRowSelected())
+                    {
+                        DisableDeleteEventButton();
+                        ClearDataControls();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("удалитьСобытиеToolStripMenuItem_Click", ex.Message, "");
             }
         }
 
@@ -79,19 +86,26 @@ namespace Client.Forms.MainFormControls
 
         private void создатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mainFormControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
-            if (mainFormControls.ControllerSet.client.isServerOnline)
+            try
             {
-                var createdEvent = GetNewEventUsingAddEventForm();
-                if (createdEvent != null)
+                mainFormControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
+                if (mainFormControls.ControllerSet.client.isServerOnline)
                 {
-                    mainFormControls.ControllerSet.eventManager.AddNewEventAndSerialize(createdEvent);
-                    if (mainFormControls.ControllerSet.dataGridControlsManager.IsAnyRowSelected() == false)
+                    var createdEvent = GetNewEventUsingAddEventForm();
+                    if (createdEvent != null)
                     {
-                        mainFormControls.ControllerSet.dataGridControlsManager.ClearSelection();
+                        mainFormControls.ControllerSet.eventManager.AddNewEventAndSerialize(createdEvent);
+                        if (mainFormControls.ControllerSet.dataGridControlsManager.IsAnyRowSelected() == false)
+                        {
+                            mainFormControls.ControllerSet.dataGridControlsManager.ClearSelection();
+                        }
                     }
+                    addEventForm = null;
                 }
-                addEventForm = null;
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("создатьСобытиеToolStripMenuItem_Click", ex.Message, "");
             }
         }
 
@@ -104,38 +118,52 @@ namespace Client.Forms.MainFormControls
 
         private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Settings settings = new Settings();
-            bool prevHideClosed = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
-            int prevHideAllowance = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
-            settings.ShowDialog();
-            if (prevHideClosed != AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
+            try
             {
-                if (prevHideClosed)
+                Settings settings = new Settings();
+                bool prevHideClosed = AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED);
+                int prevHideAllowance = AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE);
+                settings.ShowDialog();
+                if (prevHideClosed != AppConfigManager.GetBoolKeyValue(Properties.Resources.TAG_HIDE_CLOSED))
                 {
-                    mainFormControls.ControllerSet.eventManager.ShowClosedEvents();
+                    if (prevHideClosed)
+                    {
+                        mainFormControls.ControllerSet.eventManager.ShowClosedEvents();
+                    }
+                    else
+                    {
+                        mainFormControls.ControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
+                    }
                 }
                 else
                 {
-                    mainFormControls.ControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
+                    if (prevHideClosed && (prevHideAllowance != AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE)))
+                    {
+                        mainFormControls.ControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                if (prevHideClosed && (prevHideAllowance != AppConfigManager.GetIntKeyValue(Properties.Resources.TAG_HIDE_ALLOWANCE)))
-                {
-                    mainFormControls.ControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
-                }
+                LogWriter.WriteMessage("настройкиToolStripMenuItem_Click", ex.Message, "");
             }
         }
 
         private void переслатьСобытиеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mainFormControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
-            if (mainFormControls.ControllerSet.client.isServerOnline)
+            try
             {
-                SendOnEventForm sendOnEventForm = new SendOnEventForm(mainFormControls.ControllerSet.client.GetServerInstance(), 
-                    mainFormControls.ControllerSet.SelectedEvent.EventData, mainFormControls.ControllerSet.client.GetUser());
-                sendOnEventForm.ShowDialog();
+                mainFormControls.ControllerSet.client.PingServerAndIndicateHisStateOnControls();
+                if (mainFormControls.ControllerSet.client.isServerOnline)
+                {
+                    SendOnEventForm sendOnEventForm = new SendOnEventForm(mainFormControls.ControllerSet.client.GetServerInstance(),
+                        mainFormControls.ControllerSet.SelectedEvent.EventData, mainFormControls.ControllerSet.client.GetUser());
+                    sendOnEventForm.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("переслатьСобытиеToolStripMenuItem_Click", ex.Message, "");
             }
         }
 

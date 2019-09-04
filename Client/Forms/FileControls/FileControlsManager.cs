@@ -52,6 +52,7 @@ namespace Client.Forms.FileControls
                 }
                 catch (Exception ex)
                 {
+                    LogWriter.WriteMessage("listBoxFiles_DoubleClick", ex.Message, "");
                     MessageBox.Show(Properties.Resources.CANNOT_OPEN_FILE, filename);
                 }
             }

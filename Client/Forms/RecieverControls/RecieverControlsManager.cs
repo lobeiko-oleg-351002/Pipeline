@@ -295,13 +295,20 @@ namespace Client.Forms.RecieverControls
 
         private void button_Click(object sender, EventArgs e)
         {
-            if (recieverControls.Recieved.Checked)
+            try
             {
-                var Event = recieverControls.ControllerSet.SelectedEvent.EventData;
-                EventHelper.MarkRecieverInLib(Event.RecieverLib, recieverControls.ControllerSet.client.GetUser());
-                recieverControls.ControllerSet.eventManager.AdmitEventAsAcquainted();
-                AddRecieversAndReconcilersToChecklist(Event);
-                recieverControls.ControllerSet.statusControlsManager.EnableStatusControls();                
+                if (recieverControls.Recieved.Checked)
+                {
+                    var Event = recieverControls.ControllerSet.SelectedEvent.EventData;
+                    EventHelper.MarkRecieverInLib(Event.RecieverLib, recieverControls.ControllerSet.client.GetUser());
+                    recieverControls.ControllerSet.eventManager.AdmitEventAsAcquainted();
+                    AddRecieversAndReconcilersToChecklist(Event);
+                    recieverControls.ControllerSet.statusControlsManager.EnableStatusControls();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("buttonEventAcquainted", ex.Message, "");
             }
         }
 

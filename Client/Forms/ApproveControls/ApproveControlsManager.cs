@@ -22,13 +22,20 @@ namespace Client.Forms.ApproveControls
 
         private void button_Click(object sender, EventArgs e)
         {
-            HideApproveControls();
-            var SelectedEvent = approveControls.ControllerSet.eventManager.SelectedEvent;
-            HandleApproveCheck(SelectedEvent);
-            HandleDisapproveCheck(SelectedEvent);
-            AcquaintSelectedUserInSelectedEvent(SelectedEvent);
-            approveControls.ControllerSet.eventManager.AdmitEventAsApproved();
-            approveControls.ControllerSet.statusControlsManager.EnableStatusControls();
+            try
+            {
+                HideApproveControls();
+                var SelectedEvent = approveControls.ControllerSet.eventManager.SelectedEvent;
+                HandleApproveCheck(SelectedEvent);
+                HandleDisapproveCheck(SelectedEvent);
+                AcquaintSelectedUserInSelectedEvent(SelectedEvent);
+                approveControls.ControllerSet.eventManager.AdmitEventAsApproved();
+                approveControls.ControllerSet.statusControlsManager.EnableStatusControls();
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("ClickApprove", ex.Message, "");
+            }
         }
 
         private void HandleApproveCheck(UiEvent SelectedEvent)

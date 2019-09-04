@@ -85,6 +85,7 @@
     <Compile Include="Misc\FileService\FilePathMap.cs" />
     <Compile Include="Misc\IndicationService\IconSet.cs" />
     <Compile Include="Misc\IndicationService\TrayIconController.cs" />
+    <Compile Include="Misc\LogManager.cs" />
     <Compile Include="Misc\Printing\PrintHandler.cs" />
     <Compile Include="Misc\Serialization\EventSerializer.cs" />
     <Compile Include="Misc\Serialization\Serializer.cs" />

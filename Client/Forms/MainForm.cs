@@ -170,10 +170,17 @@ namespace Client
         private void AddAppShortcutToStartup()
         {
             const string launcher = "Launcher.exe";
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            try
             {
-                string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + currentLocation + "\\" + launcher + "\"");
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+                {
+                    string currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    key.SetValue(Properties.Resources.CLIENT_NAME, "\"" + currentLocation + "\\" + launcher + "\"");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("AddAppShortcutToStartup", ex.Message, "");
             }
         }
 

@@ -68,15 +68,22 @@ namespace Client.Forms.DataGridControls
 
         public void UpdateSelectedEvent(BllEvent source, int rowNum)
         {
-            dataGridPopulationManager.ClearApprovedColumn(rowNum);
-            if (dataGridControls.DataGrid.SelectedRows.Count > 0)
+            try
             {
-                if (GetSelectedRowIndex() == rowNum)
+                dataGridPopulationManager.ClearApprovedColumn(rowNum);
+                if (dataGridControls.DataGrid.SelectedRows.Count > 0)
                 {
-                    dataGridControls.ControllerSet.statusControlsManager.PopulateStatusDataGridUsingStatusLib(source.StatusLib);
-                    dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers(rowNum);
-                    HandleStatusChanging();
+                    if (GetSelectedRowIndex() == rowNum)
+                    {
+                        dataGridControls.ControllerSet.statusControlsManager.PopulateStatusDataGridUsingStatusLib(source.StatusLib);
+                        dataGridControls.ControllerSet.recieverControlsManager.HandleDisplayingRecievers(rowNum);
+                        HandleStatusChanging();
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -99,8 +106,15 @@ namespace Client.Forms.DataGridControls
 
         public void SetApproverToRow(int rowNum)
         {
-            var row = dataGridControls.DataGrid.Rows[rowNum];
-            dataGridPopulationManager.SetApproverToRow(row, dataGridControls.ControllerSet.eventManager.GetEventByRowNum(rowNum).EventData.Approver.Fullname);
+            try
+            {
+                var row = dataGridControls.DataGrid.Rows[rowNum];
+                dataGridPopulationManager.SetApproverToRow(row, dataGridControls.ControllerSet.eventManager.GetEventByRowNum(rowNum).EventData.Approver.Fullname);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void SetApproverToSelectedRow()
