@@ -19,6 +19,7 @@ namespace Client.Forms.MainFormControls
             mainFormControls.CreateEventButton.Click += создатьСобытиеToolStripMenuItem_Click;
             mainFormControls.SettingsButton.Click += настройкиToolStripMenuItem_Click;
             mainFormControls.SendOnEventButton.Click += переслатьСобытиеToolStripMenuItem_Click;
+            mainFormControls.RefreshButton.Click += обновитьToolStripMenuItem_Click;
         }
 
         public void EnableSendOnEventButton()
@@ -164,6 +165,20 @@ namespace Client.Forms.MainFormControls
             catch (Exception ex)
             {
                 LogWriter.WriteMessage("переслатьСобытиеToolStripMenuItem_Click", ex.Message, "");
+            }
+        }
+
+        private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                mainFormControls.ControllerSet.eventManager.Events.Clear();
+                mainFormControls.ControllerSet.eventManager.GetEventList();
+                mainFormControls.ControllerSet.eventManager.HideClosedEventsAccordingToConfigValue();
+            }
+            catch (Exception ex)
+            {
+                LogWriter.WriteMessage("обновитьToolStripMenuItem_Click", ex.Message, "");
             }
         }
 

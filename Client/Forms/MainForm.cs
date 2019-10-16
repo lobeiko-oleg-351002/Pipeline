@@ -138,7 +138,7 @@ namespace Client
 
         private void InitMainFormControls()
         {
-            var mainFormControls = new MainFormControls(создатьСобытиеToolStripMenuItem1, удалитьСобытиеToolStripMenuItem, переслатьСобытиеToolStripMenuItem,
+            var mainFormControls = new MainFormControls(обновитьToolStripMenuItem, создатьСобытиеToolStripMenuItem1, удалитьСобытиеToolStripMenuItem, переслатьСобытиеToolStripMenuItem,
                 выходToolStripMenuItem, настройкиToolStripMenuItem, formControllerSet, this);
             formControllerSet.mainFormControlsManager = new MainFormControlsManager(mainFormControls);
         }

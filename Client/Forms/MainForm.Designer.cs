@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.обновитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.создатьСобытиеToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.переслатьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.удалитьСобытиеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,6 +87,7 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.обновитьToolStripMenuItem,
             this.создатьСобытиеToolStripMenuItem1,
             this.переслатьСобытиеToolStripMenuItem,
             this.удалитьСобытиеToolStripMenuItem,
@@ -97,6 +99,13 @@
             this.menuStrip1.Size = new System.Drawing.Size(1014, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // обновитьToolStripMenuItem
+            // 
+            this.обновитьToolStripMenuItem.BackColor = System.Drawing.Color.Khaki;
+            this.обновитьToolStripMenuItem.Name = "обновитьToolStripMenuItem";
+            this.обновитьToolStripMenuItem.Size = new System.Drawing.Size(73, 20);
+            this.обновитьToolStripMenuItem.Text = "Обновить";
             // 
             // создатьСобытиеToolStripMenuItem1
             // 
@@ -291,7 +300,7 @@
             this.label9.AutoSize = true;
             this.label9.BackColor = System.Drawing.Color.WhiteSmoke;
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label9.Location = new System.Drawing.Point(563, 2);
+            this.label9.Location = new System.Drawing.Point(647, 2);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(121, 20);
             this.label9.TabIndex = 24;
@@ -648,6 +657,7 @@
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.ToolStripMenuItem печатьToolStripMenuItem;
         private System.Drawing.Printing.PrintDocument printDocument1;
+        private System.Windows.Forms.ToolStripMenuItem обновитьToolStripMenuItem;
     }
 }
 

@@ -52,7 +52,7 @@ namespace Client.Forms.EventControls
             }
             catch (Exception ex)
             {
-                LogWriter.WriteMessage("UpdateEvent", ex.Message, "");
+                LogWriter.WriteMessage("UpdateEvent", ex.Message, Event.EventData.Name);
                 throw ex;
             }
         }
@@ -209,7 +209,7 @@ namespace Client.Forms.EventControls
             }
             catch(Exception ex) 
             {
-                LogWriter.WriteMessage("DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent", ex.Message, "");
+                LogWriter.WriteMessage("DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent", ex.Message, currentEvent.EventData.Name);
             }
             try
             {
@@ -219,7 +219,7 @@ namespace Client.Forms.EventControls
             }
             catch(Exception ex) 
             {
-                LogWriter.WriteMessage("DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent", ex.Message, "");
+                LogWriter.WriteMessage("DeleteCurrentUserFromRecieversAndReconcilersAndUpdateEvent", ex.Message, currentEvent.EventData.Name);
             }           
         }
 
@@ -413,7 +413,7 @@ namespace Client.Forms.EventControls
             }
             catch (Exception ex)
             {
-                LogWriter.WriteMessage("UpdateCachedEventUsingEventFromServer", ex.Message, "");
+                LogWriter.WriteMessage("UpdateCachedEventUsingEventFromServer", ex.Message, serverEvent.EventData.Name);
             }
             serverEvent = EventHelper.CreateEventAccordingToStatusOrUser(serverEvent, eventControls.ControllerSet.client.GetUser());
         }
